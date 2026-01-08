@@ -66,7 +66,21 @@
                 <h1 class="text-3xl font-bold text-slate-800 tracking-tight">@yield('header')</h1>
                 <p class="text-gray-500 text-sm mt-1">@yield('subheader', 'Manage your barber shop.')</p>
              </div>
+             <div class="mt-4 md:mt-0 text-right">
+                <div id="live-clock" class="text-2xl font-bold text-slate-700 tracking-wider">00:00:00</div>
+                <div id="live-date" class="text-xs font-semibold text-slate-400 uppercase tracking-widest">{{ now()->format('l, F j') }}</div>
+             </div>
         </div>
+
+        <script>
+            function updateClock() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('live-clock').textContent = timeStr;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+        </script>
 
         @if(session('success'))
             <div id="alert-3" class="flex items-center p-4 mb-4 text-green-800 rounded-lg bg-green-50 border border-green-200 shadow-sm" role="alert">

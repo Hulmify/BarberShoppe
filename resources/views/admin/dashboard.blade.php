@@ -58,7 +58,6 @@
 <div class="w-full bg-white border border-gray-200 rounded-xl shadow-sm mb-8 overflow-hidden">
     <div class="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50">
         <h5 class="text-lg font-bold text-slate-800">Today's Schedule</h5>
-        <span class="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">{{ now()->toFormattedDateString() }}</span>
     </div>
 
     @if($todaysBookings->isEmpty())
