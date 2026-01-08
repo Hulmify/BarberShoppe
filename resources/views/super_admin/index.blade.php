@@ -10,7 +10,7 @@
         body { font-family: 'Outfit', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-800 text-slate-200 min-h-screen">
+<body class="bg-slate-950  text-slate-200 min-h-screen">
 
     <nav class="bg-slate-950 border-b border-slate-700 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -76,8 +76,8 @@
                                     @csrf
                                     <input type="datetime-local" name="trial_ends_at" required 
                                            value="{{ $user->trial_ends_at ? $user->trial_ends_at->format('Y-m-d\TH:i') : '' }}"
-                                           class="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-1.5 focus:ring-amber-500 focus:border-amber-500 p-4">
-                                    <button type="submit" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-1.5 px-3 rounded transition-colors p-4">
+                                           class="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-1.5 focus:ring-amber-500 focus:border-amber-500">
+                                    <button type="submit" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-1.5 px-3 rounded transition-colors">
                                         Update
                                     </button>
                                 </form>
