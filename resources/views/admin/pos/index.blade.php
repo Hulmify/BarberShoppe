@@ -117,8 +117,8 @@
                         <select id="time" name="time" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" required>
                             <option value="">-- Select Time --</option>
                             @php
-                                $start = \Carbon\Carbon::createFromTime(9, 0);
-                                $end = \Carbon\Carbon::createFromTime(19, 0);
+                                $start = \Carbon\Carbon::createFromTime(0, 0);
+                                $end = \Carbon\Carbon::createFromTime(23, 45);
                             @endphp
                             @while($start->lte($end))
                                 <option value="{{ $start->format('H:i') }}">{{ $start->format('h:i A') }}</option>

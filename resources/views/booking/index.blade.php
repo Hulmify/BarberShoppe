@@ -370,6 +370,15 @@
             }
         }
 
+        function formatTime12h(timeStr) {
+            const [hours, minutes] = timeStr.split(':');
+            let h = parseInt(hours);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            h = h ? h : 12;
+            return h + ':' + minutes + ' ' + ampm;
+        }
+
         async function fetchSlots() {
             const date = document.getElementById('dateInput').value;
             if (!date) return;
@@ -393,7 +402,7 @@
                     data.slots.forEach(time => {
                         const div = document.createElement('div');
                         div.className = 'py-3 px-2 text-center bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer text-sm font-semibold transition-colors border border-transparent';
-                        div.textContent = time;
+                        div.textContent = formatTime12h(time);
                         div.onclick = () => selectTime(div, time);
                         container.appendChild(div);
                     });

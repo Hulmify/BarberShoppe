@@ -74,8 +74,8 @@ class BookingController extends Controller
         $duration = (int) $request->input('duration', 30); // minutes
         $stylistId = $request->input('stylist_id'); // Optional stylist filter
         
-        $start = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->start_time);
-        $end = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->end_time);
+        $start = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->start_time, $tz);
+        $end = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->end_time, $tz);
         
         // Get existing bookings
         $allBookings = $shop->bookings()
@@ -88,7 +88,7 @@ class BookingController extends Controller
 
         $slots = [];
         
-        $now = Carbon::now();
+        $now = Carbon::now($tz);
         
         while ($start->copy()->addMinutes($duration)->lte($end)) {
             $slotEnd = $start->copy()->addMinutes($duration);

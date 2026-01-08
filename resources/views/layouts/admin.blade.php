@@ -80,7 +80,12 @@
                 @endif
                 <div>
                     <div id="live-clock" class="text-2xl font-bold text-slate-700 tracking-wider">00:00:00</div>
-                    <div id="live-date" class="text-xs font-semibold text-slate-400 uppercase tracking-widest">{{ now()->format('l, F j') }}</div>
+                    <div class="flex items-center justify-end gap-2">
+                        <span id="live-timezone" class="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 uppercase">{{ auth()->user()->shop->timezone ?? config('app.timezone') }}</span>
+                        <div id="live-date" class="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                            {{ \Carbon\Carbon::now(auth()->user()->shop->timezone ?? config('app.timezone'))->format('l, F j') }}
+                        </div>
+                    </div>
                 </div>
              </div>
         </div>
@@ -88,7 +93,14 @@
         <script>
             function updateClock() {
                 const now = new Date();
-                const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const options = { 
+                    hour12: true, 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    timeZone: "{{ auth()->user()->shop->timezone ?? config('app.timezone') }}"
+                };
+                const timeStr = now.toLocaleTimeString('en-US', options);
                 document.getElementById('live-clock').textContent = timeStr;
             }
             setInterval(updateClock, 1000);

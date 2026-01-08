@@ -82,56 +82,181 @@
             <p class="text-slate-500 text-sm mt-1">Accept bookings to fill up your schedule.</p>
         </div>
     @else
-        <div class="relative overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-100">
-                    <tr>
-                        <th scope="col" class="px-6 py-4">Time</th>
-                        <th scope="col" class="px-6 py-4">Customer</th>
-                        <th scope="col" class="px-6 py-4">Services</th>
-                        <th scope="col" class="px-6 py-4">Price</th>
-                        <th scope="col" class="px-6 py-4">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($todaysBookings as $booking)
-                    <tr class="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 font-bold text-slate-800 text-base">
-                            {{ $booking->start_time->format('h:i A') }}
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-slate-800">{{ $booking->customer->name }}</div>
-                            <div class="text-xs text-gray-500">{{ $booking->customer->email }}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($booking->items as $item)
-                                    <span class="bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-0.5 rounded border border-slate-200">
-                                        {{ $item->service->name }}
-                                    </span>
-                                @endforeach
+        <div class="p-6 space-y-8">
+            <!-- Ongoing Bookings Section -->
+            @if($ongoingBookings->isNotEmpty())
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                    <h6 class="text-sm font-black uppercase tracking-[0.2em] text-red-600">Live Now</h6>
+                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    @foreach($ongoingBookings as $booking)
+                        <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-all">
+                            <div class="flex items-center gap-5 w-full md:w-auto">
+                                <div class="bg-amber-400 text-white font-black px-4 py-2 rounded-xl text-center shadow-inner">
+                                    <div class="text-xs uppercase tracking-tighter opacity-80">Started</div>
+                                    <div class="text-lg">{{ $booking->start_time->format('h:i A') }}</div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-xs font-bold text-amber-700 uppercase mb-0.5">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
+                                    <h4 class="text-xl font-black text-slate-900 leading-tight">{{ $booking->customer->name }}</h4>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        @foreach($booking->items as $item)
+                                            <span class="text-[10px] font-bold bg-white/60 text-amber-800 px-2 py-0.5 rounded border border-amber-300 uppercase tracking-tighter">{{ $item->service->name }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 font-bold text-slate-800">
-                            {{ $shop->currency ?? '$' }} {{ number_format($booking->total_price, 2) }}
-                        </td>
-                        <td class="px-6 py-4">
-                            @php
-                                $statusClass = match($booking->status) {
-                                    'confirmed' => 'bg-green-100 text-green-700 border border-green-200',
-                                    'cancelled' => 'bg-red-100 text-red-700 border border-red-200',
-                                    'pending' => 'bg-amber-100 text-amber-700 border border-amber-200',
-                                    default => 'bg-gray-100 text-gray-700 border border-gray-200'
-                                };
-                            @endphp
-                            <span class="{{ $statusClass }} text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                                {{ $booking->status }}
-                            </span>
-                        </td>
-                    </tr>
+                            <div class="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
+                                <div class="text-right mr-4 hidden md:block">
+                                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Pricing</div>
+                                    <div class="text-xl font-black text-slate-900">{{ $shop->currency ?? '$' }}{{ number_format($booking->total_price, 2) }}</div>
+                                </div>
+                                <div class="flex items-center gap-2 flex-1 md:flex-initial">
+                                    <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="flex-1 md:flex-initial">
+                                        @csrf @method('PUT')
+                                        <input type="hidden" name="status" value="completed">
+                                        <button type="submit" class="w-full bg-slate-900 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-slate-800 transition-all shadow-sm flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            Complete Visit
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.appointments.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Permanently delete this appointment? This action cannot be undone.');">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="p-2.5 text-red-600 bg-red-50 rounded-xl hover:bg-red-100 border border-red-200 transition-colors" title="Delete Permanently">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     @endforeach
-                </tbody>
-            </table>
+                </div>
+            </div>
+            @endif
+
+            <!-- Upcoming Bookings Section -->
+            @if($upcomingBookings->isNotEmpty())
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <h6 class="text-sm font-black uppercase tracking-[0.2em] text-blue-600">Coming Up Next</h6>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] border-b border-gray-100">
+                            <tr>
+                                <th class="px-6 py-4">Time Slot</th>
+                                <th class="px-6 py-4">Customer</th>
+                                <th class="px-6 py-4">Service & Duration</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @foreach($upcomingBookings as $booking)
+                            <tr class="hover:bg-blue-50/30 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="text-base font-black text-slate-900">{{ $booking->start_time->format('h:i A') }}</div>
+                                    <div class="text-[10px] font-bold text-blue-500 uppercase">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="font-bold text-slate-800">{{ $booking->customer->name }}</div>
+                                    <div class="text-[10px] text-slate-400 font-medium">
+                                        {{ $booking->customer->phone }} 
+                                        <span class="mx-1 text-slate-300">•</span> 
+                                        Booked: {{ $booking->created_at->setTimezone($tz)->format('h:i A') }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach($booking->items as $item)
+                                            <span class="text-[10px] font-bold text-slate-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200">
+                                                {{ $item->service->name }} ({{ $item->service->duration_minutes }}m)
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @php
+                                        $sStyle = match($booking->status) {
+                                            'pending' => 'bg-amber-100 text-amber-700',
+                                            'confirmed' => 'bg-green-100 text-green-700',
+                                            default => 'bg-gray-100 text-gray-700'
+                                        };
+                                    @endphp
+                                    <span class="px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest {{ $sStyle }}">{{ $booking->status }}</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        @if($booking->status == 'pending')
+                                            <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST">
+                                                @csrf @method('PUT')
+                                                <input type="hidden" name="status" value="confirmed">
+                                                <button title="Confirm Visit" class="p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 border border-green-200">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" onsubmit="return confirm('Cancel this appointment?');">
+                                            @csrf @method('PUT')
+                                            <input type="hidden" name="status" value="cancelled">
+                                            <button title="Cancel Visit" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.appointments.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Permanently delete this appointment? This action cannot be undone.');">
+                                            @csrf @method('DELETE')
+                                            <button title="Delete Permanently" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @endif
+
+            <!-- Past Bookings Section -->
+            @if($pastBookings->isNotEmpty())
+            <div class="opacity-75 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 transition-all">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+                    <h6 class="text-sm font-black uppercase tracking-[0.2em] text-gray-500">Completed or Past Today</h6>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
+                    <table class="w-full text-sm text-left">
+                        <tbody class="divide-y divide-gray-200">
+                            @foreach($pastBookings as $booking)
+                            <tr>
+                                <td class="px-6 py-3 w-32 font-bold text-gray-500">{{ $booking->start_time->format('h:i A') }}</td>
+                                <td class="px-6 py-3 font-semibold text-gray-600">{{ $booking->customer->name }}</td>
+                                <td class="px-6 py-3 text-right">
+                                    <div class="flex items-center justify-end gap-3">
+                                        <span class="px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest {{ $booking->status == 'completed' ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600' }}">{{ $booking->status }}</span>
+                                        <form action="{{ route('admin.appointments.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Permanently delete this appointment? This action cannot be undone.');">
+                                            @csrf @method('DELETE')
+                                            <button title="Delete Permanently" class="text-red-400 hover:text-red-600 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @endif
         </div>
     @endif
 </div>

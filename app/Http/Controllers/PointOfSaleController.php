@@ -58,7 +58,7 @@ class PointOfSaleController extends Controller
         if ($request->customer_type === 'new') {
             $customer = Customer::updateOrCreate(
                 ['phone' => $request->new_customer_phone],
-                ['name' => $request->new_customer_name, 'email' => $request->new_customer_email, 'password' => bcrypt('password')] 
+                ['name' => $request->new_customer_name, 'email' => $request->new_customer_email] 
             );
         } else {
             $customer = Customer::findOrFail($request->customer_id);

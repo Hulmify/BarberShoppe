@@ -33,21 +33,33 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-4 transition-opacity duration-200" id="hours_{{ $avail->day_of_week }}" style="{{ $avail->is_active ? '' : 'opacity: 0.5; pointer-events: none;' }}">
                                     <div class="relative flex-1 max-w-[150px]">
-                                        <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </div>
-                                        <input type="time" id="start_{{ $avail->day_of_week }}" name="schedule[{{ $avail->day_of_week }}][start_time]" value="{{ \Carbon\Carbon::parse($avail->start_time)->format('H:i') }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" required>
+                                        <select id="start_{{ $avail->day_of_week }}" name="schedule[{{ $avail->day_of_week }}][start_time]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" required>
+                                            @php
+                                                $sTime = \Carbon\Carbon::createFromTime(0, 0);
+                                                $currentStart = \Carbon\Carbon::parse($avail->start_time)->format('H:i');
+                                            @endphp
+                                            @for($i = 0; $i < 96; $i++)
+                                                <option value="{{ $sTime->format('H:i') }}" {{ $currentStart == $sTime->format('H:i') ? 'selected' : '' }}>
+                                                    {{ $sTime->format('h:i A') }}
+                                                </option>
+                                                @php $sTime->addMinutes(15); @endphp
+                                            @endfor
+                                        </select>
                                     </div>
                                     <span class="text-slate-400 font-medium">to</span>
                                     <div class="relative flex-1 max-w-[150px]">
-                                        <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </div>
-                                        <input type="time" id="end_{{ $avail->day_of_week }}" name="schedule[{{ $avail->day_of_week }}][end_time]" value="{{ \Carbon\Carbon::parse($avail->end_time)->format('H:i') }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" required>
+                                        <select id="end_{{ $avail->day_of_week }}" name="schedule[{{ $avail->day_of_week }}][end_time]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" required>
+                                            @php
+                                                $eTime = \Carbon\Carbon::createFromTime(0, 0);
+                                                $currentEnd = \Carbon\Carbon::parse($avail->end_time)->format('H:i');
+                                            @endphp
+                                            @for($i = 0; $i < 96; $i++)
+                                                <option value="{{ $eTime->format('H:i') }}" {{ $currentEnd == $eTime->format('H:i') ? 'selected' : '' }}>
+                                                    {{ $eTime->format('h:i A') }}
+                                                </option>
+                                                @php $eTime->addMinutes(15); @endphp
+                                            @endfor
+                                        </select>
                                     </div>
                                 </div>
                             </td>

@@ -19,16 +19,43 @@ class AdminController extends Controller
         }
 
         $tz = $shop->timezone ?? config('app.timezone');
-        $now = Carbon::now($tz);
+        config(['app.timezone' => $tz]);
+        date_default_timezone_set($tz);
+        
+        $now = Carbon::now();
 
-        $todaysBookings = $shop->bookings()
-            ->whereDate('start_time', $now->toDateString())
-            ->orderBy('start_time')
+        // Fetch bookings for the local 'Today' by calculating UTC boundaries
+        $startOfDay = $now->copy()->startOfDay()->setTimezone('UTC');
+        $endOfDay = $now->copy()->endOfDay()->setTimezone('UTC');
+
+        $allTodaysBookings = $shop->bookings()
+            ->whereBetween('start_time', [$startOfDay, $endOfDay])
+            ->with(['customer', 'items.service'])
             ->get();
+
+        // Shift all bookings to the shop's timezone for accurate display and diffs
+        $allTodaysBookings->each(function($b) use ($tz) {
+            $b->start_time->setTimezone($tz);
+            $b->end_time->setTimezone($tz);
+        });
+
+        $ongoingBookings = $allTodaysBookings->filter(function($b) use ($now) {
+            return $now->between($b->start_time, $b->end_time);
+        })->sortBy('start_time');
+
+        $upcomingBookings = $allTodaysBookings->filter(function($b) use ($now) {
+            return $b->start_time->gt($now);
+        })->sortBy('start_time');
+
+        $pastBookings = $allTodaysBookings->filter(function($b) use ($now) {
+            return $b->end_time->lt($now);
+        })->sortByDesc('start_time');
+
+        $todaysBookings = $ongoingBookings->concat($upcomingBookings)->concat($pastBookings);
             
         // Stats
-        $startOfWeek = $now->copy()->startOfWeek();
-        $endOfWeek = $now->copy()->endOfWeek();
+        $startOfWeek = $now->copy()->startOfWeek()->setTimezone('UTC');
+        $endOfWeek = $now->copy()->endOfWeek()->setTimezone('UTC');
         
         $weekRevenue = $shop->bookings()
             ->whereBetween('start_time', [$startOfWeek, $endOfWeek])
@@ -44,7 +71,18 @@ class AdminController extends Controller
              $q->where('shop_id', $shop->id);
         })->count();
 
-        return view('admin.dashboard', compact('shop', 'todaysBookings', 'weekRevenue', 'potentialRevenue', 'totalCustomers'));
+        return view('admin.dashboard', compact(
+            'shop', 
+            'todaysBookings', 
+            'ongoingBookings', 
+            'upcomingBookings', 
+            'pastBookings', 
+            'weekRevenue', 
+            'potentialRevenue', 
+            'totalCustomers', 
+            'now',
+            'tz'
+        ));
     }
 
     public function editShop()
