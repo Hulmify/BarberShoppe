@@ -34,20 +34,12 @@ class SuperAdminController extends Controller
 
     public function index()
     {
-        if (!Session::get('super_admin_authenticated')) {
-            return redirect()->route('super_admin.login');
-        }
-
         $users = User::where('role', 'barber')->get();
         return view('super_admin.index', compact('users'));
     }
 
     public function updateExpiry(Request $request, User $user)
     {
-        if (!Session::get('super_admin_authenticated')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
         $request->validate([
             'trial_ends_at' => 'required|date'
         ]);
@@ -57,5 +49,18 @@ class SuperAdminController extends Controller
         ]);
 
         return back()->with('success', "Expiry date updated for {$user->name}");
+    }
+
+    public function changePassword(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => 'required|min:8'
+        ]);
+
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password)
+        ]);
+
+        return back()->with('success', "Password updated for {$user->name}");
     }
 }

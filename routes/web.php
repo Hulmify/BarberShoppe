@@ -90,6 +90,7 @@ Route::prefix('super-admin')->name('super_admin.')->group(function () {
     Route::middleware([\App\Http\Middleware\SuperAdminAuth::class])->group(function () {
         Route::get('/', [App\Http\Controllers\SuperAdminController::class, 'index'])->name('index');
         Route::post('/users/{user}/update-expiry', [App\Http\Controllers\SuperAdminController::class, 'updateExpiry'])->name('update_expiry');
+        Route::post('/users/{user}/change-password', [App\Http\Controllers\SuperAdminController::class, 'changePassword'])->name('change_password');
     });
 });
 

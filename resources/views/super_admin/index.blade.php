@@ -29,8 +29,18 @@
         </div>
 
         @if(session('success'))
-            <div class="p-4 mb-6 text-sm text-slate-400 rounded-lg bg-green-900/20 border border-green-800/50" role="alert">
+            <div class="p-4 mb-6 text-sm text-green-400 rounded-lg bg-green-900/20 border border-green-800/50" role="alert">
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="p-4 mb-6 text-sm text-red-400 rounded-lg bg-red-900/20 border border-red-800/50" role="alert">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
@@ -72,15 +82,32 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <form action="{{ route('super_admin.update_expiry', $user) }}" method="POST" class="inline-flex items-center gap-2">
-                                    @csrf
-                                    <input type="datetime-local" name="trial_ends_at" required 
-                                           value="{{ $user->trial_ends_at ? $user->trial_ends_at->format('Y-m-d\TH:i') : '' }}"
-                                           class="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-1.5 focus:ring-amber-500 focus:border-amber-500">
-                                    <button type="submit" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-1.5 px-3 rounded transition-colors">
-                                        Update
-                                    </button>
-                                </form>
+                                <div class="flex flex-col gap-3 items-end">
+                                    <form action="{{ route('super_admin.update_expiry', $user) }}" method="POST" class="flex items-center gap-2">
+                                        @csrf
+                                        <div class="flex flex-col items-start">
+                                            <span class="text-[10px] text-slate-500 mb-1 uppercase font-semibold">Expiry Date</span>
+                                            <input type="datetime-local" name="trial_ends_at" required 
+                                                   value="{{ $user->trial_ends_at ? $user->trial_ends_at->format('Y-m-d\TH:i') : '' }}"
+                                                   class="bg-slate-900 border border-slate-700 text-white text-xs rounded-lg p-1.5 focus:ring-amber-500 focus:border-amber-500">
+                                        </div>
+                                        <button type="submit" class="mt-5 text-xs bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-1.5 px-3 rounded transition-colors whitespace-nowrap">
+                                            Update Expiry
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('super_admin.change_password', $user) }}" method="POST" class="flex items-center gap-2">
+                                        @csrf
+                                        <div class="flex flex-col items-start">
+                                            <span class="text-[10px] text-slate-500 mb-1 uppercase font-semibold">Reset Password</span>
+                                            <input type="password" name="password" required placeholder="New Password"
+                                                   class="bg-slate-900 border border-slate-700 text-white text-xs rounded-lg p-1.5 focus:ring-amber-500 focus:border-amber-500 w-40">
+                                        </div>
+                                        <button type="submit" class="mt-5 text-xs bg-slate-800 hover:bg-slate-700 text-white font-medium py-1.5 px-3 rounded border border-slate-700 transition-colors whitespace-nowrap">
+                                            Reset Password
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
