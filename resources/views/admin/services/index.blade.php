@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Services')
-@section('header', 'Services Config')
+@section('header', 'Services')
 
 @section('content')
 

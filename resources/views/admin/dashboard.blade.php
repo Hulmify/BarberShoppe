@@ -145,6 +145,9 @@
             <a href="{{ route('booking.via_slug', $shop->slug) }}" target="_blank" class="text-slate-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-white/50 font-bold rounded-lg text-sm px-6 py-3 focus:outline-none transition-colors">
                 Preview Booking Page
             </a>
+            <a href="{{ route('booking.kiosk', $shop->slug) }}" target="_blank" class="text-white bg-amber-600 hover:bg-amber-700 focus:ring-4 focus:ring-amber-300 font-bold rounded-lg text-sm px-6 py-3 focus:outline-none transition-colors border border-amber-500 shadow-lg">
+                Open Kiosk View
+            </a>
         </div>
     </div>
 </div>

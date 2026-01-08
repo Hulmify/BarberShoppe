@@ -26,6 +26,7 @@ Route::domain('{domain}')
             Route::get('/', [BookingController::class, 'index'])->name('shop.index');
             Route::get('/slots', [BookingController::class, 'slots'])->name('shop.slots');
             Route::post('/book', [BookingController::class, 'store'])->name('shop.book');
+            Route::get('/kiosk', [App\Http\Controllers\KioskController::class, 'show'])->name('shop.kiosk');
         });
     });
 
@@ -81,3 +82,4 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 Route::get('/book/{slug}', [BookingController::class, 'index'])->name('booking.via_slug');
 Route::get('/book/{slug}/slots', [BookingController::class, 'slots']);
 Route::post('/book/{slug}', [BookingController::class, 'store']);
+Route::get('/book/{slug}/kiosk', [App\Http\Controllers\KioskController::class, 'show'])->name('booking.kiosk');
