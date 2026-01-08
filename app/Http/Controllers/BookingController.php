@@ -61,33 +61,53 @@ class BookingController extends Controller
             return response()->json(['slots' => [], 'message' => 'Shop is closed today.']);
         }
         
-        // Get Availability for Day of Week
-        $dayOfWeek = $date->dayOfWeek; // 0=Sun
-        
-        $avail = $shop->availabilities()->where('day_of_week', $dayOfWeek)->first();
-        
-        if (!$avail || !$avail->is_active) {
-            return response()->json(['slots' => []]);
-        }
-
         // Generate Slots
         $duration = (int) $request->input('duration', 30); // minutes
         $stylistId = $request->input('stylist_id'); // Optional stylist filter
         
-        $start = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->start_time, $tz);
-        $end = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->end_time, $tz);
+        // Get active stylists with their availability for this day
+        $dayOfWeek = $date->dayOfWeek;
+        $stylists = $shop->stylists()
+            ->where('is_active', true)
+            ->with(['availabilities' => function($q) use ($dayOfWeek) {
+                $q->where('day_of_week', $dayOfWeek)->where('is_active', true);
+            }])
+            ->get();
+
+        if ($stylists->isEmpty()) {
+            return response()->json(['slots' => []]);
+        }
+
+        // Determine the overall working window for the day based on stylists
+        $earliestStartTime = null;
+        $latestEndTime = null;
+
+        foreach ($stylists as $s) {
+            $sAvail = $s->availabilities->first();
+            if ($sAvail) {
+                if ($earliestStartTime === null || $sAvail->start_time < $earliestStartTime) {
+                    $earliestStartTime = $sAvail->start_time;
+                }
+                if ($latestEndTime === null || $sAvail->end_time > $latestEndTime) {
+                    $latestEndTime = $sAvail->end_time;
+                }
+            }
+        }
+
+        if ($earliestStartTime === null) {
+            return response()->json(['slots' => []]);
+        }
+
+        $start = Carbon::parse($date->format('Y-m-d') . ' ' . $earliestStartTime, $tz);
+        $end = Carbon::parse($date->format('Y-m-d') . ' ' . $latestEndTime, $tz);
         
         // Get existing bookings
         $allBookings = $shop->bookings()
             ->whereDate('start_time', $date)
             ->where('status', '!=', 'cancelled')
             ->get();
-            
-        $activeStylistsCount = $shop->stylists()->where('is_active', true)->count();
-        if ($activeStylistsCount === 0) $activeStylistsCount = 1; // Fallback to 1 if no stylists set up yet
 
         $slots = [];
-        
         $now = Carbon::now($tz);
         
         while ($start->copy()->addMinutes($duration)->lte($end)) {
@@ -104,16 +124,25 @@ class BookingController extends Controller
                 return $start->lt($b->end_time) && $slotEnd->gt($b->start_time);
             });
 
-            if ($stylistId) {
-                // Specific stylist requested: available if they specifically aren't busy
-                $isAvailable = !$overlappingBookings->contains('stylist_id', $stylistId);
-            } else {
-                // No preference: available if at least one stylist is free
-                // Note: This logic assumes each booking occupies exactly 1 stylist
-                $isAvailable = $overlappingBookings->count() < $activeStylistsCount;
-            }
-            
-            if ($isAvailable) {
+            // Check which stylists are available (working and not busy)
+            $availableStylists = $stylists->filter(function($s) use ($start, $slotEnd, $overlappingBookings, $stylistId, $tz) {
+                // If specific stylist requested, skip others
+                if ($stylistId && $s->id != $stylistId) return false;
+
+                // Check if stylist is busy
+                if ($overlappingBookings->contains('stylist_id', $s->id)) return false;
+
+                // Check if stylist is working at this time
+                $sAvail = $s->availabilities->first();
+                if (!$sAvail) return false;
+
+                $sStart = Carbon::parse($start->format('Y-m-d') . ' ' . $sAvail->start_time, $tz);
+                $sEnd = Carbon::parse($start->format('Y-m-d') . ' ' . $sAvail->end_time, $tz);
+
+                return $start->gte($sStart) && $slotEnd->lte($sEnd);
+            });
+
+            if ($availableStylists->isNotEmpty()) {
                 $slots[] = $start->format('H:i');
             }
             
@@ -172,12 +201,6 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => 'Shop is closed today.'], 422);
         }
 
-        // Check if shop is active for this day of the week (Regular Schedule)
-        $dayOff = !$shop->availabilities()->where('day_of_week', $startTime->dayOfWeek)->where('is_active', true)->exists();
-        if ($dayOff) {
-            return response()->json(['success' => false, 'message' => 'Shop is not accepting bookings for this day.'], 422);
-        }
-
         $endTime = $startTime->copy()->addMinutes($totalDuration);
         
         // Double Check Availability (Concurrency)
@@ -193,23 +216,40 @@ class BookingController extends Controller
             })->get();
 
         $selectedStylistId = $validated['stylist_id'] ?? null;
-        $activeStylists = $shop->stylists()->where('is_active', true)->get();
+        $dayOfWeek = $startTime->dayOfWeek;
         
+        $activeStylists = $shop->stylists()
+            ->where('is_active', true)
+            ->with(['availabilities' => function($q) use ($dayOfWeek) {
+                $q->where('day_of_week', $dayOfWeek)->where('is_active', true);
+            }])
+            ->get();
+
+        // Filter stylists who are working AND not busy
+        $availableStylists = $activeStylists->filter(function($s) use ($startTime, $endTime, $overlappingBookings, $tz) {
+            // Check if stylist is busy
+            if ($overlappingBookings->contains('stylist_id', $s->id)) return false;
+
+            // Check if stylist is working at this time
+            $sAvail = $s->availabilities->first();
+            if (!$sAvail) return false;
+
+            $sStart = Carbon::parse($startTime->format('Y-m-d') . ' ' . $sAvail->start_time, $tz);
+            $sEnd = Carbon::parse($startTime->format('Y-m-d') . ' ' . $sAvail->end_time, $tz);
+
+            return $startTime->gte($sStart) && $endTime->lte($sEnd);
+        });
+
         if ($selectedStylistId) {
-            // Check if specific stylist is busy
-            if ($overlappingBookings->contains('stylist_id', $selectedStylistId)) {
-                return response()->json(['success' => false, 'message' => 'Requested stylist is busy at this time'], 422);
+            if (!$availableStylists->contains('id', $selectedStylistId)) {
+                return response()->json(['success' => false, 'message' => 'Requested stylist is busy or not working at this time'], 422);
             }
         } else {
-            // No preference: auto-assign a free stylist
-            $busyStylistIds = $overlappingBookings->pluck('stylist_id')->filter()->toArray();
-            $freeStylists = $activeStylists->whereNotIn('id', $busyStylistIds);
-
-            if ($freeStylists->isEmpty()) {
+            if ($availableStylists->isEmpty()) {
                 return response()->json(['success' => false, 'message' => 'No stylists available at this time'], 422);
             }
             // Assign a random free stylist
-            $selectedStylistId = $freeStylists->random()->id;
+            $selectedStylistId = $availableStylists->random()->id;
         }
         
         // Create Customer

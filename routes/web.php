@@ -66,9 +66,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefi
     // Services
     Route::resource('services', AdminController::class); 
 
-    // Availability
-    Route::get('/availability', [App\Http\Controllers\AvailabilityController::class, 'index'])->name('availability.index');
-    Route::put('/availability', [App\Http\Controllers\AvailabilityController::class, 'update'])->name('availability.update');
+
 
     // Customers
     Route::resource('customers', App\Http\Controllers\CustomerController::class)->only(['index', 'show']);
@@ -81,6 +79,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefi
     Route::post('/pos', [App\Http\Controllers\PointOfSaleController::class, 'store'])->name('pos.store');
 
     // Stylists
+    Route::get('/stylists/{stylist}/availability', [App\Http\Controllers\Admin\StylistController::class, 'availability'])->name('stylists.availability');
+    Route::put('/stylists/{stylist}/availability', [App\Http\Controllers\Admin\StylistController::class, 'updateAvailability'])->name('stylists.update_availability');
     Route::resource('stylists', App\Http\Controllers\Admin\StylistController::class);
 });
 

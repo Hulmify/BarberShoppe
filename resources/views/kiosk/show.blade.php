@@ -375,8 +375,19 @@
     <script>
         function updateClock() {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                timeZone: "{{ $shop->timezone ?? config('app.timezone') }}"
+            });
+            const dateStr = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric',
+                timeZone: "{{ $shop->timezone ?? config('app.timezone') }}"
+            });
             
             document.getElementById('clock').textContent = timeStr;
             document.getElementById('date').textContent = dateStr;

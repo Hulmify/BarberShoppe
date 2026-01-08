@@ -59,7 +59,18 @@ class StylistController extends Controller
         $data['shop_id'] = $shop->id;
         $data['is_active'] = $request->has('is_active');
         
-        Stylist::create($data);
+        $stylist = Stylist::create($data);
+
+        // Create default availability for new stylist
+        for ($i = 0; $i <= 6; $i++) {
+            $stylist->availabilities()->create([
+                'day_of_week' => $i,
+                'shop_id' => $shop->id,
+                'start_time' => '09:00:00',
+                'end_time' => '17:00:00',
+                'is_active' => true
+            ]);
+        }
 
         return redirect()->route('admin.stylists.index')->with('success', 'Stylist added successfully.');
     }
@@ -106,6 +117,45 @@ class StylistController extends Controller
         $stylist->delete();
 
         return redirect()->route('admin.stylists.index')->with('success', 'Stylist deleted successfully.');
+    }
+
+    public function availability(Stylist $stylist)
+    {
+        $this->authorizeStylist($stylist);
+        
+        // Ensure all days exist for this stylist
+        for ($i = 0; $i <= 6; $i++) {
+            $stylist->availabilities()->firstOrCreate(
+                ['day_of_week' => $i, 'shop_id' => $stylist->shop_id],
+                ['start_time' => '09:00:00', 'end_time' => '17:00:00', 'is_active' => true]
+            );
+        }
+        
+        $availabilities = $stylist->availabilities()->orderBy('day_of_week')->get();
+        
+        return view('admin.stylists.availability', compact('stylist', 'availabilities'));
+    }
+
+    public function updateAvailability(Request $request, Stylist $stylist)
+    {
+        $this->authorizeStylist($stylist);
+        
+        $data = $request->validate([
+            'schedule' => 'required|array',
+            'schedule.*.start_time' => 'required|date_format:H:i',
+            'schedule.*.end_time' => 'required|date_format:H:i',
+            'schedule.*.is_active' => 'nullable',
+        ]);
+        
+        foreach ($data['schedule'] as $day => $times) {
+            $stylist->availabilities()->where('day_of_week', $day)->update([
+                'start_time' => $times['start_time'],
+                'end_time' => $times['end_time'],
+                'is_active' => isset($times['is_active'])
+            ]);
+        }
+        
+        return back()->with('success', 'Stylist schedule updated successfully.');
     }
 
     private function authorizeStylist(Stylist $stylist)

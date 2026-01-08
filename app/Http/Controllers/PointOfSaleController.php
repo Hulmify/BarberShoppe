@@ -72,31 +72,64 @@ class PointOfSaleController extends Controller
         $tz = $shop->timezone ?? config('app.timezone');
         $startDateTime = Carbon::parse($request->date . ' ' . $request->time, $tz);
 
+        if ($startDateTime->isPast()) {
+            return back()->withErrors(['date' => 'Cannot create reservations in the past.'])->withInput();
+        }
+
         // Check if shop is closed for the requested date (Temporary Toggle)
         if ($shop->off_date && Carbon::parse($shop->off_date)->isSameDay($startDateTime)) {
             return back()->withErrors(['date' => 'The shop is marked as OFF for today. Toggle it ON in the dashboard to allow bookings.'])->withInput();
         }
 
-        // Check if shop is active for this day of the week (Regular Schedule)
-        $dayOff = !$shop->availabilities()->where('day_of_week', $startDateTime->dayOfWeek)->where('is_active', true)->exists();
-        if ($dayOff) {
-            return back()->withErrors(['date' => 'The shop is closed on this day of the week according to your schedule.'])->withInput();
-        }
-
         $endDateTime = $startDateTime->copy()->addMinutes($totalDuration);
 
+        // Fetch active stylists with their availability for this day
+        $dayOfWeek = $startDateTime->dayOfWeek;
+        $activeStylists = $shop->stylists()
+            ->where('is_active', true)
+            ->with(['availabilities' => function($q) use ($dayOfWeek) {
+                $q->where('day_of_week', $dayOfWeek)->where('is_active', true);
+            }])
+            ->get();
+
+        // Check for overlapping bookings
+        $overlappingBookings = $shop->bookings()
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($q) use ($startDateTime, $endDateTime) {
+                $q->whereBetween('start_time', [$startDateTime, $endDateTime])
+                  ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
+                  ->orWhere(function ($q2) use ($startDateTime, $endDateTime) {
+                      $q2->where('start_time', '<=', $startDateTime)
+                         ->where('end_time', '>=', $endDateTime);
+                  });
+            })->get();
+
+        // Filter stylists who are working AND not busy
+        $availableStylists = $activeStylists->filter(function($s) use ($startDateTime, $endDateTime, $overlappingBookings, $tz) {
+            // Check if stylist is busy
+            if ($overlappingBookings->contains('stylist_id', $s->id)) return false;
+
+            // Check if stylist is working at this time
+            $sAvail = $s->availabilities->first();
+            if (!$sAvail) return false;
+
+            $sStart = Carbon::parse($startDateTime->format('Y-m-d') . ' ' . $sAvail->start_time, $tz);
+            $sEnd = Carbon::parse($startDateTime->format('Y-m-d') . ' ' . $sAvail->end_time, $tz);
+
+            return $startDateTime->gte($sStart) && $endDateTime->lte($sEnd);
+        });
+
         $selectedStylistId = $request->stylist_id;
-        if (!$selectedStylistId) {
-            // Auto-assign first free stylist if no preference
-            $overlappingBookings = $shop->bookings()
-                ->where('status', '!=', 'cancelled')
-                ->where(function ($q) use ($startDateTime, $endDateTime) {
-                    $q->whereBetween('start_time', [$startDateTime, $endDateTime])
-                      ->orWhereBetween('end_time', [$startDateTime, $endDateTime]);
-                })->pluck('stylist_id')->toArray();
-            
-            $freeStylist = $shop->stylists()->where('is_active', true)->whereNotIn('id', $overlappingBookings)->first();
-            $selectedStylistId = $freeStylist ? $freeStylist->id : $shop->stylists()->where('is_active', true)->first()?->id;
+        if ($selectedStylistId) {
+            if (!$availableStylists->contains('id', $selectedStylistId)) {
+                return back()->withErrors(['stylist_id' => 'Requested stylist is busy or not working at this time.'])->withInput();
+            }
+        } else {
+            if ($availableStylists->isEmpty()) {
+                return back()->withErrors(['time' => 'No stylists available at this time.'])->withInput();
+            }
+            // Assign a random free stylist
+            $selectedStylistId = $availableStylists->random()->id;
         }
 
         $booking = Booking::create([

@@ -109,8 +109,12 @@
                 <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">3. Assignment & Timing</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
+                        @php
+                            $tz = auth()->user()->shop->timezone ?? config('app.timezone');
+                            $today = \Carbon\Carbon::now($tz)->toDateString();
+                        @endphp
                         <label for="date" class="block mb-2 text-sm font-medium text-slate-900">Date</label>
-                        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+                        <input type="date" id="date" name="date" value="{{ $today }}" min="{{ $today }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
                     </div>
                      <div>
                         <label for="time" class="block mb-2 text-sm font-medium text-slate-900">Time Slot</label>

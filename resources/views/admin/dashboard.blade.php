@@ -32,7 +32,7 @@
             </div>
             <div>
                  <span class="text-4xl font-extrabold text-slate-800">{{ $shop->currency ?? '$' }} {{ number_format($potentialRevenue) }}</span>
-                 <p class="text-xs text-slate-500 mt-1 font-medium">Completed: {{ $shop->currency ?? '$' }} {{ number_format($weekRevenue) }}</p>
+                 <p class="text-xs text-slate-500 mt-1 font-medium">Earned: {{ $shop->currency ?? '$' }} {{ number_format($weekRevenue) }}</p>
             </div>
         </div>
     </div>
@@ -211,7 +211,7 @@
                                         </form>
                                         <form action="{{ route('admin.appointments.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Permanently delete this appointment? This action cannot be undone.');">
                                             @csrf @method('DELETE')
-                                            <button title="Delete Permanently" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200">
+                                            <button title="Delete Permanently" class="p-2 text-red-600 rounded-lg hover:bg-red-100">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                             </button>
                                         </form>

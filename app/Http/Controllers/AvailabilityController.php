@@ -11,15 +11,15 @@ class AvailabilityController extends Controller
     {
         $shop = auth()->user()->shop;
         
-        // Ensure all days exist
+        // Ensure all days exist for the shop (stylist_id is null)
         for ($i = 0; $i <= 6; $i++) {
             $shop->availabilities()->firstOrCreate(
-                ['day_of_week' => $i],
+                ['day_of_week' => $i, 'stylist_id' => null],
                 ['start_time' => '09:00:00', 'end_time' => '17:00:00', 'is_active' => $i > 0 && $i < 6] // Default Mo-Fri
             );
         }
         
-        $availabilities = $shop->availabilities()->orderBy('day_of_week')->get();
+        $availabilities = $shop->availabilities()->whereNull('stylist_id')->orderBy('day_of_week')->get();
         
         return view('admin.availability.index', compact('availabilities'));
     }
@@ -36,11 +36,14 @@ class AvailabilityController extends Controller
         ]);
         
         foreach ($data['schedule'] as $day => $times) {
-            $shop->availabilities()->where('day_of_week', $day)->update([
-                'start_time' => $times['start_time'],
-                'end_time' => $times['end_time'],
-                'is_active' => isset($times['is_active'])
-            ]);
+            $shop->availabilities()
+                ->where('day_of_week', $day)
+                ->whereNull('stylist_id')
+                ->update([
+                    'start_time' => $times['start_time'],
+                    'end_time' => $times['end_time'],
+                    'is_active' => isset($times['is_active'])
+                ]);
         }
         
         return back()->with('success', 'Schedule updated successfully.');

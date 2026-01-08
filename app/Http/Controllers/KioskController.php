@@ -23,13 +23,20 @@ class KioskController extends Controller
         $stylists = $shop->stylists()->where('is_active', true)->get();
         $services = $shop->services()->take(8)->get();
         
-        $now = Carbon::now();
+        $tz = $shop->timezone ?? config('app.timezone');
+        $now = Carbon::now($tz);
+        
         $bookings = $shop->bookings()
             ->whereDate('start_time', $now->toDateString())
             ->where('status', '!=', 'cancelled')
             ->with(['customer', 'stylist'])
             ->orderBy('start_time', 'asc')
             ->get();
+
+        $bookings->each(function($b) use ($tz) {
+            $b->start_time->setTimezone($tz);
+            if ($b->end_time) $b->end_time->setTimezone($tz);
+        });
 
         // Determine who is "Now Serving" and who is "Next Up"
         $nowServing = $bookings->filter(function($b) use ($now) {

@@ -15,4 +15,9 @@ class Availability extends Model
     {
         return $this->belongsTo(Shop::class);
     }
+
+    public function stylist()
+    {
+        return $this->belongsTo(Stylist::class);
+    }
 }
