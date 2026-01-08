@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class PointOfSaleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $shop = auth()->user()->shop;
         
@@ -20,10 +20,22 @@ class PointOfSaleController extends Controller
             $q->where('shop_id', $shop->id);
         })->orderBy('name')->get();
         
-        // Get all shop services (is_active column does not exist)
-        $services = $shop->services()->get();
+        // Get shop services with search and pagination
+        $search = $request->input('search');
+        $servicesQuery = $shop->services();
         
-        return view('admin.pos.index', compact('customers', 'services'));
+        if ($search) {
+            $servicesQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+        
+        $services = $servicesQuery->paginate(10)->withQueryString();
+        
+        $stylists = $shop->stylists()->where('is_active', true)->get();
+        
+        return view('admin.pos.index', compact('customers', 'services', 'search', 'stylists'));
     }
 
     public function store(Request $request)
@@ -39,6 +51,7 @@ class PointOfSaleController extends Controller
             'new_customer_name' => 'required_if:customer_type,new|nullable|string|max:255',
             'new_customer_email' => 'required_if:customer_type,new|nullable|email|max:255', 
             'new_customer_phone' => 'nullable|string|max:20',
+            'stylist_id' => 'nullable|exists:stylists,id',
         ]);
 
         // 1. Resolve Customer
@@ -51,14 +64,27 @@ class PointOfSaleController extends Controller
             $customer = Customer::findOrFail($request->customer_id);
         }
 
-        // 2. Create Booking
-        // Calculate Total
+        // 2. Resolve Stylist and Timing
         $services = Service::whereIn('id', $request->service_ids)->get();
         $totalPrice = $services->sum('price');
         $totalDuration = $services->sum('duration_minutes');
         
         $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
         $endDateTime = $startDateTime->copy()->addMinutes($totalDuration);
+
+        $selectedStylistId = $request->stylist_id;
+        if (!$selectedStylistId) {
+            // Auto-assign first free stylist if no preference
+            $overlappingBookings = $shop->bookings()
+                ->where('status', '!=', 'cancelled')
+                ->where(function ($q) use ($startDateTime, $endDateTime) {
+                    $q->whereBetween('start_time', [$startDateTime, $endDateTime])
+                      ->orWhereBetween('end_time', [$startDateTime, $endDateTime]);
+                })->pluck('stylist_id')->toArray();
+            
+            $freeStylist = $shop->stylists()->where('is_active', true)->whereNotIn('id', $overlappingBookings)->first();
+            $selectedStylistId = $freeStylist ? $freeStylist->id : $shop->stylists()->where('is_active', true)->first()?->id;
+        }
 
         $booking = Booking::create([
             'shop_id' => $shop->id,
@@ -67,6 +93,7 @@ class PointOfSaleController extends Controller
             'end_time' => $endDateTime,
             'total_price' => $totalPrice,
             'status' => 'confirmed', 
+            'stylist_id' => $selectedStylistId,
         ]);
 
         // 3. Attach Items

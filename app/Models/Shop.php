@@ -30,4 +30,9 @@ class Shop extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    public function stylists()
+    {
+        return $this->hasMany(Stylist::class)->orderBy('display_order');
+    }
 }

@@ -53,6 +53,7 @@
                         <th scope="col" class="px-6 py-4 font-bold">Date & Time</th>
                         <th scope="col" class="px-6 py-4 font-bold">Customer</th>
                         <th scope="col" class="px-6 py-4 font-bold">Services</th>
+                        <th scope="col" class="px-6 py-4 font-bold">Stylist</th>
                         <th scope="col" class="px-6 py-4 font-bold">Price</th>
                         <th scope="col" class="px-6 py-4 font-bold">Status</th>
                         <th scope="col" class="px-6 py-4 font-bold text-right">Actions</th>
@@ -77,6 +78,9 @@
                                     </span>
                                 @endforeach
                             </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="font-medium text-slate-700">{{ $booking->stylist->name ?? 'Unassigned' }}</span>
                         </td>
                         <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
                             {{ auth()->user()->shop->currency ?? '$' }} {{ number_format($booking->total_price, 2) }}

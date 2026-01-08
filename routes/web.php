@@ -72,6 +72,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // POS / Quick Reservation
     Route::get('/pos', [App\Http\Controllers\PointOfSaleController::class, 'index'])->name('pos.index');
     Route::post('/pos', [App\Http\Controllers\PointOfSaleController::class, 'store'])->name('pos.store');
+
+    // Stylists
+    Route::resource('stylists', App\Http\Controllers\Admin\StylistController::class);
 });
 
 // Direct Booking Link via Path (for testing or non-CNAME usage)

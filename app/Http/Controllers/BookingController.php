@@ -22,9 +22,24 @@ class BookingController extends Controller
     public function index(Request $request, $slug = null)
     {
         $shop = $this->getShop($request, $slug);
-        $services = $shop->services; 
         
-        return view('booking.index', compact('shop', 'services'));
+        // Get services with search and pagination
+        $search = $request->input('search');
+        $servicesQuery = $shop->services();
+        
+        if ($search) {
+            $servicesQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+        
+        $services = $servicesQuery->paginate(10)->withQueryString();
+        
+        // Get active stylists
+        $stylists = $shop->stylists()->where('is_active', true)->get();
+        
+        return view('booking.index', compact('shop', 'services', 'search', 'stylists'));
     }
 
     public function slots(Request $request, $slug = null)
@@ -45,30 +60,41 @@ class BookingController extends Controller
         }
 
         // Generate Slots
-        
         $duration = (int) $request->input('duration', 30); // minutes
+        $stylistId = $request->input('stylist_id'); // Optional stylist filter
         
         $start = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->start_time);
         $end = Carbon::parse($date->format('Y-m-d') . ' ' . $avail->end_time);
         
         // Get existing bookings
-        $bookings = $shop->bookings()
+        $allBookings = $shop->bookings()
             ->whereDate('start_time', $date)
             ->where('status', '!=', 'cancelled')
             ->get();
             
+        $activeStylistsCount = $shop->stylists()->where('is_active', true)->count();
+        if ($activeStylistsCount === 0) $activeStylistsCount = 1; // Fallback to 1 if no stylists set up yet
+
         $slots = [];
         
         while ($start->copy()->addMinutes($duration)->lte($end)) {
             $slotEnd = $start->copy()->addMinutes($duration);
             
-            // Check collision
-            $collision = $bookings->contains(function ($b) use ($start, $slotEnd) {
-                // Overlap: (StartA < EndB) and (EndA > StartB)
+            // Filter bookings that overlap with this slot
+            $overlappingBookings = $allBookings->filter(function ($b) use ($start, $slotEnd) {
                 return $start->lt($b->end_time) && $slotEnd->gt($b->start_time);
             });
+
+            if ($stylistId) {
+                // Specific stylist requested: available if they specifically aren't busy
+                $isAvailable = !$overlappingBookings->contains('stylist_id', $stylistId);
+            } else {
+                // No preference: available if at least one stylist is free
+                // Note: This logic assumes each booking occupies exactly 1 stylist
+                $isAvailable = $overlappingBookings->count() < $activeStylistsCount;
+            }
             
-            if (!$collision) {
+            if ($isAvailable) {
                 $slots[] = $start->format('H:i');
             }
             
@@ -90,6 +116,7 @@ class BookingController extends Controller
             'customer_name' => 'required|string',
             'customer_email' => 'required|email',
             'customer_phone' => 'nullable|string',
+            'stylist_id' => 'nullable|exists:stylists,id',
         ]);
 
         // Calculate Totals
@@ -102,7 +129,7 @@ class BookingController extends Controller
         $endTime = $startTime->copy()->addMinutes($totalDuration);
         
         // Double Check Availability (Concurrency)
-        $exists = $shop->bookings()
+        $overlappingBookings = $shop->bookings()
             ->where('status', '!=', 'cancelled')
             ->where(function ($q) use ($startTime, $endTime) {
                 $q->whereBetween('start_time', [$startTime, $endTime])
@@ -111,7 +138,27 @@ class BookingController extends Controller
                       $q2->where('start_time', '<=', $startTime)
                          ->where('end_time', '>=', $endTime);
                   });
-            })->exists();
+            })->get();
+
+        $selectedStylistId = $validated['stylist_id'] ?? null;
+        $activeStylists = $shop->stylists()->where('is_active', true)->get();
+        
+        if ($selectedStylistId) {
+            // Check if specific stylist is busy
+            if ($overlappingBookings->contains('stylist_id', $selectedStylistId)) {
+                return response()->json(['success' => false, 'message' => 'Requested stylist is busy at this time'], 422);
+            }
+        } else {
+            // No preference: auto-assign a free stylist
+            $busyStylistIds = $overlappingBookings->pluck('stylist_id')->filter()->toArray();
+            $freeStylists = $activeStylists->whereNotIn('id', $busyStylistIds);
+
+            if ($freeStylists->isEmpty()) {
+                return response()->json(['success' => false, 'message' => 'No stylists available at this time'], 422);
+            }
+            // Assign a random free stylist
+            $selectedStylistId = $freeStylists->random()->id;
+        }
         
         // Create Customer
         $customer = Customer::firstOrCreate(
@@ -126,7 +173,8 @@ class BookingController extends Controller
             'start_time' => $startTime,
             'end_time' => $endTime,
             'total_price' => $totalPrice,
-            'status' => 'pending'
+            'status' => 'pending',
+            'stylist_id' => $selectedStylistId,
         ]);
 
         // Items

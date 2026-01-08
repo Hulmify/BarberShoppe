@@ -49,6 +49,9 @@
             <li>
                <a href="{{ route('admin.availability.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.availability*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Schedule</a>
             </li>
+            <li>
+               <a href="{{ route('admin.stylists.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.stylists*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Stylists</a>
+            </li>
              <li>
                <a href="{{ route('admin.shop.edit') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.shop*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Settings</a>
             </li>
