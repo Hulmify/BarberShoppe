@@ -23,6 +23,18 @@ class CustomerController extends Controller
 
     public function show($id)
     {
-        // Show customer history
+        $shopId = auth()->user()->shop->id;
+        
+        $customer = Customer::whereHas('bookings', function($q) use ($shopId) {
+            $q->where('shop_id', $shopId);
+        })->with(['bookings' => function($q) use ($shopId) {
+            $q->where('shop_id', $shopId)->with('items.service')->latest();
+        }])->findOrFail($id);
+        
+        // Calculate total stats
+        $totalSpent = $customer->bookings->where('status', 'completed')->sum('total_price');
+        $lastVisit = $customer->bookings->first()?->start_time;
+
+        return view('admin.customers.show', compact('customer', 'totalSpent', 'lastVisit'));
     }
 }

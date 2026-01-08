@@ -79,12 +79,22 @@ class AdminController extends Controller
         return redirect()->route('admin.dashboard');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $shop = auth()->user()->shop;
         if (!$shop) return redirect()->route('admin.dashboard');
         
-        $services = $shop->services;
+        $query = $shop->services();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        $services = $query->paginate(10)->withQueryString();
         return view('admin.services.index', compact('services'));
     }
 

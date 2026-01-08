@@ -32,6 +32,7 @@ class AvailabilityController extends Controller
             'schedule' => 'required|array',
             'schedule.*.start_time' => 'required|date_format:H:i',
             'schedule.*.end_time' => 'required|date_format:H:i',
+            'schedule.*.is_active' => 'nullable',
         ]);
         
         foreach ($data['schedule'] as $day => $times) {

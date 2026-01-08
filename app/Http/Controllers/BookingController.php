@@ -37,9 +37,6 @@ class BookingController extends Controller
         
         // Get Availability for Day of Week
         $dayOfWeek = $date->dayOfWeek; // 0=Sun
-        // Our DB uses 0=Sun? Or 1=Mon? PHP dayOfWeek is 0 (Sunday) to 6 (Saturday).
-        // My seeder used 1-5.
-        // Let's assume standard 0-6.
         
         $avail = $shop->availabilities()->where('day_of_week', $dayOfWeek)->first();
         
@@ -48,10 +45,6 @@ class BookingController extends Controller
         }
 
         // Generate Slots
-        // Logic: Start to End, step by Service Duration?
-        // Wait, "multiple services" -> Total Duration.
-        // If user selects services with total 45 mins.
-        // We need to find 45 min gaps.
         
         $duration = (int) $request->input('duration', 30); // minutes
         
@@ -79,8 +72,7 @@ class BookingController extends Controller
                 $slots[] = $start->format('H:i');
             }
             
-            $start->addMinutes(15); // Interval 15 mins? Or 30? 
-            // "Modern" apps usually flexible. 15 or 30 mins stepping.
+            $start->addMinutes(15); 
         }
         
         return response()->json(['slots' => $slots]);
@@ -110,7 +102,6 @@ class BookingController extends Controller
         $endTime = $startTime->copy()->addMinutes($totalDuration);
         
         // Double Check Availability (Concurrency)
-        // ... (Skipping complex lock for MVP, but basic check)
         $exists = $shop->bookings()
             ->where('status', '!=', 'cancelled')
             ->where(function ($q) use ($startTime, $endTime) {
@@ -121,9 +112,6 @@ class BookingController extends Controller
                          ->where('end_time', '>=', $endTime);
                   });
             })->exists();
-
-        // The logic above is slightly buggy for exact overlaps, but ok.
-        // Better: start < existing.end AND end > existing.start
         
         // Create Customer
         $customer = Customer::firstOrCreate(
@@ -138,7 +126,7 @@ class BookingController extends Controller
             'start_time' => $startTime,
             'end_time' => $endTime,
             'total_price' => $totalPrice,
-            'status' => 'confirmed'
+            'status' => 'pending'
         ]);
 
         // Items

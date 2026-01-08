@@ -68,6 +68,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Appointments
     Route::resource('appointments', App\Http\Controllers\AppointmentController::class)->only(['index', 'update', 'destroy']);
+
+    // POS / Quick Reservation
+    Route::get('/pos', [App\Http\Controllers\PointOfSaleController::class, 'index'])->name('pos.index');
+    Route::post('/pos', [App\Http\Controllers\PointOfSaleController::class, 'store'])->name('pos.store');
 });
 
 // Direct Booking Link via Path (for testing or non-CNAME usage)

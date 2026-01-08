@@ -29,7 +29,7 @@
 
 ## 5. Technical Implementation
 - **Custom Domains**: Middleware to handle requests from `book.custom.com` mapping to `shops` table.
-- **Styling**: Premium, responsive CSS (Vanilla).
+- **Styling**: Modern UI with Tailwind CSS and Flowbite (replaced Vanilla CSS plan).
 - **Interactivity**: Vanilla JS for booking flow validation and state.
 
 ## 6. Review & Refine
