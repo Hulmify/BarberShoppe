@@ -388,7 +388,7 @@
                 
                 container.innerHTML = '';
                 if (data.slots.length === 0) {
-                    container.innerHTML = '<div class="col-span-full text-center text-red-500 py-4">No slots available for this period.</div>';
+                    container.innerHTML = `<div class="col-span-full text-center text-red-500 py-4">${data.message || 'No slots available for this period.'}</div>`;
                 } else {
                     data.slots.forEach(time => {
                         const div = document.createElement('div');

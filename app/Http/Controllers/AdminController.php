@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Shop;
 use App\Models\Service;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -17,20 +18,23 @@ class AdminController extends Controller
             return view('admin.setup_shop');
         }
 
+        $tz = $shop->timezone ?? config('app.timezone');
+        $now = Carbon::now($tz);
+
         $todaysBookings = $shop->bookings()
-            ->whereDate('start_time', now())
+            ->whereDate('start_time', $now->toDateString())
             ->orderBy('start_time')
             ->get();
             
         // Stats
-        $startOfWeek = now()->startOfWeek();
-        $endOfWeek = now()->endOfWeek();
+        $startOfWeek = $now->copy()->startOfWeek();
+        $endOfWeek = $now->copy()->endOfWeek();
         
         $weekRevenue = $shop->bookings()
             ->whereBetween('start_time', [$startOfWeek, $endOfWeek])
             ->where('status', 'completed') // Assuming 'completed' means paid/done
             ->sum('total_price');
-            
+        
         $potentialRevenue = $shop->bookings()
             ->whereBetween('start_time', [$startOfWeek, $endOfWeek])
             ->whereIn('status', ['confirmed', 'completed'])
@@ -58,6 +62,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'primary_color' => 'nullable|string',
             'currency' => 'nullable|string|size:3',
+            'timezone' => 'required|string',
         ]);
 
         auth()->user()->shop->update($data);
@@ -73,6 +78,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'primary_color' => 'nullable|string',
             'currency' => 'nullable|string|size:3',
+            'timezone' => 'required|string',
         ]);
 
         auth()->user()->shop()->create($data);
@@ -145,5 +151,24 @@ class AdminController extends Controller
         $service->delete();
         
         return back()->with('success', 'Service deleted.');
+    }
+
+    public function toggleOffDay()
+    {
+        $shop = auth()->user()->shop;
+        $tz = $shop->timezone ?? config('app.timezone');
+        $today = Carbon::now($tz)->toDateString();
+        
+        if ($shop->off_date && $shop->off_date == $today) {
+            $shop->off_date = null;
+            $message = 'Shop is now open for today!';
+        } else {
+            $shop->off_date = $today;
+            $message = 'Shop is now closed for today!';
+        }
+        
+        $shop->save();
+        
+        return back()->with('success', $message);
     }
 }

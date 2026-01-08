@@ -58,6 +58,19 @@
 <div class="w-full bg-white border border-gray-200 rounded-xl shadow-sm mb-8 overflow-hidden">
     <div class="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50">
         <h5 class="text-lg font-bold text-slate-800">Today's Schedule</h5>
+        
+        <form action="{{ route('admin.shop.toggle_off') }}" method="POST">
+            @csrf
+            @php 
+                $tz = $shop->timezone ?? config('app.timezone');
+                $isOff = $shop->off_date && $shop->off_date == \Carbon\Carbon::now($tz)->toDateString(); 
+            @endphp
+            <button type="submit" 
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-all {{ $isOff ? 'bg-red-100 text-red-700 border border-red-200 hover:bg-red-200' : 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200' }}">
+                <div class="w-2.5 h-2.5 rounded-full {{ $isOff ? 'bg-red-500 animate-pulse' : 'bg-green-500' }}"></div>
+                {{ $isOff ? 'Today Is Off (Click to Enable)' : 'Today Is On (Click to Disable)' }}
+            </button>
+        </form>
     </div>
 
     @if($todaysBookings->isEmpty())

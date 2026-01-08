@@ -61,6 +61,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefi
     Route::get('/shop', [AdminController::class, 'editShop'])->name('shop.edit');
     Route::put('/shop', [AdminController::class, 'updateShop'])->name('shop.update');
     Route::post('/shop', [AdminController::class, 'storeShop'])->name('shop.store');
+    Route::post('/shop/toggle-off', [AdminController::class, 'toggleOffDay'])->name('shop.toggle_off');
     
     // Services
     Route::resource('services', AdminController::class); 

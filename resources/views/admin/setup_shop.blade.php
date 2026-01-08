@@ -38,6 +38,15 @@
             <input type="color" name="primary_color" value="{{ old('primary_color', '#000000') }}" style="height: 40px;">
         </div>
 
+        <div class="form-group">
+            <label>Timezone</label>
+            <select name="timezone" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                @foreach(DateTimeZone::listIdentifiers() as $tz)
+                    <option value="{{ $tz }}" {{ old('timezone', 'Asia/Kolkata') == $tz ? 'selected' : '' }}>{{ $tz }}</option>
+                @endforeach
+            </select>
+        </div>
+
         <button type="submit">Create Shop</button>
     </form>
 </body>

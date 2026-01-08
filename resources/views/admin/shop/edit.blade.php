@@ -50,6 +50,15 @@
                     <option value="AED" {{ old('currency', $shop->currency) == 'AED' ? 'selected' : '' }}>AED (د.إ) - UAE Dirham</option>
                 </select>
             </div>
+
+            <div>
+                <label for="timezone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Timezone</label>
+                <select id="timezone" name="timezone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                    @foreach(DateTimeZone::listIdentifiers() as $tz)
+                        <option value="{{ $tz }}" {{ old('timezone', $shop->timezone) == $tz ? 'selected' : '' }}>{{ $tz }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
 
         <div class="mb-6">

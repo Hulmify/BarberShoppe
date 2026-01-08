@@ -69,7 +69,20 @@ class PointOfSaleController extends Controller
         $totalPrice = $services->sum('price');
         $totalDuration = $services->sum('duration_minutes');
         
-        $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
+        $tz = $shop->timezone ?? config('app.timezone');
+        $startDateTime = Carbon::parse($request->date . ' ' . $request->time, $tz);
+
+        // Check if shop is closed for the requested date (Temporary Toggle)
+        if ($shop->off_date && Carbon::parse($shop->off_date)->isSameDay($startDateTime)) {
+            return back()->withErrors(['date' => 'The shop is marked as OFF for today. Toggle it ON in the dashboard to allow bookings.'])->withInput();
+        }
+
+        // Check if shop is active for this day of the week (Regular Schedule)
+        $dayOff = !$shop->availabilities()->where('day_of_week', $startDateTime->dayOfWeek)->where('is_active', true)->exists();
+        if ($dayOff) {
+            return back()->withErrors(['date' => 'The shop is closed on this day of the week according to your schedule.'])->withInput();
+        }
+
         $endDateTime = $startDateTime->copy()->addMinutes($totalDuration);
 
         $selectedStylistId = $request->stylist_id;

@@ -48,11 +48,17 @@ class BookingController extends Controller
         
         // Validate date
         $request->validate(['date' => 'required|date']);
-        $date = Carbon::parse($request->date)->startOfDay();
-        $today = Carbon::today();
+        $tz = $shop->timezone ?? config('app.timezone');
+        $date = Carbon::parse($request->date, $tz)->startOfDay();
+        $today = Carbon::now($tz)->startOfDay();
 
         if ($date->lt($today)) {
             return response()->json(['slots' => []]);
+        }
+
+        // Check if shop is closed for the requested date
+        if ($shop->off_date && Carbon::parse($shop->off_date)->startOfDay()->equalTo($date)) {
+            return response()->json(['slots' => [], 'message' => 'Shop is closed today.']);
         }
         
         // Get Availability for Day of Week
@@ -154,10 +160,22 @@ class BookingController extends Controller
         $totalDuration = $services->sum('duration_minutes');
         
         // Time
-        $startTime = Carbon::parse($validated['date'] . ' ' . $validated['time']);
+        $tz = $shop->timezone ?? config('app.timezone');
+        $startTime = Carbon::parse($validated['date'] . ' ' . $validated['time'], $tz);
         
         if ($startTime->isPast()) {
             return response()->json(['success' => false, 'message' => 'Cannot book appointments in the past'], 422);
+        }
+
+        // Check if shop is closed for the requested date (Temporary Toggle)
+        if ($shop->off_date && Carbon::parse($shop->off_date)->isSameDay($startTime)) {
+            return response()->json(['success' => false, 'message' => 'Shop is closed today.'], 422);
+        }
+
+        // Check if shop is active for this day of the week (Regular Schedule)
+        $dayOff = !$shop->availabilities()->where('day_of_week', $startTime->dayOfWeek)->where('is_active', true)->exists();
+        if ($dayOff) {
+            return response()->json(['success' => false, 'message' => 'Shop is not accepting bookings for this day.'], 422);
         }
 
         $endTime = $startTime->copy()->addMinutes($totalDuration);
