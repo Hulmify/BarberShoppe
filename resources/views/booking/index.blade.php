@@ -16,6 +16,12 @@
 
     <div class="w-full max-w-3xl">
         <header class="text-center mb-10 animate-fade-in-down">
+            <div class="flex justify-end mb-4">
+                <a href="{{ request()->attributes->has('shop') ? route('shop.my_appointments') : route('booking.my_appointments', ['slug' => $shop->slug]) }}" class="text-sm font-medium text-slate-500 hover:text-amber-600 transition-colors flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    My Appointments
+                </a>
+            </div>
             <h1 class="text-4xl font-extrabold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-amber-600">
                 {{ $shop->name }}
             </h1>
@@ -162,16 +168,16 @@
                 
                 <div class="grid gap-6 md:grid-cols-2">
                     <div>
-                        <label for="customer_name" class="block mb-2 text-sm font-medium text-slate-900">Full Name</label>
-                        <input type="text" id="customer_name" name="customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="John Doe" required>
+                        <label for="customer_phone" class="block mb-2 text-sm font-medium text-slate-900">Phone Number</label>
+                        <input type="tel" id="customer_phone" name="customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="(555) 123-4567" required>
                     </div>
                     <div>
-                        <label for="customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address</label>
-                        <input type="email" id="customer_email" name="customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="name@example.com" required>
+                        <label for="customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address (Optional)</label>
+                        <input type="email" id="customer_email" name="customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="name@example.com">
                     </div>
                     <div class="md:col-span-2">
-                        <label for="customer_phone" class="block mb-2 text-sm font-medium text-slate-900">Phone Number (Optional)</label>
-                        <input type="tel" id="customer_phone" name="customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="(555) 123-4567">
+                        <label for="customer_name" class="block mb-2 text-sm font-medium text-slate-900">Full Name</label>
+                        <input type="text" id="customer_name" name="customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="John Doe" required>
                     </div>
                 </div>
             </div>
@@ -447,7 +453,7 @@
                     alert('Booking Confirmed! ID: ' + data.booking_id);
                     location.reload();
                 } else {
-                    alert('Error: ' + JSON.stringify(data.errors || 'Unknown error'));
+                    alert(data.message || 'Error: ' + JSON.stringify(data.errors || 'Unknown error'));
                 }
             } catch (err) {
                 alert('Request failed');

@@ -27,6 +27,8 @@ Route::domain('{domain}')
             Route::get('/slots', [BookingController::class, 'slots'])->name('shop.slots');
             Route::post('/book', [BookingController::class, 'store'])->name('shop.book');
             Route::get('/kiosk', [App\Http\Controllers\KioskController::class, 'show'])->name('shop.kiosk');
+            Route::get('/my-appointments', [BookingController::class, 'myAppointments'])->name('shop.my_appointments');
+            Route::post('/my-appointments', [BookingController::class, 'searchAppointments'])->name('shop.search_appointments');
         });
     });
 
@@ -99,3 +101,5 @@ Route::get('/book/{slug}', [BookingController::class, 'index'])->name('booking.v
 Route::get('/book/{slug}/slots', [BookingController::class, 'slots']);
 Route::post('/book/{slug}', [BookingController::class, 'store']);
 Route::get('/book/{slug}/kiosk', [App\Http\Controllers\KioskController::class, 'show'])->name('booking.kiosk');
+Route::get('/book/{slug}/my-appointments', [BookingController::class, 'myAppointments'])->name('booking.my_appointments');
+Route::post('/book/{slug}/my-appointments', [BookingController::class, 'searchAppointments'])->name('booking.search_appointments');

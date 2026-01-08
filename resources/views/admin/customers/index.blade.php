@@ -21,8 +21,8 @@
                 <thead class="text-xs text-slate-700 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
                         <th scope="col" class="px-6 py-4 font-bold">Name</th>
-                        <th scope="col" class="px-6 py-4 font-bold">Email</th>
                         <th scope="col" class="px-6 py-4 font-bold">Phone</th>
+                        <th scope="col" class="px-6 py-4 font-bold">Email</th>
                         <th scope="col" class="px-6 py-4 font-bold">Total Bookings</th>
                         <th scope="col" class="px-6 py-4 font-bold text-right">Actions</th>
                     </tr>
@@ -33,11 +33,11 @@
                         <td class="px-6 py-4 font-bold text-slate-900 whitespace-nowrap">
                             {{ $customer->name }}
                         </td>
-                        <td class="px-6 py-4">
-                            {{ $customer->email }}
+                        <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-medium">
+                            {{ $customer->phone }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-slate-500">
-                            {{ $customer->phone ?? '-' }}
+                        <td class="px-6 py-4">
+                            {{ $customer->email ?? '-' }}
                         </td>
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">

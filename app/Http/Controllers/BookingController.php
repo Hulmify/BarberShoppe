@@ -127,10 +127,26 @@ class BookingController extends Controller
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
             'customer_name' => 'required|string',
-            'customer_email' => 'required|email',
-            'customer_phone' => 'nullable|string',
+            'customer_email' => 'nullable|email',
+            'customer_phone' => 'required|string',
             'stylist_id' => 'nullable|exists:stylists,id',
         ]);
+
+        // Check if customer already has an active booking in this shop
+        $existingCustomer = Customer::where('phone', $validated['customer_phone'])->first();
+        if ($existingCustomer) {
+            $activeBooking = Booking::where('shop_id', $shop->id)
+                ->where('customer_id', $existingCustomer->id)
+                ->whereNotIn('status', ['completed', 'cancelled'])
+                ->first();
+
+            if ($activeBooking) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'You already have an active appointment. You can only book another one after your current appointment is completed or cancelled.'
+                ], 422);
+            }
+        }
 
         // Calculate Totals
         $services = $shop->services()->whereIn('id', $validated['service_ids'])->get();
@@ -179,9 +195,9 @@ class BookingController extends Controller
         }
         
         // Create Customer
-        $customer = Customer::firstOrCreate(
-            ['email' => $validated['customer_email']],
-            ['name' => $validated['customer_name'], 'phone' => $validated['customer_phone']]
+        $customer = Customer::updateOrCreate(
+            ['phone' => $validated['customer_phone']],
+            ['name' => $validated['customer_name'], 'email' => $validated['customer_email']]
         );
 
         // Create Booking
@@ -205,5 +221,37 @@ class BookingController extends Controller
         }
         
         return response()->json(['success' => true, 'booking_id' => $booking->id]);
+    }
+
+    public function myAppointments(Request $request, $slug = null)
+    {
+        $shop = $this->getShop($request, $slug);
+        $phone = $request->query('phone');
+        $bookings = collect();
+
+        if ($phone) {
+            $customer = Customer::where('phone', $phone)->first();
+            if ($customer) {
+                $bookings = Booking::where('shop_id', $shop->id)
+                    ->where('customer_id', $customer->id)
+                    ->with(['items.service', 'stylist'])
+                    ->orderBy('start_time', 'desc')
+                    ->get();
+            }
+        }
+
+        return view('booking.my_appointments', compact('shop', 'bookings', 'phone'));
+    }
+
+    public function searchAppointments(Request $request, $slug = null)
+    {
+        $request->validate(['phone' => 'required|string']);
+        
+        // Handle both domain-based and slug-based routing
+        if ($request->attributes->has('shop')) {
+            return redirect()->route('shop.my_appointments', ['phone' => $request->phone]);
+        }
+        
+        return redirect()->route('booking.my_appointments', ['slug' => $slug, 'phone' => $request->phone]);
     }
 }

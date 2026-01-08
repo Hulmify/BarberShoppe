@@ -46,13 +46,13 @@
                         <input type="text" id="new_customer_name" name="new_customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="John Doe">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <div>
-                            <label for="new_customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address</label>
-                            <input type="email" id="new_customer_email" name="new_customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="john@example.com">
-                        </div>
                         <div>
                             <label for="new_customer_phone" class="block mb-2 text-sm font-medium text-slate-900">Phone Number</label>
                             <input type="tel" id="new_customer_phone" name="new_customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="+1 234 567 890">
+                        </div>
+                         <div>
+                            <label for="new_customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address (Optional)</label>
+                            <input type="email" id="new_customer_email" name="new_customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="john@example.com">
                         </div>
                     </div>
                 </div>
