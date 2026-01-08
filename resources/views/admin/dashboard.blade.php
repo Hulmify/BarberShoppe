@@ -261,6 +261,35 @@
     @endif
 </div>
 
+<!-- Quick Access Actions -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <a href="{{ route('booking.kiosk', $shop->slug) }}?fullscreen=1" target="_blank" class="group relative overflow-hidden bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800 transition-all hover:scale-[1.02] hover:shadow-2xl">
+        <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform">
+             <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        </div>
+        <div class="relative z-10">
+            <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2">
+                Open Kiosk View
+                <span class="bg-amber-500 text-slate-900 text-[10px] uppercase font-black px-2 py-0.5 rounded">Full Screen</span>
+            </h3>
+            <p class="text-slate-400 text-sm max-w-xs">Ideal for shop front tablets. Displays stylists, now serving, and booking QR code.</p>
+        </div>
+    </a>
+
+    <a href="{{ route('admin.appointments.index', ['date' => \Carbon\Carbon::now($tz)->toDateString()]) }}" class="group relative overflow-hidden bg-white p-6 rounded-2xl shadow-lg border border-gray-200 transition-all hover:scale-[1.02] hover:shadow-2xl">
+        <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform text-slate-900">
+             <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        </div>
+        <div class="relative z-10">
+            <h3 class="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
+                Today's Schedule
+                <span class="bg-blue-100 text-blue-700 text-[10px] uppercase font-black px-2 py-0.5 rounded">Quick Link</span>
+            </h3>
+            <p class="text-slate-500 text-sm max-w-xs">Instantly view and manage all of today's appointments in a focused list view.</p>
+        </div>
+    </a>
+</div>
+
 <!-- Link Section -->
 <div class="w-full bg-slate-900 border border-slate-800 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
     <div class="absolute top-0 right-0 p-4 opacity-10">
@@ -281,9 +310,6 @@
             </div>
             <a href="{{ route('booking.via_slug', $shop->slug) }}" target="_blank" class="text-slate-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-white/50 font-bold rounded-lg text-sm px-6 py-3 focus:outline-none transition-colors">
                 Preview Booking Page
-            </a>
-            <a href="{{ route('booking.kiosk', $shop->slug) }}" target="_blank" class="text-white bg-amber-600 hover:bg-amber-700 focus:ring-4 focus:ring-amber-300 font-bold rounded-lg text-sm px-6 py-3 focus:outline-none transition-colors border border-amber-500 shadow-lg">
-                Open Kiosk View
             </a>
         </div>
     </div>

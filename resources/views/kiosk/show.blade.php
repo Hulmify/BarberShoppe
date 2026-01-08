@@ -270,8 +270,13 @@
 <body>
     <div class="kiosk-container">
         <header>
-            <div class="shop-info">
+            <div class="shop-info" style="display: flex; align-items: center; gap: 2rem;">
                 <h1>{{ $shop->name }}</h1>
+                <button id="fullscreen-btn" title="Toggle Fullscreen" class="bg-transparent border-none p-0 text-white hover:text-gray-300 focus:outline-none focus:ring-0 active:outline-none" onclick="toggleFullscreen()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3"/>
+                    </svg>
+                </button>
             </div>
             <div class="clock-container">
                 <div id="clock">00:00:00</div>
@@ -411,6 +416,46 @@
         setTimeout(() => {
             window.location.reload();
         }, 60000);
+
+        // Fullscreen Logic
+        const fsBtn = document.getElementById('fullscreen-btn');
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Check for auto-fullscreen request
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('fullscreen') === '1') {
+            // Create a temporary overlay to request fullscreen on first click
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.background = 'rgba(0,0,0,0.8)';
+            overlay.style.color = 'white';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = '9999';
+            overlay.style.cursor = 'pointer';
+            overlay.innerHTML = '<div style="text-align:center"><h2 style="font-size:2rem;margin-bottom:1rem">Kiosk Mode</h2><p>Click anywhere to enter full screen</p></div>';
+            
+            overlay.onclick = () => {
+                document.documentElement.requestFullscreen();
+                overlay.remove();
+            };
+            document.body.appendChild(overlay);
+        }
     </script>
 </body>
 </html>

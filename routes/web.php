@@ -53,6 +53,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Admin Panel
 Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/trial-expired', function() {
         return view('admin.trial_expired');
     })->name('trial_expired');
@@ -72,6 +73,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefi
     Route::resource('customers', App\Http\Controllers\CustomerController::class)->only(['index', 'show']);
 
     // Appointments
+    Route::get('/appointments/today', [App\Http\Controllers\AppointmentController::class, 'today'])->name('appointments.today');
     Route::resource('appointments', App\Http\Controllers\AppointmentController::class)->only(['index', 'update', 'destroy']);
 
     // POS / Quick Reservation

@@ -35,6 +35,9 @@
               <a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.dashboard') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Dashboard</a>
             </li>
             <li>
+              <a href="{{ route('admin.analytics.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.analytics*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Analytics</a>
+            </li>
+            <li>
               <a href="{{ route('admin.appointments.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.appointments*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Appointments</a>
             </li>
             <li>
