@@ -48,7 +48,12 @@ class BookingController extends Controller
         
         // Validate date
         $request->validate(['date' => 'required|date']);
-        $date = Carbon::parse($request->date);
+        $date = Carbon::parse($request->date)->startOfDay();
+        $today = Carbon::today();
+
+        if ($date->lt($today)) {
+            return response()->json(['slots' => []]);
+        }
         
         // Get Availability for Day of Week
         $dayOfWeek = $date->dayOfWeek; // 0=Sun
@@ -77,9 +82,17 @@ class BookingController extends Controller
 
         $slots = [];
         
+        $now = Carbon::now();
+        
         while ($start->copy()->addMinutes($duration)->lte($end)) {
             $slotEnd = $start->copy()->addMinutes($duration);
             
+            // Skip if slot start time has already passed
+            if ($start->lt($now)) {
+                $start->addMinutes(15);
+                continue;
+            }
+
             // Filter bookings that overlap with this slot
             $overlappingBookings = $allBookings->filter(function ($b) use ($start, $slotEnd) {
                 return $start->lt($b->end_time) && $slotEnd->gt($b->start_time);
@@ -126,6 +139,11 @@ class BookingController extends Controller
         
         // Time
         $startTime = Carbon::parse($validated['date'] . ' ' . $validated['time']);
+        
+        if ($startTime->isPast()) {
+            return response()->json(['success' => false, 'message' => 'Cannot book appointments in the past'], 422);
+        }
+
         $endTime = $startTime->copy()->addMinutes($totalDuration);
         
         // Double Check Availability (Concurrency)

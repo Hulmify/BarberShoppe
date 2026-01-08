@@ -358,13 +358,13 @@
                 <div class="services-ticker" id="ticker">
                     @foreach($services as $service)
                         <div class="ticker-item">
-                            {{ $service->name }} <span class="ticker-price">${{ number_format($service->price, 2) }}</span>
+                            {{ $service->name }} <span class="ticker-price">{{ $shop->currency ?? '$' }} {{ number_format($service->price, 2) }}</span>
                         </div>
                     @endforeach
                     {{-- Duplicate for seamless loop --}}
                     @foreach($services as $service)
                         <div class="ticker-item">
-                            {{ $service->name }} <span class="ticker-price">${{ number_format($service->price, 2) }}</span>
+                            {{ $service->name }} <span class="ticker-price">{{ $shop->currency ?? '$' }} {{ number_format($service->price, 2) }}</span>
                         </div>
                     @endforeach
                 </div>

@@ -47,6 +47,7 @@
                     <option value="GBP" {{ old('currency', $shop->currency) == 'GBP' ? 'selected' : '' }}>GBP (£) - British Pound</option>
                     <option value="CAD" {{ old('currency', $shop->currency) == 'CAD' ? 'selected' : '' }}>CAD ($) - Canadian Dollar</option>
                     <option value="AUD" {{ old('currency', $shop->currency) == 'AUD' ? 'selected' : '' }}>AUD ($) - Australian Dollar</option>
+                    <option value="AED" {{ old('currency', $shop->currency) == 'AED' ? 'selected' : '' }}>AED (د.إ) - UAE Dirham</option>
                 </select>
             </div>
         </div>
