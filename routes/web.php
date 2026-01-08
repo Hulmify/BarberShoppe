@@ -49,8 +49,11 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Admin Panel
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/trial-expired', function() {
+        return view('admin.trial_expired');
+    })->name('trial_expired');
     
     // Shop Management
     Route::get('/shop', [AdminController::class, 'editShop'])->name('shop.edit');
@@ -76,6 +79,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Stylists
     Route::resource('stylists', App\Http\Controllers\Admin\StylistController::class);
+});
+
+// Super Admin Routes
+Route::prefix('super-admin')->name('super_admin.')->group(function () {
+    Route::get('/login', [App\Http\Controllers\SuperAdminController::class, 'login'])->name('login');
+    Route::post('/login', [App\Http\Controllers\SuperAdminController::class, 'authenticate'])->name('authenticate');
+    Route::post('/logout', [App\Http\Controllers\SuperAdminController::class, 'logout'])->name('logout');
+    
+    Route::middleware([\App\Http\Middleware\SuperAdminAuth::class])->group(function () {
+        Route::get('/', [App\Http\Controllers\SuperAdminController::class, 'index'])->name('index');
+        Route::post('/users/{user}/update-expiry', [App\Http\Controllers\SuperAdminController::class, 'updateExpiry'])->name('update_expiry');
+    });
 });
 
 // Direct Booking Link via Path (for testing or non-CNAME usage)

@@ -66,9 +66,22 @@
                 <h1 class="text-3xl font-bold text-slate-800 tracking-tight">@yield('header')</h1>
                 <p class="text-gray-500 text-sm mt-1">@yield('subheader', 'Manage your barber shop.')</p>
              </div>
-             <div class="mt-4 md:mt-0 text-right">
-                <div id="live-clock" class="text-2xl font-bold text-slate-700 tracking-wider">00:00:00</div>
-                <div id="live-date" class="text-xs font-semibold text-slate-400 uppercase tracking-widest">{{ now()->format('l, F j') }}</div>
+             <div class="mt-4 md:mt-0 text-right flex flex-col items-end gap-2">
+                @if(auth()->user()->trial_ends_at)
+                    @php
+                        $daysLeft = now()->diffInDays(auth()->user()->trial_ends_at, false);
+                        $daysLeft = round($daysLeft);
+                    @endphp
+                    @if($daysLeft >= 0 && $daysLeft <= 7)
+                        <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                            {{ $daysLeft == 1 ? 'Last day of subscription' : $daysLeft . ' days left in subscription' }}
+                        </div>
+                    @endif
+                @endif
+                <div>
+                    <div id="live-clock" class="text-2xl font-bold text-slate-700 tracking-wider">00:00:00</div>
+                    <div id="live-date" class="text-xs font-semibold text-slate-400 uppercase tracking-widest">{{ now()->format('l, F j') }}</div>
+                </div>
              </div>
         </div>
 

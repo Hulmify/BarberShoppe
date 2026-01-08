@@ -57,11 +57,12 @@
             </p>
         </form>
 
-        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+        <div class="mt-8 pt-6 border-t border-gray-100 text-center flex flex-col items-center gap-4">
              <button onclick="fillDemo()" class="text-xs text-slate-500 bg-slate-50 hover:bg-slate-100 border border-gray-200 px-3 py-2 rounded-full transition-colors cursor-pointer inline-flex items-center gap-2">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 Tap to fill Demo Account
             </button>
+            <a href="{{ route('super_admin.login') }}" class="text-[10px] uppercase tracking-widest text-slate-300 hover:text-slate-500 transition-colors">Platform Admin</a>
         </div>
     </div>
 
