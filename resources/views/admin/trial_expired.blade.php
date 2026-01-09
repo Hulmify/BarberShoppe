@@ -10,7 +10,7 @@
     <div class="bg-white border border-red-100 rounded-3xl shadow-xl p-10 relative overflow-hidden">
         <!-- Decoration -->
         <div class="absolute -top-10 -right-10 w-40 h-40 bg-red-50 rounded-full blur-3xl opacity-50"></div>
-        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-amber-50 rounded-full blur-3xl opacity-50"></div>
+        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-primary-50 rounded-full blur-3xl opacity-50"></div>
 
         <div class="relative z-10 p-4">
             <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-50 mb-8 border border-red-100">

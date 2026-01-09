@@ -16,12 +16,12 @@
 
             <div class="mb-6">
                 <label for="name" class="block mb-2 text-sm font-medium text-slate-900">Service Name</label>
-                <input type="text" id="name" name="name" value="{{ old('name', $service->name ?? '') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="e.g. Master Fade" required>
+                <input type="text" id="name" name="name" value="{{ old('name', $service->name ?? '') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="e.g. Master Fade" required>
             </div>
 
             <div class="mb-6">
                 <label for="description" class="block mb-2 text-sm font-medium text-slate-900">Description (Optional)</label>
-                <textarea id="description" name="description" rows="4" class="block p-2.5 w-full text-sm text-slate-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-amber-500 focus:border-amber-500" placeholder="e.g. Precision haircut with hot towel finish.">{{ old('description', $service->description ?? '') }}</textarea>
+                <textarea id="description" name="description" rows="4" class="block p-2.5 w-full text-sm text-slate-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500" placeholder="e.g. Precision haircut with hot towel finish.">{{ old('description', $service->description ?? '') }}</textarea>
             </div>
 
             <div class="grid gap-6 mb-8 md:grid-cols-2">
@@ -31,7 +31,7 @@
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
                             <span class="text-gray-500 font-bold text-sm">{{ auth()->user()->shop->currency ?? '$' }}</span>
                         </div>
-                        <input type="number" id="price" step="0.01" name="price" value="{{ old('price', $service->price ?? '') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full ps-10 p-2.5" placeholder="0.00" required>
+                        <input type="number" id="price" step="0.01" name="price" value="{{ old('price', $service->price ?? '') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5" placeholder="0.00" required>
                     </div>
                 </div>
                 <div>
@@ -40,7 +40,7 @@
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
                         </div>
-                        <input type="number" id="duration_minutes" name="duration_minutes" value="{{ old('duration_minutes', $service->duration_minutes ?? '30') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full ps-10 p-2.5" required>
+                        <input type="number" id="duration_minutes" name="duration_minutes" value="{{ old('duration_minutes', $service->duration_minutes ?? '30') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5" required>
                     </div>
                 </div>
             </div>

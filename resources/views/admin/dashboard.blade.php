@@ -12,8 +12,8 @@
     <div class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
         <h5 class="mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase">Today's Appointments</h5>
         <div class="flex items-center gap-4">
-            <div class="p-3 bg-blue-50 rounded-full">
-                <svg class="w-8 h-8 text-blue-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div class="p-3 bg-primary-50 rounded-full">
+                <svg class="w-8 h-8 text-primary-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
             </div>
@@ -95,18 +95,18 @@
                 </div>
                 <div class="grid grid-cols-1 gap-4">
                     @foreach($ongoingBookings as $booking)
-                        <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-all">
+                        <div class="bg-primary-50 border-2 border-primary-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-all">
                             <div class="flex items-center gap-5 w-full md:w-auto">
-                                <div class="bg-amber-400 text-white font-black px-4 py-2 rounded-xl text-center shadow-inner">
+                                <div class="bg-primary-400 text-white font-black px-4 py-2 rounded-xl text-center shadow-inner">
                                     <div class="text-xs uppercase tracking-tighter opacity-80">Started</div>
                                     <div class="text-lg">{{ $booking->start_time->format('h:i A') }}</div>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="text-xs font-bold text-amber-700 uppercase mb-0.5">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
+                                    <div class="text-xs font-bold text-primary-700 uppercase mb-0.5">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
                                     <h4 class="text-xl font-black text-slate-900 leading-tight">{{ $booking->customer->name }}</h4>
                                     <div class="flex items-center gap-2 mt-1">
                                         @foreach($booking->items as $item)
-                                            <span class="text-[10px] font-bold bg-white/60 text-amber-800 px-2 py-0.5 rounded border border-amber-300 uppercase tracking-tighter">{{ $item->service->name }}</span>
+                                            <span class="text-[10px] font-bold bg-white/60 text-primary-800 px-2 py-0.5 rounded border border-primary-300 uppercase tracking-tighter">{{ $item->service->name }}</span>
                                         @endforeach
                                     </div>
                                 </div>
@@ -143,8 +143,8 @@
             @if($upcomingBookings->isNotEmpty())
             <div>
                 <div class="flex items-center gap-2 mb-4">
-                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
-                    <h6 class="text-sm font-black uppercase tracking-[0.2em] text-blue-600">Coming Up Next</h6>
+                    <div class="w-3 h-3 rounded-full bg-primary-500"></div>
+                    <h6 class="text-sm font-black uppercase tracking-[0.2em] text-primary-600">Coming Up Next</h6>
                 </div>
                 <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                     <table class="w-full text-sm text-left">
@@ -159,10 +159,10 @@
                         </thead>
                         <tbody class="divide-y divide-gray-50">
                             @foreach($upcomingBookings as $booking)
-                            <tr class="hover:bg-blue-50/30 transition-colors">
+                            <tr class="hover:bg-primary-50/30 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="text-base font-black text-slate-900">{{ $booking->start_time->format('h:i A') }}</div>
-                                    <div class="text-[10px] font-bold text-blue-500 uppercase">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
+                                    <div class="text-[10px] font-bold text-primary-500 uppercase">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="font-bold text-slate-800">{{ $booking->customer->name }}</div>
@@ -184,9 +184,9 @@
                                 <td class="px-6 py-4">
                                     @php
                                         $sStyle = match($booking->status) {
-                                            'pending' => 'bg-amber-100 text-amber-700',
+                                            'pending' => 'bg-primary-100 text-primary-700',
                                             'confirmed' => 'bg-green-100 text-green-700',
-                                            'in_progress' => 'bg-blue-600 text-white',
+                                            'in_progress' => 'bg-primary-600 text-white',
                                             default => 'bg-gray-100 text-gray-700'
                                         };
                                     @endphp
@@ -198,7 +198,7 @@
                                             <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST">
                                                 @csrf @method('PUT')
                                                 <input type="hidden" name="status" value="in_progress">
-                                                <button title="Start Visit" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200">
+                                                <button title="Start Visit" class="p-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 border border-primary-200">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                 </button>
                                             </form>
@@ -251,7 +251,7 @@
                                 <td class="px-6 py-3 font-semibold text-gray-600">{{ $booking->customer->name }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <div class="flex items-center justify-end gap-3">
-                                        <span class="px-2 py-1 rounded text-[10px] font-bold {{ $booking->status == 'completed' ? 'bg-blue-100 text-blue-700' : ($booking->status == 'in_progress' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600') }}">{{ ucwords(str_replace('_', ' ', $booking->status)) }}</span>
+                                        <span class="px-2 py-1 rounded text-[10px] font-bold {{ $booking->status == 'completed' ? 'bg-primary-100 text-primary-700' : ($booking->status == 'in_progress' ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-600') }}">{{ ucwords(str_replace('_', ' ', $booking->status)) }}</span>
                                         <form action="{{ route('admin.appointments.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Permanently delete this appointment? This action cannot be undone.');">
                                             @csrf @method('DELETE')
                                             <button title="Delete Permanently" class="text-red-400 hover:text-red-600 transition-colors">
@@ -280,7 +280,7 @@
         <div class="relative z-10">
             <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2">
                 Open Kiosk View
-                <span class="bg-amber-500 text-slate-900 text-[10px] uppercase font-black px-2 py-0.5 rounded">Full Screen</span>
+                <span class="bg-primary-500 text-slate-900 text-[10px] uppercase font-black px-2 py-0.5 rounded">Full Screen</span>
             </h3>
             <p class="text-slate-400 text-sm max-w-xs">Ideal for shop front tablets. Displays stylists, now serving, and booking QR code.</p>
         </div>
@@ -293,7 +293,7 @@
         <div class="relative z-10">
             <h3 class="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
                 Today's Schedule
-                <span class="bg-blue-100 text-blue-700 text-[10px] uppercase font-black px-2 py-0.5 rounded">Quick Link</span>
+                <span class="bg-primary-100 text-primary-700 text-[10px] uppercase font-black px-2 py-0.5 rounded">Quick Link</span>
             </h3>
             <p class="text-slate-500 text-sm max-w-xs">Instantly view and manage all of today's appointments in a focused list view.</p>
         </div>
@@ -311,7 +311,7 @@
         <p class="text-slate-300 text-sm mb-6 max-w-lg">Share this link directly with your customers or add it to your social media bio to start accepting appointments.</p>
         
         <div class="flex flex-col sm:flex-row items-center gap-4">
-            <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 text-sm font-mono text-amber-500 break-all">
+            <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 text-sm font-mono text-primary-500 break-all">
                 @if($shop->custom_domain)
                     http://{{ $shop->custom_domain }}
                 @else

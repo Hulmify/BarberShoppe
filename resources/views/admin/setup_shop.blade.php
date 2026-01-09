@@ -43,7 +43,7 @@
 
         <div class="form-group">
             <label>Primary Color</label>
-            <input type="color" name="primary_color" value="{{ old('primary_color', '#000000') }}" style="height: 40px;">
+            <input type="color" name="primary_color" value="{{ old('primary_color', '#4896bf') }}" style="height: 40px;">
         </div>
 
         <div class="form-group">

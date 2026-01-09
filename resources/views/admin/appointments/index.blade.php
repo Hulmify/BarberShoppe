@@ -37,7 +37,7 @@
         <div class="flex flex-col md:flex-row gap-6">
             <div class="w-full md:w-64">
                 <label for="date" class="block mb-2 text-sm font-medium text-slate-700">Filter Date</label>
-                <input type="date" id="date" name="date" value="{{ request('date') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+                <input type="date" id="date" name="date" value="{{ request('date') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
             </div>
             <div class="flex-1">
                 <label class="block mb-2 text-sm font-medium text-slate-700">Filter by Statuses</label>
@@ -53,7 +53,7 @@
                         <label class="inline-flex items-center cursor-pointer group">
                             <input type="checkbox" name="statuses[]" value="{{ $status }}" 
                                 {{ $checked ? 'checked' : '' }}
-                                class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 transition-colors">
+                                class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 transition-colors">
                             <span class="ml-2 text-sm text-slate-600 group-hover:text-slate-900 capitalize">{{ str_replace('_', ' ', $status) }}</span>
                         </label>
                     @endforeach
@@ -135,8 +135,8 @@
                                 $statusStyles = match($booking->status) {
                                     'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200 ring-yellow-600/20',
                                     'confirmed' => 'bg-green-50 text-green-700 border-green-200 ring-green-600/20',
-                                    'in_progress' => 'bg-blue-600 text-white border-blue-700 ring-blue-500/20',
-                                    'completed' => 'bg-blue-50 text-blue-700 border-blue-200 ring-blue-600/20',
+                                    'in_progress' => 'bg-primary-600 text-white border-primary-700 ring-primary-500/20',
+                                    'completed' => 'bg-primary-50 text-primary-700 border-primary-200 ring-primary-600/20',
                                     'cancelled' => 'bg-red-50 text-red-700 border-red-200 ring-red-600/20',
                                     default => 'bg-gray-50 text-gray-600 border-gray-200 ring-gray-500/10'
                                 };
@@ -169,7 +169,7 @@
                                     <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST">
                                         @csrf @method('PUT')
                                         <input type="hidden" name="status" value="in_progress">
-                                        <button type="submit" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200" title="Start Visit">
+                                        <button type="submit" class="p-2 bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors border border-primary-200" title="Start Visit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         </button>
                                     </form>
@@ -207,7 +207,7 @@
                                     <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" onsubmit="return confirm('Restore this booking to Confirmed?');">
                                         @csrf @method('PUT')
                                         <input type="hidden" name="status" value="confirmed">
-                                        <button type="submit" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors border border-amber-200 group" title="Restore Booking">
+                                        <button type="submit" class="p-2 bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors border border-primary-200 group" title="Restore Booking">
                                             <div class="flex items-center gap-1 text-xs font-semibold px-1">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                                 Restore

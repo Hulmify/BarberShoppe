@@ -15,9 +15,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
-            --brand-color: {{ $shop->primary_color ?? '#f59e0b' }};
-            --brand-light: {{ ($shop->primary_color ?? '#f59e0b') . '1a' }}; /* 10% opacity */
-            --brand-medium: {{ ($shop->primary_color ?? '#f59e0b') . '33' }}; /* 20% opacity */
+            --brand-color: {{ $shop->primary_color ?? '#4896bf' }};
+            --brand-light: {{ ($shop->primary_color ?? '#4896bf') . '1a' }}; /* 10% opacity */
+            --brand-medium: {{ ($shop->primary_color ?? '#4896bf') . '33' }}; /* 20% opacity */
         }
         body { font-family: 'Outfit', sans-serif; }
         
@@ -27,15 +27,15 @@
         .bg-brand-light { background-color: var(--brand-light) !important; }
         .bg-brand-gradient { background: linear-gradient(to right, #1e293b, var(--brand-color)) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
         
-        /* Override specific amber classes to use brand color */
-        .text-amber-600, .text-amber-700 { color: var(--brand-color) !important; }
-        .bg-amber-100, .bg-amber-50 { background-color: var(--brand-light) !important; }
-        .bg-amber-500, .bg-amber-600 { background-color: var(--brand-color) !important; }
-        .border-amber-400, .border-amber-500 { border-color: var(--brand-color) !important; }
-        .from-amber-100 { --tw-gradient-from: var(--brand-light) !important; }
-        .to-amber-200 { --tw-gradient-to: var(--brand-medium) !important; }
-        .fill-amber-500 { fill: var(--brand-color) !important; }
-        .ring-amber-200, .ring-amber-500\/20 { --tw-ring-color: var(--brand-medium) !important; }
+        /* Override specific primary classes to use brand color */
+        .text-primary-600, .text-primary-700 { color: var(--brand-color) !important; }
+        .bg-primary-100, .bg-primary-50 { background-color: var(--brand-light) !important; }
+        .bg-primary-500, .bg-primary-600 { background-color: var(--brand-color) !important; }
+        .border-primary-400, .border-primary-500 { border-color: var(--brand-color) !important; }
+        .from-primary-100 { --tw-gradient-from: var(--brand-light) !important; }
+        .to-primary-200 { --tw-gradient-to: var(--brand-medium) !important; }
+        .fill-primary-500 { fill: var(--brand-color) !important; }
+        .ring-primary-200, .ring-primary-500\/20 { --tw-ring-color: var(--brand-medium) !important; }
     </style>
 </head>
 <body class="bg-gray-50 text-slate-900 min-h-screen flex flex-col items-center py-10 px-4">
@@ -43,7 +43,7 @@
     <div class="w-full max-w-3xl">
         <header class="text-center mb-10 animate-fade-in-down">
             <div class="flex justify-end mb-4">
-                <a href="{{ request()->attributes->has('shop') ? route('shop.my_appointments') : route('booking.my_appointments', ['slug' => $shop->slug]) }}" class="text-sm font-medium text-slate-500 hover:text-amber-600 transition-colors flex items-center gap-1">
+                <a href="{{ request()->attributes->has('shop') ? route('shop.my_appointments') : route('booking.my_appointments', ['slug' => $shop->slug]) }}" class="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     My Appointments
                 </a>
@@ -65,7 +65,7 @@
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 transition-transform hover:scale-[1.01] duration-300">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold flex items-center gap-2">
-                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-700 text-sm font-bold">1</span>
+                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary-100 text-secondary-700 text-sm font-bold">1</span>
                         Select Services
                     </h2>
                     <button type="button" onclick="clearServiceSelection()" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1.5 p-1">
@@ -82,13 +82,13 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                             </svg>
                         </div>
-                        <input type="text" id="serviceSearchInput" value="{{ $search ?? '' }}" placeholder="Search services..." class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full pl-10 p-2.5" onkeyup="filterBookingServices()">
+                        <input type="text" id="serviceSearchInput" value="{{ $search ?? '' }}" placeholder="Search services..." class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5" onkeyup="filterBookingServices()">
                     </div>
                 </div>
                 
                 <div class="grid gap-4" id="servicesGrid">
                     @forelse($services as $service)
-                        <div class="service-item group relative flex items-center justify-between p-4 rounded-xl border-2 border-gray-100 hover:border-amber-400 cursor-pointer transition-all duration-200"
+                        <div class="service-item group relative flex items-center justify-between p-4 rounded-xl border-2 border-gray-100 hover:border-primary-400 cursor-pointer transition-all duration-200"
                              data-id="{{ $service->id }}"
                              data-name="{{ strtolower($service->name) }}" 
                              data-desc="{{ strtolower($service->description ?? '') }}"
@@ -102,11 +102,11 @@
                                     <span>{{ $service->description }}</span>
                                 </div>
                             </div>
-                            <div class="text-xl font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+                            <div class="text-xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
                                 {{ $shop->currency ?? '$' }} {{ $service->price }}
                             </div>
                             <!-- Selected Checkmark Indicator (Hidden by default) -->
-                            <div class="absolute top-0 right-0 -mt-2 -mr-2 bg-amber-500 text-white rounded-full p-1 shadow-md opacity-0 scale-50 transition-all duration-200 checkmark">
+                            <div class="absolute top-0 right-0 -mt-2 -mr-2 bg-primary-500 text-white rounded-full p-1 shadow-md opacity-0 scale-50 transition-all duration-200 checkmark">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
                         </div>
@@ -128,20 +128,20 @@
             @if($stylists->count() > 0)
             <div id="step2" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 hidden transition-all duration-500 opacity-0 translate-y-4">
                 <h2 class="text-xl font-bold mb-2 flex items-center gap-2">
-                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-700 text-sm font-bold">2</span>
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary-100 text-secondary-700 text-sm font-bold">2</span>
                     Choose Your Stylist
                 </h2>
                 <p class="text-sm text-slate-500 mb-6">Optional - Select a preferred stylist or skip to continue</p>
                 
                 <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                     @foreach($stylists as $stylist)
-                        <div class="stylist-card group relative flex flex-col items-center p-4 rounded-xl border-2 border-gray-100 hover:border-amber-400 cursor-pointer transition-all duration-200"
+                        <div class="stylist-card group relative flex flex-col items-center p-4 rounded-xl border-2 border-gray-100 hover:border-primary-400 cursor-pointer transition-all duration-200"
                              onclick="selectStylist(this, {{ $stylist->id }})">
-                            <div class="w-20 h-20 rounded-full overflow-hidden mb-3 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                            <div class="w-20 h-20 rounded-full overflow-hidden mb-3 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
                                 @if($stylist->image_base64)
                                     <img src="{{ $stylist->image_base64 }}" alt="{{ $stylist->name }}" class="w-full h-full object-cover">
                                 @else
-                                    <svg class="w-10 h-10 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-10 h-10 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                                     </svg>
                                 @endif
@@ -151,14 +151,14 @@
                                 <p class="text-xs text-slate-500 text-center mt-1 line-clamp-2">{{ $stylist->bio }}</p>
                             @endif
                             <!-- Selected Checkmark -->
-                            <div class="absolute top-0 right-0 -mt-2 -mr-2 bg-amber-500 text-white rounded-full p-1 shadow-md opacity-0 scale-50 transition-all duration-200 stylist-checkmark">
+                            <div class="absolute top-0 right-0 -mt-2 -mr-2 bg-primary-500 text-white rounded-full p-1 shadow-md opacity-0 scale-50 transition-all duration-200 stylist-checkmark">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
                         </div>
                     @endforeach
                     
                     <!-- No Preference Option -->
-                    <div class="stylist-card group relative flex flex-col items-center p-4 rounded-xl border-2 border-gray-100 hover:border-amber-400 cursor-pointer transition-all duration-200 border-amber-500 bg-amber-50"
+                    <div class="stylist-card group relative flex flex-col items-center p-4 rounded-xl border-2 border-gray-100 hover:border-primary-400 cursor-pointer transition-all duration-200 border-primary-500 bg-primary-50"
                          onclick="selectStylist(this, null)">
                         <div class="w-20 h-20 rounded-full overflow-hidden mb-3 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                             <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,7 +168,7 @@
                         <h3 class="font-semibold text-base text-slate-900 text-center">No Preference</h3>
                         <p class="text-xs text-slate-500 text-center mt-1">Any available stylist</p>
                         <!-- Selected Checkmark -->
-                        <div class="absolute top-0 right-0 -mt-2 -mr-2 bg-amber-500 text-white rounded-full p-1 shadow-md opacity-100 scale-100 transition-all duration-200 stylist-checkmark">
+                        <div class="absolute top-0 right-0 -mt-2 -mr-2 bg-primary-500 text-white rounded-full p-1 shadow-md opacity-100 scale-100 transition-all duration-200 stylist-checkmark">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         </div>
                     </div>
@@ -180,23 +180,23 @@
             <!-- Step 3: Date & Time -->
             <div id="dateStep" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 hidden transition-all duration-500 opacity-0 translate-y-4">
                 <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-700 text-sm font-bold">{{ $stylists->count() > 0 ? '3' : '2' }}</span>
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary-100 text-secondary-700 text-sm font-bold">{{ $stylists->count() > 0 ? '3' : '2' }}</span>
                     Choose Date & Time
                 </h2>
                 
                 <div class="mb-6">
                     <label for="dateInput" class="block mb-2 text-sm font-medium text-slate-900">Select Date</label>
-                    <input type="date" id="dateInput" name="date" min="{{ date('Y-m-d') }}" onchange="fetchSlots()" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+                    <input type="date" id="dateInput" name="date" min="{{ date('Y-m-d') }}" onchange="fetchSlots()" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                 </div>
 
                 <label class="block mb-2 text-sm font-medium text-slate-900">Available Time Slots</label>
                 
                 <!-- Quick Filters -->
                 <div class="flex gap-2 mb-4 overflow-x-auto pb-1 no-scrollbar">
-                    <button type="button" onclick="filterBookingTimeGroups('all')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-amber-500 text-white shadow-sm border border-amber-500" data-group="all">All Day</button>
-                    <button type="button" onclick="filterBookingTimeGroups('morning')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="morning">Morning</button>
-                    <button type="button" onclick="filterBookingTimeGroups('afternoon')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="afternoon">Afternoon</button>
-                    <button type="button" onclick="filterBookingTimeGroups('evening')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="evening">Evening</button>
+                    <button type="button" onclick="filterBookingTimeGroups('all')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-primary-500 text-white shadow-sm border border-primary-500" data-group="all">All Day</button>
+                    <button type="button" onclick="filterBookingTimeGroups('morning')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="morning">Morning</button>
+                    <button type="button" onclick="filterBookingTimeGroups('afternoon')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="afternoon">Afternoon</button>
+                    <button type="button" onclick="filterBookingTimeGroups('evening')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="evening">Evening</button>
                 </div>
 
                 <div id="slotsContainer" class="space-y-6 max-h-96 overflow-y-auto p-4 border border-gray-100 rounded-xl bg-slate-50/50 custom-scrollbar">
@@ -235,22 +235,22 @@
             <!-- Step 4: Details -->
             <div id="detailsStep" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 hidden transition-all duration-500 opacity-0 translate-y-4">
                 <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-700 text-sm font-bold">{{ $stylists->count() > 0 ? '4' : '3' }}</span>
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary-100 text-secondary-700 text-sm font-bold">{{ $stylists->count() > 0 ? '4' : '3' }}</span>
                     Your Details
                 </h2>
                 
                 <div class="grid gap-6 md:grid-cols-2">
                     <div>
                         <label for="customer_phone" class="block mb-2 text-sm font-medium text-slate-900">Phone Number</label>
-                        <input type="tel" id="customer_phone" name="customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="(555) 123-4567" required>
+                        <input type="tel" id="customer_phone" name="customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="(555) 123-4567" required>
                     </div>
                     <div>
                         <label for="customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address (Optional)</label>
-                        <input type="email" id="customer_email" name="customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="name@example.com">
+                        <input type="email" id="customer_email" name="customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="name@example.com">
                     </div>
                     <div class="md:col-span-2">
                         <label for="customer_name" class="block mb-2 text-sm font-medium text-slate-900">Full Name</label>
-                        <input type="text" id="customer_name" name="customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="John Doe" required>
+                        <input type="text" id="customer_name" name="customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="John Doe" required>
                     </div>
                 </div>
             </div>
@@ -295,7 +295,7 @@
                     const id = parseInt(el.dataset.id);
                     if (selectedServices.has(id)) {
                         el.classList.remove('border-gray-100');
-                        el.classList.add('border-amber-500', 'bg-amber-50');
+                        el.classList.add('border-primary-500', 'bg-primary-50');
                         const checkmark = el.querySelector('.checkmark');
                         checkmark.classList.remove('opacity-0', 'scale-50');
                         checkmark.classList.add('opacity-100', 'scale-100');
@@ -318,7 +318,7 @@
             
             if (selectedServices.has(id)) {
                 selectedServices.delete(id);
-                el.classList.remove('border-amber-500', 'bg-amber-50');
+                el.classList.remove('border-primary-500', 'bg-primary-50');
                 el.classList.add('border-gray-100');
                 checkmark.classList.remove('opacity-100', 'scale-100');
                 checkmark.classList.add('opacity-0', 'scale-50');
@@ -328,7 +328,7 @@
             } else {
                 selectedServices.add(id);
                 el.classList.remove('border-gray-100');
-                el.classList.add('border-amber-500', 'bg-amber-50');
+                el.classList.add('border-primary-500', 'bg-primary-50');
                 checkmark.classList.remove('opacity-0', 'scale-50');
                 checkmark.classList.add('opacity-100', 'scale-100');
                 
@@ -348,7 +348,7 @@
             totalD = 0;
             
             document.querySelectorAll('.service-item').forEach(el => {
-                el.classList.remove('border-amber-500', 'bg-amber-50');
+                el.classList.remove('border-primary-500', 'bg-primary-50');
                 el.classList.add('border-gray-100');
                 const checkmark = el.querySelector('.checkmark');
                 checkmark.classList.remove('opacity-100', 'scale-100');
@@ -378,7 +378,7 @@
         function selectStylist(el, id) {
             // Remove previous selection from all cards
             document.querySelectorAll('.stylist-card').forEach(card => {
-                card.classList.remove('border-amber-500', 'bg-amber-50');
+                card.classList.remove('border-primary-500', 'bg-primary-50');
                 card.classList.add('border-gray-100');
                 const checkmark = card.querySelector('.stylist-checkmark');
                 if (checkmark) {
@@ -389,7 +389,7 @@
 
             // Add selection to clicked card
             el.classList.remove('border-gray-100');
-            el.classList.add('border-amber-500', 'bg-amber-50');
+            el.classList.add('border-primary-500', 'bg-primary-50');
             const checkmark = el.querySelector('.stylist-checkmark');
             if (checkmark) {
                 checkmark.classList.remove('opacity-0', 'scale-50');
@@ -481,10 +481,10 @@
             buttons.forEach(btn => {
                 if (btn.dataset.group === group) {
                     btn.classList.remove('bg-white', 'text-slate-500', 'border-slate-200');
-                    btn.classList.add('bg-amber-500', 'text-white', 'shadow-sm', 'border-amber-500');
+                    btn.classList.add('bg-primary-500', 'text-white', 'shadow-sm', 'border-primary-500');
                 } else {
                     btn.classList.add('bg-white', 'text-slate-500', 'border-slate-200');
-                    btn.classList.remove('bg-amber-500', 'text-white', 'shadow-sm', 'border-amber-500');
+                    btn.classList.remove('bg-primary-500', 'text-white', 'shadow-sm', 'border-primary-500');
                 }
             });
 
@@ -509,7 +509,7 @@
             const noSlotsMsg = document.getElementById('no-slots-msg');
             
             // Show Loader
-            noSlotsMsg.innerHTML = '<svg class="inline w-8 h-8 text-gray-200 animate-spin fill-amber-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>';
+            noSlotsMsg.innerHTML = '<svg class="inline w-8 h-8 text-gray-200 animate-spin fill-primary-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>';
             
             // Hide sections
             document.querySelectorAll('.slot-grid').forEach(g => g.innerHTML = '');
@@ -567,7 +567,7 @@
 
         function createBookingSlotButton(timeStr) {
             const div = document.createElement('div');
-            div.className = 'py-3 px-2 text-center bg-white border border-gray-200 hover:border-amber-400 hover:bg-amber-50 rounded-xl cursor-pointer transition-all shadow-sm flex flex-col items-center justify-center gap-0.5';
+            div.className = 'py-3 px-2 text-center bg-white border border-gray-200 hover:border-primary-400 hover:bg-primary-50 rounded-xl cursor-pointer transition-all shadow-sm flex flex-col items-center justify-center gap-0.5';
             
             const [hours, minutes] = timeStr.split(':');
             const h = parseInt(hours);
@@ -586,13 +586,13 @@
         function selectTime(el, time) {
             // Remove previous selection styles
             document.querySelectorAll('.slot-grid div').forEach(d => {
-                d.classList.remove('bg-amber-600', 'text-white', 'border-amber-700', 'ring-2', 'ring-amber-200');
+                d.classList.remove('bg-primary-600', 'text-white', 'border-primary-700', 'ring-2', 'ring-primary-200');
                 d.classList.add('bg-white', 'border-gray-200');
             });
 
             // Add new selection styles
             el.classList.remove('bg-white', 'border-gray-200');
-            el.classList.add('bg-amber-600', 'text-white', 'border-amber-700', 'ring-2', 'ring-amber-200');
+            el.classList.add('bg-primary-600', 'text-white', 'border-primary-700', 'ring-2', 'ring-primary-200');
             
             document.getElementById('timeInput').value = time;
             

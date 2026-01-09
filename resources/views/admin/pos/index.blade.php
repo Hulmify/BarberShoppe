@@ -36,11 +36,11 @@
                 
                 <div class="flex gap-4 mb-4">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="customer_type" value="existing" checked class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                        <input type="radio" name="customer_type" value="existing" checked class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
                         <span class="text-sm font-medium text-slate-700">Existing Customer</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="customer_type" value="new" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                        <input type="radio" name="customer_type" value="new" class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
                         <span class="text-sm font-medium text-slate-700">New Customer</span>
                     </label>
                 </div>
@@ -48,7 +48,7 @@
                 <!-- Existing Customer Select -->
                 <div id="existing_customer_section">
                     <label for="customer_id" class="block mb-2 text-sm font-medium text-slate-900">Select Customer</label>
-                    <select id="customer_id" name="customer_id" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+                    <select id="customer_id" name="customer_id" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                         <option value="">-- Choose Customer --</option>
                         @foreach($customers as $customer)
                             <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone ?? $customer->email }})</option>
@@ -60,16 +60,16 @@
                 <div id="new_customer_section" class="hidden space-y-4">
                     <div>
                         <label for="new_customer_name" class="block mb-2 text-sm font-medium text-slate-900">Full Name</label>
-                        <input type="text" id="new_customer_name" name="new_customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="John Doe">
+                        <input type="text" id="new_customer_name" name="new_customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="John Doe">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="new_customer_phone" class="block mb-2 text-sm font-medium text-slate-900">Phone Number</label>
-                            <input type="tel" id="new_customer_phone" name="new_customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="+1 234 567 890">
+                            <input type="tel" id="new_customer_phone" name="new_customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="+1 234 567 890">
                         </div>
                          <div>
                             <label for="new_customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address (Optional)</label>
-                            <input type="email" id="new_customer_email" name="new_customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="john@example.com">
+                            <input type="email" id="new_customer_email" name="new_customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="john@example.com">
                         </div>
                     </div>
                 </div>
@@ -87,7 +87,7 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                             </svg>
                         </div>
-                        <input type="text" id="serviceSearch" value="{{ $search ?? '' }}" placeholder="Search services..." class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full pl-10 p-2.5" onkeyup="filterServices()">
+                        <input type="text" id="serviceSearch" value="{{ $search ?? '' }}" placeholder="Search services..." class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5" onkeyup="filterServices()">
                     </div>
                 </div>
                 
@@ -99,7 +99,7 @@
                                     data-price="{{ $service->price }}" 
                                     data-name="{{ $service->name }}" 
                                     data-duration="{{ $service->duration_minutes }}"
-                                    class="service-checkbox w-5 h-5 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                                    class="service-checkbox w-5 h-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
                                 <div>
                                     <div class="font-medium text-slate-900">{{ $service->name }}</div>
                                     <div class="text-xs text-slate-500">{{ $service->duration_minutes }} mins</div>
@@ -132,11 +132,11 @@
                             $today = \Carbon\Carbon::now($tz)->toDateString();
                         @endphp
                         <label for="date" class="block mb-2 text-sm font-medium text-slate-900">Date</label>
-                        <input type="date" id="date" name="date" value="{{ $today }}" min="{{ $today }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+                        <input type="date" id="date" name="date" value="{{ $today }}" min="{{ $today }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     </div>
                     <div>
                         <label for="stylist_id" class="block mb-2 text-sm font-medium text-slate-900">Stylist (Optional)</label>
-                        <select id="stylist_id" name="stylist_id" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+                        <select id="stylist_id" name="stylist_id" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                             <option value="">-- No Preference --</option>
                             @foreach($stylists as $stylist)
                                 <option value="{{ $stylist->id }}">{{ $stylist->name }}</option>
@@ -149,7 +149,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <label class="text-sm font-medium text-slate-900">Select Time Slot</label>
                         <div id="slot-loader" class="hidden">
-                            <svg class="animate-spin h-4 w-4 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <svg class="animate-spin h-4 w-4 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
@@ -158,10 +158,10 @@
 
                     <!-- Quick Filters -->
                     <div class="flex gap-2 mb-4 overflow-x-auto pb-1 no-scrollbar">
-                        <button type="button" onclick="filterTimeGroups('all')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-amber-500 text-white shadow-sm border border-amber-500" data-group="all">All Day</button>
-                        <button type="button" onclick="filterTimeGroups('morning')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="morning">Morning</button>
-                        <button type="button" onclick="filterTimeGroups('afternoon')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="afternoon">Afternoon</button>
-                        <button type="button" onclick="filterTimeGroups('evening')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="evening">Evening</button>
+                        <button type="button" onclick="filterTimeGroups('all')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-primary-500 text-white shadow-sm border border-primary-500" data-group="all">All Day</button>
+                        <button type="button" onclick="filterTimeGroups('morning')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="morning">Morning</button>
+                        <button type="button" onclick="filterTimeGroups('afternoon')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="afternoon">Afternoon</button>
+                        <button type="button" onclick="filterTimeGroups('evening')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="evening">Evening</button>
                     </div>
                     
                     <div id="pos-slots-container" class="space-y-6 max-h-96 overflow-y-auto p-4 border border-gray-100 rounded-xl bg-slate-50/50 custom-scrollbar">
@@ -217,7 +217,7 @@
             
             <div class="border-t border-gray-200 pt-4 flex justify-between items-center mb-6">
                 <span class="text-base font-bold text-slate-700">Total</span>
-                <span class="text-2xl font-bold text-amber-600" id="total-price">{{ auth()->user()->shop->currency ?? '$' }} 0.00</span>
+                <span class="text-2xl font-bold text-primary-600" id="total-price">{{ auth()->user()->shop->currency ?? '$' }} 0.00</span>
             </div>
             
             <button type="submit" form="posForm" class="w-full text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:ring-slate-300 font-bold rounded-lg text-sm px-5 py-3.5 text-center transition-transform hover:-translate-y-0.5 shadow-md">
@@ -263,7 +263,7 @@
             
             // Highlight row if checked
             if (isChecked) {
-                cb.closest('.service-item').classList.add('bg-amber-50', 'border-amber-300');
+                cb.closest('.service-item').classList.add('bg-primary-50', 'border-primary-300');
             }
 
             cb.addEventListener('change', function() {
@@ -275,10 +275,10 @@
                         price: parseFloat(this.dataset.price),
                         duration: parseInt(this.dataset.duration || 30)
                     });
-                    row.classList.add('bg-amber-50', 'border-amber-300');
+                    row.classList.add('bg-primary-50', 'border-primary-300');
                 } else {
                     selectedServices.delete(id);
-                    row.classList.remove('bg-amber-50', 'border-amber-300');
+                    row.classList.remove('bg-primary-50', 'border-primary-300');
                 }
                 saveAndRefresh();
             });
@@ -322,10 +322,10 @@
         buttons.forEach(btn => {
             if (btn.dataset.group === group) {
                 btn.classList.remove('bg-white', 'text-slate-500', 'border-slate-200');
-                btn.classList.add('bg-amber-500', 'text-white', 'shadow-sm', 'border-amber-500');
+                btn.classList.add('bg-primary-500', 'text-white', 'shadow-sm', 'border-primary-500');
             } else {
                 btn.classList.add('bg-white', 'text-slate-500', 'border-slate-200');
-                btn.classList.remove('bg-amber-500', 'text-white', 'shadow-sm', 'border-amber-500');
+                btn.classList.remove('bg-primary-500', 'text-white', 'shadow-sm', 'border-primary-500');
             }
         });
 
@@ -470,7 +470,7 @@
 
     function createSlotButton(timeStr) {
         const div = document.createElement('div');
-        div.className = 'time-slot-btn py-3 px-2 text-center bg-white border border-gray-200 hover:border-amber-400 hover:bg-amber-50 rounded-xl cursor-pointer transition-all shadow-sm flex flex-col items-center justify-center gap-0.5';
+        div.className = 'time-slot-btn py-3 px-2 text-center bg-white border border-gray-200 hover:border-primary-400 hover:bg-primary-50 rounded-xl cursor-pointer transition-all shadow-sm flex flex-col items-center justify-center gap-0.5';
         
         const [hours, minutes] = timeStr.split(':');
         const h = parseInt(hours);
@@ -490,26 +490,26 @@
         // Remove previous selection styles
         const allSlots = document.querySelectorAll('.time-slot-btn');
         allSlots.forEach(d => {
-            d.classList.remove('border-amber-500', 'bg-amber-600', 'text-white', 'ring-2', 'ring-amber-500/20');
+            d.classList.remove('border-primary-500', 'bg-primary-600', 'text-white', 'ring-2', 'ring-primary-500/20');
             d.classList.add('bg-white', 'border-gray-200');
             
             // Fix nested spans color
             const spans = d.querySelectorAll('span');
             spans[0].classList.remove('text-white');
             spans[0].classList.add('text-slate-900');
-            spans[1].classList.remove('text-amber-100');
+            spans[1].classList.remove('text-primary-100');
             spans[1].classList.add('text-slate-400');
         });
 
         // Add new selection styles
-        el.classList.remove('bg-white', 'border-gray-200', 'hover:bg-amber-50');
-        el.classList.add('border-amber-500', 'bg-amber-600', 'text-white', 'ring-2', 'ring-amber-500/20');
+        el.classList.remove('bg-white', 'border-gray-200', 'hover:bg-primary-50');
+        el.classList.add('border-primary-500', 'bg-primary-600', 'text-white', 'ring-2', 'ring-primary-500/20');
         
         const selectedSpans = el.querySelectorAll('span');
         selectedSpans[0].classList.remove('text-slate-900');
         selectedSpans[0].classList.add('text-white');
         selectedSpans[1].classList.remove('text-slate-400');
-        selectedSpans[1].classList.add('text-amber-100');
+        selectedSpans[1].classList.add('text-primary-100');
         
         document.getElementById('time').value = time;
     }

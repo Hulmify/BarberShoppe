@@ -31,15 +31,15 @@
 
     <!-- Decorative Elements -->
     <div class="absolute inset-0 z-0 select-none">
-        <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-amber-500/10 blur-[120px]"></div>
-        <div class="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-[120px]"></div>
+        <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-primary-500/10 blur-[120px]"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary-600/10 blur-[120px]"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03]" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 40px 40px;"></div>
     </div>
 
     <div class="w-full max-w-lg relative z-10 animate-in fade-in zoom-in-95 duration-700">
         <div class="glass-container rounded-[40px] shadow-2xl p-10 md:p-16 border border-white/5">
             <div class="text-center mb-12">
-                <h1 class="text-4xl font-black text-white tracking-tight mb-3">Super<span class="text-amber-500">Admin</span></h1>
+                <h1 class="text-4xl font-black text-white tracking-tight mb-3">Super<span class="text-primary-500">Admin</span></h1>
             </div>
 
             @if ($errors->any())
@@ -68,14 +68,14 @@
                 </div>
 
                 <button type="submit" 
-                        class="relative group w-full bg-white hover:bg-amber-500 text-black font-black py-5 rounded-2xl transition-all duration-300 transform active:scale-[0.98] shadow-xl hover:shadow-amber-500/20 overflow-hidden">
+                        class="relative group w-full bg-white hover:bg-primary-500 text-black font-black py-5 rounded-2xl transition-all duration-300 transform active:scale-[0.98] shadow-xl hover:shadow-primary-500/20 overflow-hidden">
                     <span class="relative z-10 flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
                         Authorize Session
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                     </span>
-                    <div class="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </button>
             </form>
         </div>

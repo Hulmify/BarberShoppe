@@ -40,16 +40,16 @@
         }
     </style>
 </head>
-<body class="bg-[#020617] text-slate-200 min-h-screen selection:bg-amber-500/30">
+<body class="bg-[#020617] text-slate-200 min-h-screen selection:bg-primary-500/30">
 
     <nav class="bg-[#020617]/80 backdrop-blur-xl border-b border-slate-800/60 sticky top-0 z-50 px-6 py-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold text-white tracking-tight flex items-center">
-                Super<span class="text-amber-500">Admin</span>
+                Super<span class="text-primary-500">Admin</span>
             </h1>
             <div class="flex items-center gap-8">
                 <nav class="hidden md:flex items-center gap-6">
-                    <a href="#" class="text-sm font-medium text-white border-b-2 border-amber-500 pb-1">Accounts</a>
+                    <a href="#" class="text-sm font-medium text-white border-b-2 border-primary-500 pb-1">Accounts</a>
                 </nav>
                 <form action="{{ route('super_admin.logout') }}" method="POST">
                     @csrf
@@ -136,13 +136,13 @@
                                 <td class="px-10 py-8">
                                     <div class="flex items-center gap-5">
                                         <div class="relative">
-                                            <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-amber-500 font-black border border-slate-700/50 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                                            <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-primary-500 font-black border border-slate-700/50 shadow-inner group-hover:scale-110 transition-transform duration-500">
                                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                                             </div>
                                             <div class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-slate-950 {{ $isExpired ? 'bg-rose-500' : 'bg-emerald-500' }}"></div>
                                         </div>
                                         <div class="space-y-0.5">
-                                            <div class="font-black text-white text-lg tracking-tight group-hover:text-amber-500 transition-colors">{{ $user->name }}</div>
+                                            <div class="font-black text-white text-lg tracking-tight group-hover:text-primary-500 transition-colors">{{ $user->name }}</div>
                                             <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-2">
                                                 <span>#{{ $user->id }}</span>
                                                 <span class="h-1 w-1 bg-slate-700 rounded-full"></span>
@@ -179,7 +179,7 @@
                                 </td>
                                 <td class="px-10 py-8">
                                     <div class="flex flex-col gap-4 items-end">
-                                        <form action="{{ route('super_admin.update_expiry', $user) }}" method="POST" class="flex items-end gap-3 bg-[#020617]/40 p-2.5 rounded-2xl border border-slate-800/50 hover:border-amber-500/30 transition-colors">
+                                        <form action="{{ route('super_admin.update_expiry', $user) }}" method="POST" class="flex items-end gap-3 bg-[#020617]/40 p-2.5 rounded-2xl border border-slate-800/50 hover:border-primary-500/30 transition-colors">
                                             @csrf
                                             <div class="flex flex-col gap-1">
                                                 <label class="text-[9px] text-slate-500 uppercase font-black tracking-widest pl-1">Lifecycle Matrix</label>
@@ -187,7 +187,7 @@
                                                        value="{{ $user->trial_ends_at ? $user->trial_ends_at->format('Y-m-d\TH:i') : '' }}"
                                                        class="form-input text-white text-xs rounded-xl px-3 py-2 w-48 font-mono">
                                             </div>
-                                            <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 p-2.5 rounded-xl transition-all shadow-lg shadow-amber-500/10 group/btn">
+                                            <button type="submit" class="bg-primary-500 hover:bg-primary-400 text-slate-950 p-2.5 rounded-xl transition-all shadow-lg shadow-primary-500/10 group/btn">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover/btn:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                                 </svg>

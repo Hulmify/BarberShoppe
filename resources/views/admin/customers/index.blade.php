@@ -45,7 +45,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                             <a href="{{ route('admin.customers.show', $customer->id) }}" class="inline-flex items-center font-medium text-amber-600 hover:text-amber-500 hover:underline transition-colors text-sm">
+                             <a href="{{ route('admin.customers.show', $customer->id) }}" class="inline-flex items-center font-medium text-primary-600 hover:text-primary-500 hover:underline transition-colors text-sm">
                                 View History
                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                             </a>

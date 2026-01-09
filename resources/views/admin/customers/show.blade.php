@@ -7,7 +7,7 @@
 @section('content')
 
 <div class="mb-6">
-    <a href="{{ route('admin.customers.index') }}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-amber-500 transition-colors">
+    <a href="{{ route('admin.customers.index') }}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-primary-500 transition-colors">
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
         Back to Customers
     </a>
@@ -43,7 +43,7 @@
             </div>
             <div class="text-center">
                 <div class="text-xs text-slate-500 uppercase font-bold tracking-wider">Total Spent</div>
-                <div class="text-xl font-bold text-amber-600">{{ auth()->user()->shop->currency ?? '$' }} {{ number_format($totalSpent, 2) }}</div>
+                <div class="text-xl font-bold text-primary-600">{{ auth()->user()->shop->currency ?? '$' }} {{ number_format($totalSpent, 2) }}</div>
             </div>
              <div class="text-center">
                 <div class="text-xs text-slate-500 uppercase font-bold tracking-wider">Last Visit</div>
@@ -93,7 +93,7 @@
                              @php
                                 $statusStyles = match($booking->status) {
                                     'confirmed' => 'bg-green-50 text-green-700 border-green-200 ring-green-600/20',
-                                    'completed' => 'bg-blue-50 text-blue-700 border-blue-200 ring-blue-600/20',
+                                    'completed' => 'bg-primary-50 text-primary-700 border-primary-200 ring-primary-600/20',
                                     'cancelled' => 'bg-red-50 text-red-700 border-red-200 ring-red-600/20',
                                     default => 'bg-gray-50 text-gray-600 border-gray-200 ring-gray-500/10'
                                 };

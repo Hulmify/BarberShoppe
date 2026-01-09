@@ -63,7 +63,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5">
-                    <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-primary-500 rounded-full"></div>
                     <span class="text-[10px] font-bold text-slate-500 border-none outline-none">Revenue</span>
                 </div>
                 <div class="flex items-center gap-1.5">
@@ -87,7 +87,7 @@
                             @php 
                                 $percentage = $totalBookings > 0 ? ($service->usage_count / $totalBookings) * 100 : 0;
                             @endphp
-                            <div class="bg-amber-500 h-1.5 rounded-full" style="width: {{ $percentage }}%"></div>
+                            <div class="bg-primary-500 h-1.5 rounded-full" style="width: {{ $percentage }}%"></div>
                         </div>
                     </div>
                     <div class="ml-4 text-right">
@@ -125,23 +125,23 @@
                     $peakTime = $peakHour !== null ? $busyHours['labels'][$peakHour] : 'N/A';
                 @endphp
                 <div class="flex items-start gap-4">
-                    <div class="p-2 bg-amber-500 rounded-lg">
+                    <div class="p-2 bg-primary-500 rounded-lg">
                         <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
                     </div>
                     <div>
                         <div class="text-sm font-bold">Peak Booking Time</div>
-                        <p class="text-xs text-slate-400 mt-1">Your busiest hour is typically around <span class="text-amber-400 font-bold uppercase">{{ $peakTime }}</span>.</p>
+                        <p class="text-xs text-slate-400 mt-1">Your busiest hour is typically around <span class="text-primary-400 font-bold uppercase">{{ $peakTime }}</span>.</p>
                     </div>
                 </div>
                 
                 @if($topServices->isNotEmpty())
                 <div class="flex items-start gap-4">
-                    <div class="p-2 bg-blue-500 rounded-lg">
+                    <div class="p-2 bg-primary-500 rounded-lg">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
                     <div>
                         <div class="text-sm font-bold">Star Service</div>
-                        <p class="text-xs text-slate-400 mt-1"><span class="text-blue-400 font-bold uppercase">{{ $topServices->first()->name }}</span> is your most requested service this month.</p>
+                        <p class="text-xs text-slate-400 mt-1"><span class="text-primary-400 font-bold uppercase">{{ $topServices->first()->name }}</span> is your most requested service this month.</p>
                     </div>
                 </div>
                 @endif

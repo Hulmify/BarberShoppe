@@ -14,14 +14,14 @@
 
     <!-- Optional Background Decoration -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-amber-200/20 blur-3xl"></div>
+        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary-200/20 blur-3xl"></div>
         <div class="absolute bottom-[20%] -right-[10%] w-[30%] h-[30%] rounded-full bg-slate-200/30 blur-3xl"></div>
     </div>
 
     <div class="w-full max-w-md bg-white border border-gray-100 rounded-2xl shadow-xl p-8 relative z-10 animate-fade-in-up">
         <div class="text-center mb-8">
             <a href="/" class="inline-block text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 mb-2">
-                Barber<span class="text-amber-500">Shoppe.</span>
+                Barber<span class="text-primary-500">Shoppe</span>
             </a>
             <h2 class="text-xl font-bold text-slate-900 mt-4">Welcome Back</h2>
             <p class="text-slate-500 mt-1 text-sm">Sign in to manage your appointments</p>
@@ -43,17 +43,17 @@
             @csrf
             <div>
                 <label for="email" class="block mb-2 text-sm font-medium text-slate-900">Email Address</label>
-                <input type="email" name="email" id="email" required value="{{ old('email') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition-colors" placeholder="name@company.com">
+                <input type="email" name="email" id="email" required value="{{ old('email') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 transition-colors" placeholder="name@company.com">
             </div>
             <div>
                 <label for="password" class="block mb-2 text-sm font-medium text-slate-900">Password</label>
-                <input type="password" name="password" id="password" required class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 transition-colors" placeholder="••••••••">
+                <input type="password" name="password" id="password" required class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 transition-colors" placeholder="••••••••">
             </div>
 
             <button type="submit" class="w-full text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:outline-none focus:ring-slate-300 font-bold rounded-lg text-sm px-5 py-3 text-center transition-transform hover:-translate-y-0.5">Sign In</button>
             
             <p class="text-sm font-light text-gray-500 text-center">
-                Don't have an account yet? <a href="{{ route('register') }}" class="font-medium text-amber-600 hover:underline">Sign up</a>
+                Don't have an account yet? <a href="{{ route('register') }}" class="font-medium text-primary-600 hover:underline">Sign up</a>
             </p>
         </form>
 

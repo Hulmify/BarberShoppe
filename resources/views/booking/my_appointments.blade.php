@@ -17,12 +17,12 @@
     <div class="w-full max-w-3xl">
         <header class="text-center mb-10 animate-fade-in-down">
             <div class="flex items-center justify-center mb-4">
-                <a href="{{ request()->attributes->has('shop') ? route('shop.index') : route('booking.via_slug', ['slug' => $shop->slug]) }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-amber-600 transition-colors">
+                <a href="{{ request()->attributes->has('shop') ? route('shop.index') : route('booking.via_slug', ['slug' => $shop->slug]) }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     <span>Back to Booking</span>
                 </a>
             </div>
-            <h1 class="text-4xl font-extrabold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-amber-600">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-primary-600">
                 My Appointments
             </h1>
             <p class="text-lg text-slate-500">{{ $shop->name }}</p>
@@ -30,7 +30,7 @@
 
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 mb-8">
             <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <svg class="w-6 h-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 Find Your Appointments
             </h2>
             
@@ -39,7 +39,7 @@
                 <div>
                     <label for="phone" class="block mb-2 text-sm font-medium text-slate-900">Enter your phone number</label>
                     <div class="flex gap-2">
-                        <input type="tel" id="phone" name="phone" value="{{ $phone }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" placeholder="(555) 123-4567" required>
+                        <input type="tel" id="phone" name="phone" value="{{ $phone }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="(555) 123-4567" required>
                         <button type="submit" class="text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:ring-slate-300 font-medium rounded-lg text-sm px-6 py-2.5 transition-colors">
                             Search
                         </button>
@@ -64,7 +64,7 @@
                                         {{ $booking->start_time->format('M d, Y') }}
                                     </span>
                                     <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                                    <span class="text-lg font-bold text-amber-600">
+                                    <span class="text-lg font-bold text-primary-600">
                                         {{ $booking->start_time->format('h:i A') }}
                                     </span>
                                 </div>
@@ -84,10 +84,10 @@
                                     <div class="text-xl font-bold text-slate-900">{{ $shop->currency ?? '$' }} {{ number_format($booking->total_price, 2) }}</div>
                                     @php
                                         $statusClasses = [
-                                            'pending' => 'bg-amber-100 text-amber-700',
+                                            'pending' => 'bg-primary-100 text-primary-700',
                                             'confirmed' => 'bg-emerald-100 text-emerald-700',
                                             'cancelled' => 'bg-rose-100 text-rose-700',
-                                            'completed' => 'bg-blue-100 text-blue-700',
+                                            'completed' => 'bg-primary-100 text-primary-700',
                                         ];
                                         $statusClass = $statusClasses[$booking->status] ?? 'bg-gray-100 text-gray-700';
                                     @endphp
@@ -116,7 +116,7 @@
                         </div>
                         <h3 class="text-lg font-medium text-slate-900">No appointments found</h3>
                         <p class="text-slate-500 mt-1">We couldn't find any appointments for this phone number.</p>
-                        <a href="{{ request()->attributes->has('shop') ? route('shop.index') : route('booking.via_slug', ['slug' => $shop->slug]) }}" class="mt-6 inline-flex items-center text-amber-600 font-semibold hover:text-amber-700">
+                        <a href="{{ request()->attributes->has('shop') ? route('shop.index') : route('booking.via_slug', ['slug' => $shop->slug]) }}" class="mt-6 inline-flex items-center text-primary-600 font-semibold hover:text-primary-700">
                             Book your first appointment
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>

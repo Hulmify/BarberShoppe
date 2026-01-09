@@ -16,7 +16,7 @@
     <nav class="bg-slate-900 border-b border-slate-800 fixed w-full z-50 top-0 start-0">
       <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 rtl:space-x-reverse transition-transform hover:scale-105">
-            <span class="self-center text-2xl font-bold whitespace-nowrap text-white">Barber<span class="text-amber-500">Shoppe.</span></span>
+            <span class="self-center text-2xl font-bold whitespace-nowrap text-white">Barber<span class="text-primary-500">Shoppe</span></span>
         </a>
         <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <form action="{{ route('logout') }}" method="POST" class="inline">
@@ -33,29 +33,28 @@
         <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
           <ul class="flex flex-col p-4 md:p-0 js-nav-menu mt-4 font-medium border border-gray-700 rounded-lg bg-slate-800 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-slate-900 items-center">
             <li>
-              <a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.dashboard') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Dashboard</a>
-            </li>
-            <li class="hidden md:block w-px h-4 bg-slate-700 mx-1"></li>
-            <li>
-              <a href="{{ route('admin.appointments.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.appointments*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Appointments</a>
+              <a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.dashboard') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">Dashboard</a>
             </li>
             <li>
-                <a href="{{ route('admin.pos.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.pos*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">POS</a>
+              <a href="{{ route('admin.appointments.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.appointments*') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">Appointments</a>
             </li>
             <li>
-              <a href="{{ route('admin.customers.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.customers*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Customers</a>
+                <a href="{{ route('admin.pos.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.pos*') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">POS</a>
             </li>
             <li>
-              <a href="{{ route('admin.analytics.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.analytics*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Analytics</a>
+              <a href="{{ route('admin.customers.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.customers*') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">Customers</a>
             </li>
             <li>
-               <a href="{{ route('admin.services.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.services*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Services</a>
+              <a href="{{ route('admin.analytics.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.analytics*') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">Analytics</a>
             </li>
             <li>
-               <a href="{{ route('admin.stylists.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.stylists*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Stylists</a>
+               <a href="{{ route('admin.services.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.services*') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">Services</a>
+            </li>
+            <li>
+               <a href="{{ route('admin.stylists.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.stylists*') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">Stylists</a>
             </li>
              <li>
-               <a href="{{ route('admin.shop.edit') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.shop*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Settings</a>
+               <a href="{{ route('admin.shop.edit') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.shop*') ? 'text-primary-500 md:p-0' : 'text-white hover:text-primary-500 md:p-0 transition-colors' }}">Settings</a>
             </li>
           </ul>
         </div>
@@ -75,7 +74,7 @@
                         $daysLeft = round($daysLeft);
                     @endphp
                     @if($daysLeft >= 0 && $daysLeft <= 7)
-                        <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                        <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 border border-primary-200">
                             {{ $daysLeft == 1 ? 'Last day of subscription' : $daysLeft . ' days left in subscription' }}
                         </div>
                     @endif
@@ -83,7 +82,7 @@
                 <div>
                     <div id="live-clock" class="text-2xl font-bold text-slate-700 tracking-wider">00:00:00</div>
                     <div class="flex items-center justify-end gap-2">
-                        <span id="live-timezone" class="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 uppercase">{{ auth()->user()->shop->timezone ?? config('app.timezone') }}</span>
+                        <span id="live-timezone" class="text-[10px] font-bold text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded border border-primary-100 uppercase">{{ auth()->user()->shop->timezone ?? config('app.timezone') }}</span>
                         <div id="live-date" class="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                             {{ \Carbon\Carbon::now(auth()->user()->shop->timezone ?? config('app.timezone'))->format('l, F j') }}
                         </div>
