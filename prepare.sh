@@ -1,7 +1,10 @@
 # The script is used to prepare the project for deployment on Cpanel
 
-# Delete previous zip
-rm app.zip
+# Delete zips directory
+rm -rf zips
+
+# Create zips directory
+mkdir zips
 
 # Build assets
 npm install
@@ -16,7 +19,7 @@ php artisan cache:clear
 
 
 # Zip project excluding dev files
-zip -r app.zip . \
+zip -r zips/app.zip . \
     -x ".git/*" \
     -x ".env" \
     -x "tests/*" \
@@ -26,7 +29,11 @@ zip -r app.zip . \
     -x ".gitattributes" \
     -x ".env.example" \
     -x ".editorconfig" \
-    -x "prepare.sh"
+    -x "prepare.sh" \
+    -x "vendor/*"
+
+# Zip vendor
+zip -r zips/vendor.zip vendor
 
 # Command to run migrations
 echo "Run these commands on the server after uploading the zip file and extracting it"
