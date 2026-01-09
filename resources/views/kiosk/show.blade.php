@@ -57,9 +57,7 @@
         .shop-info h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(to right, #fff, var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
         }
 
         .clock-container {

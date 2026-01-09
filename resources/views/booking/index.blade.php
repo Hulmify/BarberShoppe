@@ -48,7 +48,7 @@
                     <img src="{{ $shop->logo }}" alt="{{ $shop->name }}" class="h-20 w-auto object-contain">
                 </div>
             @endif
-            <h1 class="text-4xl font-extrabold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-amber-600">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2 text-brand">
                 {{ $shop->name }}
             </h1>
             <p class="text-lg text-slate-500">{{ $shop->description ?? 'Premium Barber Services' }}</p>
