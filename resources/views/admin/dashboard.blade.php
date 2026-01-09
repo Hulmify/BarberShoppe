@@ -108,6 +108,23 @@
                                         @foreach($booking->items as $item)
                                             <span class="text-[10px] font-bold bg-white/60 text-primary-800 px-2 py-0.5 rounded border border-primary-300 uppercase tracking-tighter">{{ $item->service->name }}</span>
                                         @endforeach
+                                    <div class="mt-3 flex items-center gap-2">
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Stylist:</span>
+                                        <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="m-0">
+                                            @csrf @method('PUT')
+                                            <select 
+                                                name="stylist_id" 
+                                                onchange="this.form.submit()" 
+                                                class="text-[10px] rounded-lg border-primary-200 bg-white/50 focus:ring-primary-500 focus:border-primary-500 block p-1 py-0.5 font-bold text-primary-800"
+                                            >
+                                                <option value="">Unassigned</option>
+                                                @foreach($stylists as $stylist)
+                                                    <option value="{{ $stylist->id }}" {{ $booking->stylist_id == $stylist->id ? 'selected' : '' }}>
+                                                        {{ $stylist->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -154,6 +171,7 @@
                                 <th class="px-6 py-4">Customer</th>
                                 <th class="px-6 py-4">Service & Duration</th>
                                 <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4 font-bold">Stylist</th>
                                 <th class="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -191,6 +209,23 @@
                                         };
                                     @endphp
                                     <span class="px-2 py-1 rounded text-[10px] font-bold {{ $sStyle }}">{{ ucwords(str_replace('_', ' ', $booking->status)) }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="m-0">
+                                        @csrf @method('PUT')
+                                        <select 
+                                            name="stylist_id" 
+                                            onchange="this.form.submit()" 
+                                            class="text-[10px] rounded-lg border-gray-200 bg-gray-50 focus:ring-primary-500 focus:border-primary-500 block w-full p-1 font-bold text-slate-700"
+                                        >
+                                            <option value="">Unassigned</option>
+                                            @foreach($stylists as $stylist)
+                                                <option value="{{ $stylist->id }}" {{ $booking->stylist_id == $stylist->id ? 'selected' : '' }}>
+                                                    {{ $stylist->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </form>
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">

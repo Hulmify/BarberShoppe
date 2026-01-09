@@ -12,7 +12,7 @@ class AppointmentController extends Controller
         $shop = auth()->user()->shop;
         $tz = $shop->timezone ?? config('app.timezone');
         
-        $query = $shop->bookings()->with(['customer', 'items.service'])->latest('start_time');
+        $query = $shop->bookings()->with(['customer', 'items.service', 'stylist'])->latest('start_time');
         if ($request->filled('date')) {
             $query->whereDate('start_time', $request->date);
         } elseif ($request->get('filter') === 'today') {
@@ -39,19 +39,37 @@ class AppointmentController extends Controller
             $b->start_time->setTimezone($tz);
             if ($b->end_time) $b->end_time->setTimezone($tz);
         });
+
+        $stylists = $shop->stylists()->where('is_active', true)->get();
         
-        return view('admin.appointments.index', compact('bookings'));
+        return view('admin.appointments.index', compact('bookings', 'stylists'));
     }
 
     public function update(Request $request, $id)
     {
         $booking = auth()->user()->shop->bookings()->findOrFail($id);
         
-        $request->validate(['status' => 'required|in:confirmed,cancelled,completed,in_progress']);
+        $request->validate([
+            'status' => 'nullable|in:confirmed,cancelled,completed,in_progress',
+            'stylist_id' => 'nullable|exists:stylists,id'
+        ]);
         
-        $booking->update(['status' => $request->status]);
+        if ($request->filled('status')) {
+            $booking->update(['status' => $request->status]);
+        }
+
+        if ($request->has('stylist_id')) {
+            $stylistId = $request->input('stylist_id');
+            if ($stylistId) {
+                // Verify stylist belongs to shop
+                $stylist = auth()->user()->shop->stylists()->findOrFail($stylistId);
+                $booking->update(['stylist_id' => $stylist->id]);
+            } else {
+                $booking->update(['stylist_id' => null]);
+            }
+        }
         
-        return back()->with('success', 'Booking status updated.');
+        return back()->with('success', 'Appointment updated.');
     }
 
     public function destroy($id)

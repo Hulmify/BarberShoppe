@@ -125,7 +125,21 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="font-medium text-slate-700">{{ $booking->stylist->name ?? 'Unassigned' }}</span>
+                            <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="m-0">
+                                @csrf @method('PUT')
+                                <select 
+                                    name="stylist_id" 
+                                    onchange="this.form.submit()" 
+                                    class="text-xs rounded-lg border-gray-300 bg-gray-50 focus:ring-primary-500 focus:border-primary-500 block w-full p-1 font-medium text-slate-700"
+                                >
+                                    <option value="">Unassigned</option>
+                                    @foreach($stylists as $stylist)
+                                        <option value="{{ $stylist->id }}" {{ $booking->stylist_id == $stylist->id ? 'selected' : '' }}>
+                                            {{ $stylist->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
                         </td>
                         <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
                             {{ auth()->user()->shop->currency ?? '$' }} {{ number_format($booking->total_price, 2) }}

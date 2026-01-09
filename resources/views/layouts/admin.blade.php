@@ -141,7 +141,7 @@
         </main>
         
         <footer class="mt-20 text-center text-sm text-gray-400 py-6 border-t border-gray-200">
-            &copy; {{ date('Y') }} BarberShoppe. Designed with ❤️ in India.
+            &copy; {{ date('Y') }} Hulmify. Designed with ❤️ in India.
         </footer>
     </div>
 

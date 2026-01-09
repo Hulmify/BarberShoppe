@@ -30,8 +30,10 @@ class AdminController extends Controller
 
         $allTodaysBookings = $shop->bookings()
             ->whereBetween('start_time', [$startOfDay, $endOfDay])
-            ->with(['customer', 'items.service'])
+            ->with(['customer', 'items.service', 'stylist'])
             ->get();
+        
+        $stylists = $shop->stylists()->where('is_active', true)->get();
 
         // Shift all bookings to the shop's timezone for accurate display and diffs
         $allTodaysBookings->each(function($b) use ($tz) {
@@ -87,7 +89,8 @@ class AdminController extends Controller
             'potentialRevenue', 
             'totalCustomers', 
             'now',
-            'tz'
+            'tz',
+            'stylists'
         ));
     }
 
