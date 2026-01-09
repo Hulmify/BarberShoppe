@@ -215,9 +215,19 @@
                 <p class="text-slate-400 italic">No services selected</p>
             </div>
             
-            <div class="border-t border-gray-200 pt-4 flex justify-between items-center mb-6">
-                <span class="text-base font-bold text-slate-700">Total</span>
-                <span class="text-2xl font-bold text-primary-600" id="total-price">{{ auth()->user()->shop->currency ?? '$' }} 0.00</span>
+            <div class="border-t border-gray-200 pt-4 mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-slate-600">Services Selected</span>
+                    <span class="text-sm font-bold text-slate-900" id="total-items">0</span>
+                </div>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm text-slate-600">Total Duration</span>
+                    <span class="text-sm font-bold text-slate-900" id="total-duration">0 mins</span>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                    <span class="text-base font-bold text-slate-700">Total Price</span>
+                    <span class="text-2xl font-bold text-primary-600" id="total-price">{{ auth()->user()->shop->currency ?? '$' }} 0.00</span>
+                </div>
             </div>
             
             <button type="submit" form="posForm" class="w-full text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:ring-slate-300 font-bold rounded-lg text-sm px-5 py-3.5 text-center transition-transform hover:-translate-y-0.5 shadow-md">
@@ -552,7 +562,11 @@
     function updateSummary() {
         const listContainer = document.getElementById('selected-services-list');
         const totalEl = document.getElementById('total-price');
+        const durationEl = document.getElementById('total-duration');
+        const itemsEl = document.getElementById('total-items');
+        
         let total = 0;
+        let duration = 0;
         const currency = @json(auth()->user()->shop->currency ?? '$');
         
         listContainer.innerHTML = '';
@@ -562,6 +576,8 @@
         } else {
             selectedServices.forEach(s => {
                 total += s.price;
+                duration += (s.duration || 0);
+                
                 const item = document.createElement('div');
                 item.className = 'flex justify-between items-center text-sm';
                 item.innerHTML = `<span>${s.name}</span> <span class="font-medium">${currency} ${s.price.toFixed(2)}</span>`;
@@ -570,6 +586,8 @@
         }
         
         totalEl.textContent = `${currency} ${total.toFixed(2)}`;
+        if (durationEl) durationEl.textContent = `${duration} mins`;
+        if (itemsEl) itemsEl.textContent = selectedServices.size;
 
         // Sync hidden inputs for form submission
         const container = document.getElementById('hidden-services-container');

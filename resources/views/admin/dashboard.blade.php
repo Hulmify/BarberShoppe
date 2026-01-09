@@ -109,6 +109,13 @@
                                             <span class="text-[10px] font-bold bg-white/60 text-primary-800 px-2 py-0.5 rounded border border-primary-300 uppercase tracking-tighter">{{ $item->service->name }}</span>
                                         @endforeach
                                     </div>
+                                    @php
+                                        $totalDuration = $booking->items->sum(fn($i) => $i->service->duration_minutes ?? 0);
+                                        $totalItems = $booking->items->count();
+                                    @endphp
+                                    <div class="text-[10px] text-slate-500 font-bold mt-3 ml-0.5">
+                                        Total: {{ $totalItems }} services, {{ $totalDuration }} mins
+                                    </div>
                                     <div class="mt-3 flex items-center gap-2">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Stylist:</span>
                                         <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="m-0">
@@ -198,6 +205,13 @@
                                                 {{ $item->service->name }} ({{ $item->service->duration_minutes }}m)
                                             </span>
                                         @endforeach
+                                    </div>
+                                    @php
+                                        $totalDuration = $booking->items->sum(fn($i) => $i->service->duration_minutes ?? 0);
+                                        $totalItems = $booking->items->count();
+                                    @endphp
+                                    <div class="text-[10px] text-slate-400 font-bold mt-3">
+                                        Total: {{ $totalItems }} services, {{ $totalDuration }} mins
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">

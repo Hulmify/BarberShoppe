@@ -131,6 +131,13 @@
                                     </span>
                                 @endforeach
                             </div>
+                            @php
+                                $totalDuration = $booking->items->sum(fn($i) => $i->service->duration_minutes ?? 0);
+                                $totalItems = $booking->items->count();
+                            @endphp
+                            <div class="text-xs text-slate-400 font-medium mt-3">
+                                {{ $totalItems }} services, {{ $totalDuration }} mins
+                            </div>
                         </td>
                         <td class="px-6 py-4">
                             <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="m-0">
