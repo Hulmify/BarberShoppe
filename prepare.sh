@@ -14,18 +14,6 @@ php artisan route:clear
 php artisan view:clear
 php artisan cache:clear
 
-# Create HTaccess file for Cpanel deployment
-FILE_NAME=".htaccess"
-
-cat <<EOL > "$FILE_NAME"
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteRule ^(.*)\$ public/\$1 [L]
-</IfModule>
-EOL
-
-echo "File '$FILE_NAME' created with content."
-
 
 # Zip project excluding dev files
 zip -r app.zip . \
@@ -39,9 +27,6 @@ zip -r app.zip . \
     -x ".env.example" \
     -x ".editorconfig" \
     -x "prepare.sh"
-
-# Clean up
-rm -f "$FILE_NAME"
 
 # Command to run migrations
 echo "Run these commands on the server after uploading the zip file and extracting it"

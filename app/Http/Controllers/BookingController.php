@@ -342,6 +342,7 @@ class BookingController extends Controller
                     ->where('customer_id', $customer->id)
                     ->with(['items.service', 'stylist'])
                     ->orderBy('start_time', 'desc')
+                    ->limit(10)
                     ->get();
                 
 

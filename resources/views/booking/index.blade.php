@@ -281,6 +281,7 @@
 
     <script>
         const STORAGE_KEY = 'booking_state_' + {{ $shop->id }};
+        const MY_APPOINTMENTS_URL = "{{ request()->attributes->has('shop') ? route('shop.my_appointments') : route('booking.my_appointments', ['slug' => $shop->slug]) }}";
         let selectedServices = new Set();
         let totalP = 0;
         let totalD = 0;
@@ -631,8 +632,8 @@
                 
                 if (data.success) {
                     localStorage.removeItem(STORAGE_KEY);
-                    alert('Booking Confirmed! ID: ' + data.booking_id);
-                    location.reload();
+                    const phone = document.getElementById('customer_phone').value;
+                    window.location.href = MY_APPOINTMENTS_URL + '?phone=' + encodeURIComponent(phone) + '&booked=1';
                 } else {
                     alert(data.message || 'Error: ' + JSON.stringify(data.errors || 'Unknown error'));
                 }

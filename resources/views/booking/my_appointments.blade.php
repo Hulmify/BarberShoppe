@@ -27,6 +27,18 @@
             </h1>
             <p class="text-lg text-slate-500">{{ $shop->name }}</p>
         </header>
+        
+        @if(request()->query('booked'))
+            <div class="mb-8 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-6 flex items-center gap-4 animate-fade-in">
+                <div class="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">Booking Confirmed!</h3>
+                    <p class="text-emerald-700/80">Your appointment has been successfully scheduled. We've listed it below.</p>
+                </div>
+            </div>
+        @endif
 
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 mb-8">
             <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
