@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin') - BarberShoppe</title>
+    <link rel="icon" type="image/png" href="/app_favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -44,7 +45,6 @@
             <li>
               <a href="{{ route('admin.customers.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.customers*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Customers</a>
             </li>
-            <li class="hidden md:block w-px h-4 bg-slate-700 mx-1"></li>
             <li>
               <a href="{{ route('admin.analytics.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.analytics*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Analytics</a>
             </li>
@@ -54,7 +54,6 @@
             <li>
                <a href="{{ route('admin.stylists.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.stylists*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Stylists</a>
             </li>
-            <li class="hidden md:block w-px h-4 bg-slate-700 mx-1"></li>
              <li>
                <a href="{{ route('admin.shop.edit') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.shop*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Settings</a>
             </li>
