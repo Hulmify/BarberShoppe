@@ -423,7 +423,15 @@
                 let hasAfternoon = false;
                 let hasEvening = false;
 
-                data.slots.forEach(timeStr => {
+                data.slots.forEach(slotData => {
+                    let timeStr, isOccupied = false;
+                    if (typeof slotData === 'string') {
+                        timeStr = slotData;
+                    } else {
+                        timeStr = slotData.time;
+                        isOccupied = slotData.occupied;
+                    }
+
                     const hour = parseInt(timeStr.split(':')[0]);
                     let group = 'evening';
                     if (hour < 12) {
@@ -437,7 +445,7 @@
                     }
 
                     const grid = document.querySelector(`#group-${group} .slot-grid`);
-                    const slotBtn = createSlotButton(timeStr);
+                    const slotBtn = createSlotButton(timeStr, isOccupied);
                     grid.appendChild(slotBtn);
                 });
 
@@ -468,9 +476,18 @@
         return `${displayHours}:${minutes} ${ampm}`;
     }
 
-    function createSlotButton(timeStr) {
+    function createSlotButton(timeStr, isOccupied = false) {
         const div = document.createElement('div');
-        div.className = 'time-slot-btn py-3 px-2 text-center bg-white border border-gray-200 hover:border-primary-400 hover:bg-primary-50 rounded-xl cursor-pointer transition-all shadow-sm flex flex-col items-center justify-center gap-0.5';
+        let classes = 'time-slot-btn py-3 px-2 text-center border rounded-xl cursor-pointer transition-all shadow-sm flex flex-col items-center justify-center gap-0.5 ';
+        
+        if (isOccupied) {
+            classes += 'bg-red-50 border-red-200 hover:border-red-400 hover:bg-red-100';
+        } else {
+            classes += 'bg-white border-gray-200 hover:border-primary-400 hover:bg-primary-50';
+        }
+
+        div.className = classes;
+        div.dataset.occupied = isOccupied ? 'true' : 'false';
         
         const [hours, minutes] = timeStr.split(':');
         const h = parseInt(hours);
@@ -478,8 +495,8 @@
         const ampm = h >= 12 ? 'PM' : 'AM';
 
         div.innerHTML = `
-            <span class="text-sm font-bold text-slate-900">${displayH}:${minutes}</span>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${ampm}</span>
+            <span class="text-sm font-bold ${isOccupied ? 'text-red-900' : 'text-slate-900'}">${displayH}:${minutes}</span>
+            <span class="text-[10px] font-bold ${isOccupied ? 'text-red-400' : 'text-slate-400'} uppercase tracking-tighter">${ampm}</span>
         `;
 
         div.onclick = function() { selectPosTime(this, timeStr); };
@@ -490,25 +507,43 @@
         // Remove previous selection styles
         const allSlots = document.querySelectorAll('.time-slot-btn');
         allSlots.forEach(d => {
+            const isOccupied = d.dataset.occupied === 'true';
             d.classList.remove('border-primary-500', 'bg-primary-600', 'text-white', 'ring-2', 'ring-primary-500/20');
-            d.classList.add('bg-white', 'border-gray-200');
+            
+            if (isOccupied) {
+                d.classList.add('bg-red-50', 'border-red-200');
+                d.classList.remove('bg-white', 'border-gray-200');
+            } else {
+                d.classList.add('bg-white', 'border-gray-200');
+                d.classList.remove('bg-red-50', 'border-red-200');
+            }
             
             // Fix nested spans color
             const spans = d.querySelectorAll('span');
             spans[0].classList.remove('text-white');
-            spans[0].classList.add('text-slate-900');
             spans[1].classList.remove('text-primary-100');
-            spans[1].classList.add('text-slate-400');
+
+            if (isOccupied) {
+                spans[0].classList.add('text-red-900');
+                spans[1].classList.add('text-red-400');
+                spans[0].classList.remove('text-slate-900');
+                spans[1].classList.remove('text-slate-400');
+            } else {
+                spans[0].classList.add('text-slate-900');
+                spans[1].classList.add('text-slate-400');
+                spans[0].classList.remove('text-red-900');
+                spans[1].classList.remove('text-red-400');
+            }
         });
 
         // Add new selection styles
-        el.classList.remove('bg-white', 'border-gray-200', 'hover:bg-primary-50');
+        el.classList.remove('bg-white', 'border-gray-200', 'hover:bg-primary-50', 'bg-red-50', 'border-red-200', 'hover:bg-red-100');
         el.classList.add('border-primary-500', 'bg-primary-600', 'text-white', 'ring-2', 'ring-primary-500/20');
         
         const selectedSpans = el.querySelectorAll('span');
-        selectedSpans[0].classList.remove('text-slate-900');
+        selectedSpans[0].classList.remove('text-slate-900', 'text-red-900');
         selectedSpans[0].classList.add('text-white');
-        selectedSpans[1].classList.remove('text-slate-400');
+        selectedSpans[1].classList.remove('text-slate-400', 'text-red-400');
         selectedSpans[1].classList.add('text-primary-100');
         
         document.getElementById('time').value = time;

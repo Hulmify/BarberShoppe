@@ -106,13 +106,56 @@ class PointOfSaleController extends Controller
     {
         $shop = auth()->user()->shop;
         $tz = $shop->timezone ?? config('app.timezone');
+        $date = $request->input('date');
+        $duration = (int) $request->input('duration', 30);
+        $stylistId = $request->input('stylist_id');
+
+        // Parse bounds in Shop Time
+        $start = Carbon::parse($date . ' 00:00:00', $tz);
+        $limit = Carbon::parse($date . ' 23:45:00', $tz);
         
-        $start = Carbon::createFromTime(0, 0, 0, $tz);
-        $end = Carbon::createFromTime(23, 45, 0, $tz);
-        
+        // Fetch Bookings for the day (coverage check)
+        // Convert day bounds to UTC for DB query
+        $dayStartUtc = $start->copy()->setTimezone('UTC');
+        $dayEndUtc = $start->copy()->endOfDay()->setTimezone('UTC'); // Full day coverage
+
+        $bookingsQuery = Booking::where('shop_id', $shop->id)
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($q) use ($dayStartUtc, $dayEndUtc) {
+                // Overlap with the day
+                $q->where('start_time', '<', $dayEndUtc)
+                  ->where('end_time', '>', $dayStartUtc);
+            });
+
+        if ($stylistId) {
+            $bookingsQuery->where('stylist_id', $stylistId);
+        }
+
+        $bookings = $bookingsQuery->get();
+
         $slots = [];
-        while ($start->lte($end)) {
-            $slots[] = $start->format('H:i');
+        while ($start->lte($limit)) {
+            $slotStart = $start->copy();
+            $slotEnd = $start->copy()->addMinutes($duration);
+            
+            // Convert slot to UTC for accurate comparison
+            $slotStartUtc = $slotStart->copy()->setTimezone('UTC');
+            $slotEndUtc = $slotEnd->copy()->setTimezone('UTC');
+
+            $isOccupied = false;
+            foreach ($bookings as $booking) {
+                // Check Overlap: (StartA < EndB) && (EndA > StartB)
+                if ($slotStartUtc->lt($booking->end_time) && $slotEndUtc->gt($booking->start_time)) {
+                    $isOccupied = true;
+                    break;
+                }
+            }
+
+            $slots[] = [
+                'time' => $start->format('H:i'),
+                'occupied' => $isOccupied,
+            ];
+            
             $start->addMinutes(15);
         }
         
