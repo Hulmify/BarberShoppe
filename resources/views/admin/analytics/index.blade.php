@@ -122,7 +122,7 @@
             <div class="space-y-4">
                 @php
                     $peakHour = collect($busyHours['counts'])->keys()->sort(fn($a, $b) => $busyHours['counts'][$b] <=> $busyHours['counts'][$a])->first();
-                    $peakTime = $peakHour !== null ? $busyHours['labels'][$peakHour] : 'N/A';
+                    $peakTime = $peakHour !== null ? \Carbon\Carbon::parse($busyHours['labels'][$peakHour])->format('g:i A') : 'N/A';
                 @endphp
                 <div class="flex items-start gap-4">
                     <div class="p-2 bg-primary-500 rounded-lg">

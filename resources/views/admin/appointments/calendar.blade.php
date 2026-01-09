@@ -13,17 +13,17 @@
             List View
         </a>
         <div class="h-8 w-px bg-gray-200 mx-2"></div>
-        <div class="flex items-center gap-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-yellow-500"></span> Pending</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-green-500"></span> Confirmed</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#4896bf]"></span> In Progress</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-500"></span> Completed</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-red-500"></span> Cancelled</div>
+        <div class="flex items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-widest hidden sm:flex">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm shadow-yellow-500/50"></span> Pending</div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm shadow-green-500/50"></span> Confirmed</div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 shadow-sm shadow-sky-500/50"></span> In Progress</div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-500 shadow-sm shadow-slate-500/50"></span> Completed</div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm shadow-red-500/50"></span> Cancelled</div>
         </div>
     </div>
 </div>
 
-<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="bg-white border border-gray-200 rounded-3xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
     <div id="calendar" class="min-h-[700px]"></div>
 </div>
 
@@ -115,120 +115,147 @@
 <style>
     /* FullCalendar Customization */
     :root {
-        --fc-border-color: #f1f5f9;
-        --fc-today-bg-color: #f8fafc;
-        --fc-button-bg-color: #1e293b;
-        --fc-button-border-color: #1e293b;
-        --fc-button-hover-bg-color: #0f172a;
-        --fc-button-hover-border-color: #0f172a;
-        --fc-event-border-color: transparent;
+        --fc-border-color: #e2e8f0;
+        --fc-today-bg-color: #eff6ff;
+        --fc-button-bg-color: #ffffff;
+        --fc-button-border-color: #cbd5e1;
+        --fc-button-hover-bg-color: #f8fafc;
+        --fc-button-hover-border-color: #94a3b8;
+        --fc-button-text-color: #475569;
+        
+        --fc-button-active-bg-color: #2563eb;
+        --fc-button-active-border-color: #2563eb;
+        --fc-button-active-text-color: #ffffff;
     }
     
     .fc { font-family: 'Outfit', sans-serif; }
     
-    /* Improve table layout stability */
-    .fc table {
-        font-size: 1em; /* Reset font size */
-    }
-
-    /* Toolbar */
+    /* Header Toolbar */
     .fc .fc-toolbar.fc-header-toolbar {
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 0 0.5rem;
     }
+    
     .fc .fc-toolbar-title {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: 800;
-        color: #1e293b;
-        text-transform: uppercase;
+        color: #0f172a;
+        letter-spacing: -0.025em;
     }
 
     /* Buttons */
     .fc .fc-button-primary {
         background-color: var(--fc-button-bg-color) !important;
         border-color: var(--fc-button-border-color) !important;
-        color: white !important;
+        color: var(--fc-button-text-color) !important;
         font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 0.05em;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-    .fc .fc-button-primary:hover {
-        background-color: var(--fc-button-hover-bg-color) !important;
-    }
-    .fc .fc-button-group > .fc-button {
-        border-radius: 0;
-    }
-    .fc .fc-button-group > .fc-button:first-child {
-        border-top-left-radius: 0.5rem;
-        border-bottom-left-radius: 0.5rem;
-    }
-    .fc .fc-button-group > .fc-button:last-child {
-        border-top-right-radius: 0.5rem;
-        border-bottom-right-radius: 0.5rem;
-    }
-
-    /* Event Styling */
-    .fc-event {
-        cursor: pointer;
-        border: none !important;
-        border-radius: 4px;
-        padding: 1px 3px;
-        font-size: 0.7rem; /* Smaller font for tighter packing */
-        font-weight: 600;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        transition: transform 0.1s;
-        
-        /* Flex layout for content */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        overflow: hidden;
-    }
-    .fc-event-main {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        line-height: 1.1;
-    }
-    .fc-event:hover {
-        transform: scale(1.02);
-        z-index: 5;
+        text-transform: capitalize;
+        font-size: 0.875rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        transition: all 0.2s;
     }
     
-    /* Headers & Grid */
+    .fc .fc-button-primary:hover {
+        background-color: var(--fc-button-hover-bg-color) !important;
+        border-color: var(--fc-button-hover-border-color) !important;
+        color: #1e293b !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .fc .fc-button-primary:not(:disabled).fc-button-active,
+    .fc .fc-button-primary:not(:disabled):active {
+        background-color: var(--fc-button-active-bg-color) !important;
+        border-color: var(--fc-button-active-border-color) !important;
+        color: var(--fc-button-active-text-color) !important;
+        box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+    }
+    
+    .fc .fc-button-group > .fc-button {
+        border-radius: 0;
+        margin-left: -1px;
+    }
+    .fc .fc-button-group > .fc-button:first-child {
+        border-top-left-radius: 0.75rem;
+        border-bottom-left-radius: 0.75rem;
+        margin-left: 0;
+    }
+    .fc .fc-button-group > .fc-button:last-child {
+        border-top-right-radius: 0.75rem;
+        border-bottom-right-radius: 0.75rem;
+    }
+
+    /* Grid & Headers */
     .fc .fc-col-header-cell {
         background-color: #f8fafc;
-        padding: 8px 0;
+        padding: 12px 0;
+        border-bottom: 2px solid #e2e8f0;
     }
+    
     .fc-col-header-cell-cushion {
-        color: #64748b;
-        font-size: 0.7rem;
+        color: #475569;
+        font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
+        letter-spacing: 0.05em;
         text-decoration: none !important;
     }
-    .fc-timegrid-slot-label-cushion {
-        font-size: 0.7rem;
+    
+    .fc-timegrid-axis-cushion {
         color: #94a3b8;
+        font-size: 0.75rem;
         font-weight: 500;
     }
     
-    /* Today Highlight */
-    .fc .fc-day-today {
-        background-color: #f8fafc !important;
+    .fc-timegrid-slot-label-cushion {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
     }
     
-    /* Now Indicator */
-    .fc .fc-timegrid-now-indicator-line {
+    /* Events */
+    .fc-event {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        margin: 1px 2px; /* Breathing room */
+    }
+    
+    .fc-event-custom-content {
+        height: 100%;
+        width: 100%;
+        border-radius: 6px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+        padding: 4px 6px;
+        border-left: 3px solid #6366f1; /* Default Color */
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        overflow: hidden;
+    }
+    
+    .fc-event:hover .fc-event-custom-content {
+        transform: translateY(-1px) scale(1.01);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        z-index: 50;
+    }
+    
+    /* Time Grid Lines */
+    .fc-timegrid-slot {
+        height: 3rem; /* Make slots taller */
+    }
+    
+    .fc-timegrid-now-indicator-line {
         border-color: #ef4444;
         border-width: 2px;
+        box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
     }
-    .fc .fc-timegrid-now-indicator-arrow {
+    
+    .fc-timegrid-now-indicator-arrow {
         border-color: #ef4444;
         border-width: 6px;
     }
@@ -247,7 +274,7 @@
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            navLinks: true, // can click day/week names to navigate views
+            navLinks: true, 
             businessHours: {
                 daysOfWeek: [ 1, 2, 3, 4, 5, 6, 0 ], 
                 startTime: '09:00', 
@@ -264,19 +291,57 @@
             nowIndicator: true,
             height: 'auto',
             contentHeight: 'auto',
-            aspectRatio: 1.3, // Lower ratio = Taller slots
-            expandRows: true, // stretches to fill height
+            aspectRatio: 1.5,
+            expandRows: true,
             stickyHeaderDates: true,
-            slotDuration: '00:15:00', // Matches data granularity
-            slotLabelInterval: '01:00', // Keep labels clean
+            slotDuration: '00:15:00', 
+            slotLabelInterval: '01:00',
             eventTimeFormat: {
                 hour: 'numeric',
                 minute: '2-digit',
                 meridiem: 'short'
             },
-            // Prevent overlapping events from looking messy
-            slotEventOverlap: true,
-             
+            slotEventOverlap: false, // Cleaner look
+            
+            // Custom Event Rendering for Richer UI
+            eventContent: function(arg) {
+                // Parse properties
+                const props = arg.event.extendedProps;
+                const status = props.status || 'pending';
+                const timeText = arg.timeText;
+                
+                // Extract customer and service from title as backup, or use props if available
+                let titleParts = arg.event.title.split(' (');
+                let customerName = props.customer || titleParts[0];
+                let serviceName = titleParts[1] ? titleParts[1].replace(')', '') : 'Service';
+
+                // Status Colors
+                const statusColors = {
+                    pending: '#eab308',   // yellow-500
+                    confirmed: '#22c55e', // green-500
+                    in_progress: '#0ea5e9', // sky-500
+                    completed: '#64748b',   // slate-500
+                    cancelled: '#ef4444'    // red-500
+                };
+                
+                const borderColor = statusColors[status] || '#6366f1';
+                const bgColor = statusColors[status] + '15'; // 15 = ~8% opacity hex
+                
+                return {
+                    html: `
+                        <div class="fc-event-custom-content" style="border-left-color: ${borderColor}; background-color: ${bgColor}">
+                            <div class="flex items-center justify-between gap-1 w-full relative">
+                                <div class="font-bold text-xs text-slate-800 truncate leading-tight">${customerName}</div>
+                            </div>
+                            <div class="text-[10px] text-slate-500 font-medium truncate mt-0.5">${serviceName}</div>
+                            <div class="mt-auto flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wide">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                ${timeText}
+                            </div>
+                        </div>
+                    `
+                };
+            }
         });
         calendar.render();
     });
@@ -306,10 +371,10 @@
         const statusText = props.status.toUpperCase().replace('_', ' ');
         
         // Clean status styling
-        let classes = 'inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold border ';
+        let classes = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-bold border shadow-sm ';
         if (props.status === 'pending') classes += 'bg-yellow-50 text-yellow-700 border-yellow-200';
         else if (props.status === 'confirmed') classes += 'bg-green-50 text-green-700 border-green-200';
-        else if (props.status === 'in_progress') classes += 'bg-blue-600 text-white border-blue-600';
+        else if (props.status === 'in_progress') classes += 'bg-sky-50 text-sky-700 border-sky-200';
         else if (props.status === 'completed') classes += 'bg-slate-100 text-slate-700 border-slate-200';
         else if (props.status === 'cancelled') classes += 'bg-red-50 text-red-700 border-red-200';
         
