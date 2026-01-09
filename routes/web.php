@@ -17,10 +17,10 @@ $appHost = parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST);
 // -----------------------------------------------------------------------------
 // 1. Tenant / Shop Routes (Custom Domains & CNAME)
 // -----------------------------------------------------------------------------
-// Match ANY domain except localhost and 127.0.0.1
+// Match ANY domain except the app host, localhost and 127.0.0.1
 // This ensures that accessing the site via a custom domain hits the shop logic first.
 Route::domain('{domain}')
-    ->where(['domain' => '^(?!(localhost|127\.0\.0\.1)$).*$'])
+    ->where(['domain' => '^(?!('.$appHost.'|localhost|127\.0\.0\.1)$).*$'])
     ->group(function () {
         Route::middleware([IdentifyShop::class])->group(function () {
             Route::get('/', [BookingController::class, 'index'])->name('shop.index');
