@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class AnalyticsController extends Controller
 {
+    /**
+     * Display the analytics dashboard with revenue, bookings, and performance data.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
     public function index(Request $request)
     {
         $shop = auth()->user()->shop;
@@ -21,20 +27,21 @@ class AnalyticsController extends Controller
         $tz = $shop->timezone ?? config('app.timezone');
         $now = Carbon::now($tz);
 
-        // Date Range Handling
+        // Parse date range from request or default to the last 30 days
         $startDateStr = $request->input('start_date', $now->copy()->subDays(29)->toDateString());
         $endDateStr = $request->input('end_date', $now->toDateString());
 
         $startDate = Carbon::parse($startDateStr, $tz)->startOfDay();
         $endDate = Carbon::parse($endDateStr, $tz)->endOfDay();
 
-        // Ensure reasonable limits (e.g., max 1 year) or just calculate days
+        // Limit range to a maximum of 1 year to prevent performance issues
         $diffInDays = $startDate->diffInDays($endDate);
         if ($diffInDays > 365) {
             $startDate = $endDate->copy()->subYear();
             $diffInDays = 365;
         }
 
+        // Fetch non-cancelled bookings within the selected range
         $bookings = $shop->bookings()
             ->whereBetween('start_time', [$startDate->copy()->setTimezone('UTC'), $endDate->copy()->setTimezone('UTC')])
             ->where('status', '!=', 'cancelled')
@@ -46,6 +53,7 @@ class AnalyticsController extends Controller
             'revenue' => []
         ];
 
+        // Prepare data for the timeline chart
         for ($i = 0; $i <= $diffInDays; $i++) {
             $currentDate = $startDate->copy()->addDays($i);
             
@@ -58,7 +66,7 @@ class AnalyticsController extends Controller
             $chartData['revenue'][] = (float) $dayBookings->sum('total_price');
         }
 
-        // 2. Top Services (within range)
+        // 2. Identification of Top Services (most booked)
         $topServices = DB::table('booking_items')
             ->join('bookings', 'booking_items.booking_id', '=', 'bookings.id')
             ->join('services', 'booking_items.service_id', '=', 'services.id')
@@ -71,7 +79,7 @@ class AnalyticsController extends Controller
             ->limit(5)
             ->get();
 
-        // 3. Busy Hours (Usage insights - based on full history or selected range? Let's use history for pattern, but range for insights)
+        // 3. Busy Hours Pattern Analysis
         $busyHoursRaw = $bookings->groupBy(function($b) use ($tz) {
             return (int)$b->start_time->copy()->setTimezone($tz)->format('H');
         });
@@ -85,7 +93,7 @@ class AnalyticsController extends Controller
             $busyHours['counts'][] = isset($busyHoursRaw[$h]) ? $busyHoursRaw[$h]->count() : 0;
         }
 
-        // 4. Stylist Performance (Revenue & Bookings per stylist)
+        // 4. Stylist Performance Analysis (Revenue generation)
         $stylistPerformance = DB::table('bookings')
             ->join('stylists', 'bookings.stylist_id', '=', 'stylists.id')
             ->where('bookings.shop_id', $shop->id)
@@ -100,7 +108,7 @@ class AnalyticsController extends Controller
             ->orderByDesc('total_revenue')
             ->get();
 
-        // 5. Overall Stats (within range)
+        // 5. Aggregate Summary Statistics
         $totalRevenue = (float)$bookings->where('status', 'completed')->sum('total_price');
         $totalBookings = $bookings->count();
         $avgBookingValue = $totalBookings > 0 ? $totalRevenue / $totalBookings : 0;
@@ -119,3 +127,4 @@ class AnalyticsController extends Controller
         ));
     }
 }
+

@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Shop;
 use App\Models\Service;
-use Illuminate\Support\Str;
+use App\Models\Customer;
 use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    /**
+     * Display the main admin dashboard with today's overview and stats.
+     *
+     * @return \Illuminate\View\View
+     */
     public function dashboard()
     {
         $shop = auth()->user()->shop;
@@ -67,7 +72,7 @@ class AdminController extends Controller
         
         $weekRevenue = $shop->bookings()
             ->whereBetween('start_time', [$startOfWeek, $endOfWeek])
-            ->where('status', 'completed') // Assuming 'completed' means paid/done
+            ->where('status', 'completed')
             ->sum('total_price');
         
         $potentialRevenue = $shop->bookings()
@@ -75,7 +80,7 @@ class AdminController extends Controller
             ->whereIn('status', ['confirmed', 'completed', 'in_progress'])
             ->sum('total_price');
             
-        $totalCustomers = \App\Models\Customer::whereHas('bookings', function($q) use ($shop) {
+        $totalCustomers = Customer::whereHas('bookings', function($q) use ($shop) {
              $q->where('shop_id', $shop->id);
         })->count();
 
@@ -94,12 +99,23 @@ class AdminController extends Controller
         ));
     }
 
+    /**
+     * Show the shop settings edit form.
+     *
+     * @return \Illuminate\View\View
+     */
     public function editShop()
     {
         $shop = auth()->user()->shop;
         return view('admin.shop.edit', compact('shop'));
     }
 
+    /**
+     * Update the shop settings.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updateShop(Request $request)
     {
         $data = $request->validate([
@@ -128,6 +144,12 @@ class AdminController extends Controller
         return back()->with('success', 'Shop updated.');
     }
 
+    /**
+     * Create a new shop for the user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function storeShop(Request $request)
     {
         $data = $request->validate([
@@ -152,6 +174,12 @@ class AdminController extends Controller
         return redirect()->route('admin.dashboard');
     }
 
+    /**
+     * List all services for the shop.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
         $shop = auth()->user()->shop;
@@ -171,11 +199,22 @@ class AdminController extends Controller
         return view('admin.services.index', compact('services'));
     }
 
+    /**
+     * Show form to create a new service.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
         return view('admin.services.create');
     }
 
+    /**
+     * Store a new service.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
         $shop = auth()->user()->shop;
@@ -191,12 +230,25 @@ class AdminController extends Controller
         return redirect()->route('admin.services.index')->with('success', 'Service created successfully.');
     }
 
+    /**
+     * Show form to edit an existing service.
+     *
+     * @param string $id
+     * @return \Illuminate\View\View
+     */
     public function edit(string $id)
     {
         $service = auth()->user()->shop->services()->findOrFail($id);
         return view('admin.services.edit', compact('service'));
     }
 
+    /**
+     * Update an existing service.
+     *
+     * @param Request $request
+     * @param string $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request, string $id)
     {
         $service = auth()->user()->shop->services()->findOrFail($id);
@@ -212,6 +264,12 @@ class AdminController extends Controller
         return redirect()->route('admin.services.index')->with('success', 'Service updated successfully.');
     }
 
+    /**
+     * Delete a service.
+     *
+     * @param string $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(string $id)
     {
         $service = auth()->user()->shop->services()->findOrFail($id);
@@ -220,6 +278,11 @@ class AdminController extends Controller
         return back()->with('success', 'Service deleted.');
     }
 
+    /**
+     * Toggle "Closed Today" status for the shop.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function toggleOffDay()
     {
         $shop = auth()->user()->shop;
@@ -239,3 +302,4 @@ class AdminController extends Controller
         return back()->with('success', $message);
     }
 }
+

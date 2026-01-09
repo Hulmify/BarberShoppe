@@ -67,8 +67,6 @@ Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefi
     // Services
     Route::resource('services', AdminController::class); 
 
-
-
     // Customers
     Route::resource('customers', App\Http\Controllers\CustomerController::class)->only(['index', 'show']);
 

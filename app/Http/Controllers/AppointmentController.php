@@ -7,19 +7,27 @@ use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
+    /**
+     * List appointments with filtering and pagination for the admin panel.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
         $shop = auth()->user()->shop;
         $tz = $shop->timezone ?? config('app.timezone');
         
         $query = $shop->bookings()->with(['customer', 'items.service', 'stylist'])->latest('start_time');
+        
+        // Filter by specific date or pre-defined filters
         if ($request->filled('date')) {
             $query->whereDate('start_time', $request->date);
         } elseif ($request->get('filter') === 'today') {
             $query->whereDate('start_time', now()->timezone($tz));
         }
         
-        // Filter by Status
+        // Filter by Status (supports multiple via array or comma-separated string)
         if ($request->filled('statuses')) {
             $statuses = is_array($request->statuses) ? $request->statuses : explode(',', $request->statuses);
             $query->whereIn('status', $statuses);
@@ -35,6 +43,7 @@ class AppointmentController extends Controller
 
         $bookings = $query->paginate(15)->withQueryString();
         
+        // Ensure all times are shifted to the shop's local timezone for display
         $bookings->getCollection()->each(function($b) use ($tz) {
             $b->start_time->setTimezone($tz);
             if ($b->end_time) $b->end_time->setTimezone($tz);
@@ -45,6 +54,13 @@ class AppointmentController extends Controller
         return view('admin.appointments.index', compact('bookings', 'stylists'));
     }
 
+    /**
+     * Update appointment status or assigned stylist.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request, $id)
     {
         $booking = auth()->user()->shop->bookings()->findOrFail($id);
@@ -72,14 +88,21 @@ class AppointmentController extends Controller
         return back()->with('success', 'Appointment updated.');
     }
 
+    /**
+     * Permanently delete an appointment.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy($id)
     {
         $booking = auth()->user()->shop->bookings()->findOrFail($id);
         
-        // Optionally delete associated items if not handled by database cascade
+        // Clean up associated items
         $booking->items()->delete();
         $booking->delete();
         
         return back()->with('success', 'Appointment permanently deleted.');
     }
 }
+

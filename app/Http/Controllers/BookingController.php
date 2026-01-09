@@ -11,6 +11,13 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    /**
+     * Resolve the shop instance from request or slug.
+     *
+     * @param Request $request
+     * @param string|null $slug
+     * @return Shop
+     */
     private function getShop(Request $request, $slug = null)
     {
         if ($request->attributes->has('shop')) {
@@ -19,11 +26,18 @@ class BookingController extends Controller
         return Shop::where('slug', $slug)->firstOrFail();
     }
 
+    /**
+     * Display the public booking page.
+     *
+     * @param Request $request
+     * @param string|null $slug
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request, $slug = null)
     {
         $shop = $this->getShop($request, $slug);
         
-        // Get services with search and pagination
+        // Get services with search and pagination for the booking catalog
         $search = $request->input('search');
         $servicesQuery = $shop->services();
         
@@ -36,36 +50,44 @@ class BookingController extends Controller
         
         $services = $servicesQuery->paginate(10)->withQueryString();
         
-        // Get active stylists
+        // Get active stylists to allow customers to choose their preferred barber
         $stylists = $shop->stylists()->where('is_active', true)->get();
         
         return view('booking.index', compact('shop', 'services', 'search', 'stylists'));
     }
 
+    /**
+     * Fetch available time slots for a given date and service duration.
+     *
+     * @param Request $request
+     * @param string|null $slug
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function slots(Request $request, $slug = null)
     {
         $shop = $this->getShop($request, $slug);
         
-        // Validate date
+        // Validate the requested date
         $request->validate(['date' => 'required|date']);
         $tz = $shop->timezone ?? config('app.timezone');
         $date = Carbon::parse($request->date, $tz)->startOfDay();
         $today = Carbon::now($tz)->startOfDay();
 
+        // Don't allow bookings in the past
         if ($date->lt($today)) {
             return response()->json(['slots' => []]);
         }
 
-        // Check if shop is closed for the requested date
+        // Check if shop is explicitly closed for the requested date (manual override)
         if ($shop->off_date && Carbon::parse($shop->off_date)->startOfDay()->equalTo($date)) {
             return response()->json(['slots' => [], 'message' => 'Shop is closed today.']);
         }
         
-        // Generate Slots
+        // Determine required duration and optional stylist preference
         $duration = (int) $request->input('duration', 30); // minutes
-        $stylistId = $request->input('stylist_id'); // Optional stylist filter
+        $stylistId = $request->input('stylist_id');
         
-        // Get active stylists with their availability for this day
+        // Get active stylists with their availability for requested day of week
         $dayOfWeek = $date->dayOfWeek;
         $stylists = $shop->stylists()
             ->where('is_active', true)
@@ -78,7 +100,7 @@ class BookingController extends Controller
             return response()->json(['slots' => []]);
         }
 
-        // Determine the overall working window for the day based on stylists
+        // Calculate the overall operating hours based on the earliest and latest stylist shifts
         $earliestStartTime = null;
         $latestEndTime = null;
 
@@ -101,7 +123,7 @@ class BookingController extends Controller
         $start = Carbon::parse($date->format('Y-m-d') . ' ' . $earliestStartTime, $tz);
         $end = Carbon::parse($date->format('Y-m-d') . ' ' . $latestEndTime, $tz);
         
-        // Get existing bookings
+        // Retrieve all existing bookings for this day to check for overlaps
         $allBookings = $shop->bookings()
             ->whereDate('start_time', $date)
             ->where('status', '!=', 'cancelled')
@@ -110,6 +132,7 @@ class BookingController extends Controller
         $slots = [];
         $now = Carbon::now($tz);
         
+        // Iterate through the day in 15-minute increments
         while ($start->copy()->addMinutes($duration)->lte($end)) {
             $slotEnd = $start->copy()->addMinutes($duration);
             
@@ -119,20 +142,22 @@ class BookingController extends Controller
                 continue;
             }
 
-            // Filter bookings that overlap with this slot
+            // Identify any bookings that conflict with this specific time slot
             $overlappingBookings = $allBookings->filter(function ($b) use ($start, $slotEnd) {
                 return $start->lt($b->end_time) && $slotEnd->gt($b->start_time);
             });
 
-            // Check which stylists are available (working and not busy)
+            // Find stylists who are:
+            // 1. Scheduled to work during this entire window
+            // 2. Not already booked for an overlapping appointment
             $availableStylists = $stylists->filter(function($s) use ($start, $slotEnd, $overlappingBookings, $stylistId, $tz) {
-                // If specific stylist requested, skip others
+                // If the user requested a specific stylist, ignore others
                 if ($stylistId && $s->id != $stylistId) return false;
 
                 // Check if stylist is busy
                 if ($overlappingBookings->contains('stylist_id', $s->id)) return false;
 
-                // Check if stylist is working at this time
+                // Check if stylist is on shift
                 $sAvail = $s->availabilities->first();
                 if (!$sAvail) return false;
 
@@ -142,6 +167,7 @@ class BookingController extends Controller
                 return $start->gte($sStart) && $slotEnd->lte($sEnd);
             });
 
+            // If at least one stylist can take the appointment, this slot is available
             if ($availableStylists->isNotEmpty()) {
                 $slots[] = $start->format('H:i');
             }
@@ -152,6 +178,13 @@ class BookingController extends Controller
         return response()->json(['slots' => $slots]);
     }
 
+    /**
+     * Create a new booking for a customer.
+     *
+     * @param Request $request
+     * @param string|null $slug
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request, $slug = null)
     {
         $shop = $this->getShop($request, $slug);
@@ -167,7 +200,7 @@ class BookingController extends Controller
             'stylist_id' => 'nullable|exists:stylists,id',
         ]);
 
-        // Check if customer already has an active booking in this shop
+        // Rate limiting/Business logic: prevent multiple active bookings from the same customer
         $existingCustomer = Customer::where('phone', $validated['customer_phone'])->first();
         if ($existingCustomer) {
             $activeBooking = Booking::where('shop_id', $shop->id)
@@ -178,17 +211,16 @@ class BookingController extends Controller
             if ($activeBooking) {
                 return response()->json([
                     'success' => false, 
-                    'message' => 'You already have an active appointment. You can only book another one after your current appointment is completed or cancelled.'
+                    'message' => 'You already have an active appointment.'
                 ], 422);
             }
         }
 
-        // Calculate Totals
+        // Calculate totals based on selected services
         $services = $shop->services()->whereIn('id', $validated['service_ids'])->get();
         $totalPrice = $services->sum('price');
         $totalDuration = $services->sum('duration_minutes');
         
-        // Time
         $tz = $shop->timezone ?? config('app.timezone');
         $startTime = Carbon::parse($validated['date'] . ' ' . $validated['time'], $tz);
         
@@ -196,14 +228,14 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => 'Cannot book appointments in the past'], 422);
         }
 
-        // Check if shop is closed for the requested date (Temporary Toggle)
+        // Re-check shop closure status
         if ($shop->off_date && Carbon::parse($shop->off_date)->isSameDay($startTime)) {
             return response()->json(['success' => false, 'message' => 'Shop is closed today.'], 422);
         }
 
         $endTime = $startTime->copy()->addMinutes($totalDuration);
         
-        // Double Check Availability (Concurrency)
+        // Final concurrency check: verify availability just before creating the record
         $overlappingBookings = $shop->bookings()
             ->where('status', '!=', 'cancelled')
             ->where(function ($q) use ($startTime, $endTime) {
@@ -225,12 +257,9 @@ class BookingController extends Controller
             }])
             ->get();
 
-        // Filter stylists who are working AND not busy
         $availableStylists = $activeStylists->filter(function($s) use ($startTime, $endTime, $overlappingBookings, $tz) {
-            // Check if stylist is busy
             if ($overlappingBookings->contains('stylist_id', $s->id)) return false;
 
-            // Check if stylist is working at this time
             $sAvail = $s->availabilities->first();
             if (!$sAvail) return false;
 
@@ -248,17 +277,17 @@ class BookingController extends Controller
             if ($availableStylists->isEmpty()) {
                 return response()->json(['success' => false, 'message' => 'No stylists available at this time'], 422);
             }
-            // Assign a random free stylist
+            // Auto-assign any available stylist if none was requested
             $selectedStylistId = $availableStylists->random()->id;
         }
         
-        // Create Customer
+        // Register or update customer profile
         $customer = Customer::updateOrCreate(
             ['phone' => $validated['customer_phone']],
             ['name' => $validated['customer_name'], 'email' => $validated['customer_email']]
         );
 
-        // Create Booking
+        // Persist the booking
         $booking = Booking::create([
             'shop_id' => $shop->id,
             'customer_id' => $customer->id,
@@ -269,7 +298,7 @@ class BookingController extends Controller
             'stylist_id' => $selectedStylistId,
         ]);
 
-        // Items
+        // Attach services to the booking
         foreach ($services as $svc) {
             BookingItem::create([
                 'booking_id' => $booking->id,
@@ -281,6 +310,13 @@ class BookingController extends Controller
         return response()->json(['success' => true, 'booking_id' => $booking->id]);
     }
 
+    /**
+     * Show appointment history for a customer based on their phone number.
+     *
+     * @param Request $request
+     * @param string|null $slug
+     * @return \Illuminate\View\View
+     */
     public function myAppointments(Request $request, $slug = null)
     {
         $shop = $this->getShop($request, $slug);
@@ -301,6 +337,13 @@ class BookingController extends Controller
         return view('booking.my_appointments', compact('shop', 'bookings', 'phone'));
     }
 
+    /**
+     * Redirect to the appointment list for a customer phone number.
+     *
+     * @param Request $request
+     * @param string|null $slug
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function searchAppointments(Request $request, $slug = null)
     {
         $request->validate(['phone' => 'required|string']);
@@ -313,3 +356,4 @@ class BookingController extends Controller
         return redirect()->route('booking.my_appointments', ['slug' => $slug, 'phone' => $request->phone]);
     }
 }
+
