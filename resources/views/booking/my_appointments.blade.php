@@ -17,7 +17,7 @@
     <div class="w-full max-w-3xl">
         <header class="text-center mb-10 animate-fade-in-down">
             <div class="flex items-center justify-center mb-4">
-                <a href="{{ request()->attributes->has('shop') ? route('shop.index') : route('booking.via_slug', ['slug' => $shop->slug]) }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 transition-colors">
+                <a href="{{ request()->attributes->has('shop') ? route('shop.index') : $shop->booking_url }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     <span>Back to Booking</span>
                 </a>
@@ -129,7 +129,7 @@
                         </div>
                         <h3 class="text-lg font-medium text-slate-900">No appointments found</h3>
                         <p class="text-slate-500 mt-1">We couldn't find any appointments for this phone number.</p>
-                        <a href="{{ request()->attributes->has('shop') ? route('shop.index') : route('booking.via_slug', ['slug' => $shop->slug]) }}" class="mt-6 inline-flex items-center text-primary-600 font-semibold hover:text-primary-700">
+                        <a href="{{ request()->attributes->has('shop') ? route('shop.index') : $shop->booking_url }}" class="mt-6 inline-flex items-center text-primary-600 font-semibold hover:text-primary-700">
                             Book your first appointment
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>

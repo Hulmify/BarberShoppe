@@ -23,7 +23,7 @@
     </div>
 </div>
 
-<div class="bg-white border border-gray-200 rounded-3xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+<div class="bg-white border border-gray-200 rounded-3xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300">
     <div id="calendar" class="min-h-[700px]"></div>
 </div>
 
@@ -134,6 +134,35 @@
     .fc .fc-toolbar.fc-header-toolbar {
         margin-bottom: 2rem;
         padding: 0 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .fc .fc-toolbar.fc-header-toolbar {
+            flex-direction: column !important;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .fc .fc-toolbar-chunk {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.1rem !important;
+        }
+        .fc .fc-button-primary {
+            padding: 0.4rem 0.7rem !important;
+            font-size: 0.75rem !important;
+            border-radius: 0.5rem !important;
+        }
+        .fc .fc-button-group > .fc-button:first-child {
+            border-top-left-radius: 0.5rem !important;
+            border-bottom-left-radius: 0.5rem !important;
+        }
+        .fc .fc-button-group > .fc-button:last-child {
+            border-top-right-radius: 0.5rem !important;
+            border-bottom-right-radius: 0.5rem !important;
+        }
     }
     
     .fc .fc-toolbar-title {
@@ -259,6 +288,35 @@
         border-color: #ef4444;
         border-width: 6px;
     }
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    @media (max-width: 768px) {
+        .fc-view-harness {
+            overflow-x: auto !important;
+            padding-bottom: 8px;
+        }
+        .fc-view-harness .fc-view {
+            min-width: 800px !important;
+        }
+        /* Style the internal scroller to match custom look */
+        .fc-view-harness::-webkit-scrollbar { height: 6px; }
+        .fc-view-harness::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .fc-view-harness::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    }
 </style>
 @endpush
 
@@ -268,11 +326,26 @@
     document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'timeGridWeek',
+            initialView: window.innerWidth < 768 ? 'timeGridWeek' : 'timeGridWeek',
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: window.innerWidth < 768 ? 'timeGridDay,timeGridWeek' : 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            windowResize: function(view) {
+                if (window.innerWidth < 768) {
+                    calendar.setOption('headerToolbar', {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'timeGridDay,timeGridWeek'
+                    });
+                } else {
+                    calendar.setOption('headerToolbar', {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    });
+                }
             },
             navLinks: true, 
             businessHours: {

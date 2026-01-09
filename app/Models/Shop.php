@@ -35,4 +35,13 @@ class Shop extends Model
     {
         return $this->hasMany(Stylist::class)->orderBy('display_order');
     }
+
+    public function getBookingUrlAttribute()
+    {
+        if ($this->custom_domain) {
+            return 'https://' . $this->custom_domain;
+        }
+
+        return route('booking.via_slug', $this->slug);
+    }
 }

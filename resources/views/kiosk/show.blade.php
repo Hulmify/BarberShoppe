@@ -43,8 +43,24 @@
             display: grid;
             grid-template-rows: auto 1fr auto;
             height: 100vh;
-            padding: 2rem;
-            gap: 2rem;
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .kiosk-container {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                padding: 1rem;
+                gap: 1.5rem;
+                overflow-y: auto;
+            }
+            body {
+                overflow: auto;
+                height: auto;
+            }
         }
 
         /* Header */
@@ -80,6 +96,22 @@
             font-size: 1.2rem;
         }
 
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+                gap: 1rem;
+            }
+            .shop-info {
+                flex-direction: column;
+                gap: 0.5rem !important;
+            }
+            .shop-info h1 { font-size: 1.5rem; }
+            #clock { font-size: 2rem; }
+            #date { font-size: 1rem; }
+        }
+
         /* Main Content */
         main {
             display: grid;
@@ -87,6 +119,14 @@
             gap: 2rem;
             min-height: 0; /* Important for grid 1fr scrolling */
             overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+                overflow: visible;
+                height: auto;
+            }
         }
 
         .section-card {
@@ -98,6 +138,15 @@
             flex-direction: column;
             min-height: 0; /* Allow inner content to control scrolling */
             overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .section-card {
+                padding: 1.5rem;
+                border-radius: 24px;
+                overflow: visible;
+                height: auto;
+            }
         }
 
         .section-title {
@@ -166,6 +215,22 @@
             overflow-y: hidden;
             flex: 1;
             position: relative;
+            min-height: 200px;
+        }
+
+        @media (max-width: 768px) {
+            .queue-list {
+                overflow: visible;
+                height: auto;
+                flex: none;
+            }
+            .queue-scroll-container {
+                animation: none !important;
+                transform: none !important;
+            }
+            .queue-content-clone {
+                display: none !important;
+            }
         }
 
         .queue-scroll-container {
@@ -214,6 +279,18 @@
             padding: 1.5rem;
             border-radius: 24px;
             border: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            footer {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 1.5rem;
+            }
+            .qr-section {
+                flex-direction: column;
+                gap: 1rem !important;
+            }
         }
 
         .qr-section {
@@ -444,7 +521,7 @@
                             <!-- Now Serving Clone -->
                             <div style="margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Now Serving</div>
                             <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
-                                @foreach($nowServing as $booking)
+                                @forelse($nowServing as $booking)
                                     <div class="queue-item" style="background: rgba(56, 189, 248, 0.15); border-color: var(--accent);">
                                         <div>
                                             <div class="queue-time">{{ $booking->customer->name }}</div>
@@ -452,7 +529,11 @@
                                         </div>
                                         <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
                                     </div>
-                                @endforeach
+                                @empty
+                                    <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
+                                        No upcoming bookings
+                                    </div>
+                                @endforelse
                             </div>
 
                             <!-- Next Up Clone -->
@@ -530,7 +611,7 @@
         updateClock();
 
         // Generate QR Code
-        const bookingUrl = "{{ route('booking.via_slug', ['slug' => $shop->slug]) }}";
+        const bookingUrl = "{{ $shop->booking_url }}";
         new QRCode(document.getElementById("qrcode"), {
             text: bookingUrl,
             width: 120,

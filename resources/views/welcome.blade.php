@@ -137,12 +137,12 @@
                     <a href="#demo" class="hover:text-primary-500 transition-colors">Demo</a>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 sm:gap-4">
                     @auth
-                        <a href="{{ route('admin.dashboard') }}" class="btn-premium px-6 py-2.5 bg-slate-900 text-white rounded-full font-bold text-sm shadow-xl shadow-slate-900/20 hover:shadow-slate-900/30">Go to Dashboard</a>
+                        <a href="{{ route('admin.dashboard') }}" class="btn-premium px-4 sm:px-6 py-2 sm:py-2.5 bg-slate-900 text-white rounded-full font-bold text-xs sm:text-sm shadow-xl shadow-slate-900/20 hover:shadow-slate-900/30 whitespace-nowrap">Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="hidden sm:block font-bold text-sm text-slate-600 hover:text-slate-900 px-4 py-2">Log In</a>
-                        <a href="{{ route('register') }}" class="btn-premium px-6 py-2.5 bg-primary-500 text-white rounded-full font-bold text-sm shadow-xl shadow-primary-500/20 hover:shadow-primary-500/30">Start Free Trial</a>
+                        <a href="{{ route('login') }}" class="font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 px-2 sm:px-4 py-2">Log In</a>
+                        <a href="{{ route('register') }}" class="btn-premium px-4 sm:px-6 py-2 sm:py-2.5 bg-primary-500 text-white rounded-full font-bold text-xs sm:text-sm shadow-xl shadow-primary-500/20 hover:shadow-primary-500/30 whitespace-nowrap">Start Trial</a>
                     @endauth
                 </div>
             </div>
