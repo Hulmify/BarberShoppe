@@ -19,7 +19,25 @@ class AppointmentController extends Controller
         $shop = auth()->user()->shop;
         $tz = $shop->timezone ?? config('app.timezone');
         
-        $query = $shop->bookings()->with(['customer', 'items.service', 'stylist'])->latest('start_time');
+        $query = $shop->bookings()
+            ->with(['customer', 'items.service', 'stylist'])
+            ->select('bookings.*');
+        
+        // Sorting Logic
+        $sortBy = $request->get('sort_by', 'start_time');
+        $sortDir = $request->get('sort_dir', 'desc');
+        $validSorts = ['start_time', 'total_price', 'status', 'customer_name'];
+
+        if (!in_array($sortBy, $validSorts)) {
+            $sortBy = 'start_time';
+        }
+
+        if ($sortBy === 'customer_name') {
+            $query->join('customers', 'bookings.customer_id', '=', 'customers.id')
+                  ->orderBy('customers.name', $sortDir);
+        } else {
+            $query->orderBy($sortBy, $sortDir);
+        }
         
         // Filter by specific date or pre-defined filters
         if ($request->filled('date')) {

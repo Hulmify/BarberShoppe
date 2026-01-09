@@ -103,12 +103,48 @@
             <table class="w-full text-sm text-left text-gray-500">
                 <thead class="text-xs text-slate-700 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th scope="col" class="px-6 py-4 font-bold">Date & Time</th>
-                        <th scope="col" class="px-6 py-4 font-bold">Customer</th>
+                        <th scope="col" class="px-6 py-4 font-bold">
+                            <a href="{{ route('admin.appointments.index', array_merge(request()->all(), ['sort_by' => 'start_time', 'sort_dir' => request('sort_by') === 'start_time' && request('sort_dir') === 'asc' ? 'desc' : 'asc'])) }}" class="group inline-flex items-center gap-1 hover:text-primary-600 transition-colors">
+                                Date & Time
+                                @if(request('sort_by') === 'start_time' || !request()->has('sort_by'))
+                                    <svg class="w-3 h-3 {{ (request('sort_dir', 'desc') === 'asc' && request('sort_by') === 'start_time') ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @else
+                                    <svg class="w-3 h-3 opacity-0 group-hover:opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @endif
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold">
+                            <a href="{{ route('admin.appointments.index', array_merge(request()->all(), ['sort_by' => 'customer_name', 'sort_dir' => request('sort_by') === 'customer_name' && request('sort_dir') === 'asc' ? 'desc' : 'asc'])) }}" class="group inline-flex items-center gap-1 hover:text-primary-600 transition-colors">
+                                Customer
+                                @if(request('sort_by') === 'customer_name')
+                                    <svg class="w-3 h-3 {{ request('sort_dir') === 'asc' ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @else
+                                    <svg class="w-3 h-3 opacity-0 group-hover:opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @endif
+                            </a>
+                        </th>
                         <th scope="col" class="px-6 py-4 font-bold">Services</th>
                         <th scope="col" class="px-6 py-4 font-bold">Stylist</th>
-                        <th scope="col" class="px-6 py-4 font-bold">Price</th>
-                        <th scope="col" class="px-6 py-4 font-bold">Status</th>
+                        <th scope="col" class="px-6 py-4 font-bold">
+                            <a href="{{ route('admin.appointments.index', array_merge(request()->all(), ['sort_by' => 'total_price', 'sort_dir' => request('sort_by') === 'total_price' && request('sort_dir') === 'asc' ? 'desc' : 'asc'])) }}" class="group inline-flex items-center gap-1 hover:text-primary-600 transition-colors">
+                                Price
+                                @if(request('sort_by') === 'total_price')
+                                    <svg class="w-3 h-3 {{ request('sort_dir') === 'asc' ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @else
+                                    <svg class="w-3 h-3 opacity-0 group-hover:opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @endif
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold">
+                            <a href="{{ route('admin.appointments.index', array_merge(request()->all(), ['sort_by' => 'status', 'sort_dir' => request('sort_by') === 'status' && request('sort_dir') === 'asc' ? 'desc' : 'asc'])) }}" class="group inline-flex items-center gap-1 hover:text-primary-600 transition-colors">
+                                Status
+                                @if(request('sort_by') === 'status')
+                                    <svg class="w-3 h-3 {{ request('sort_dir') === 'asc' ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @else
+                                    <svg class="w-3 h-3 opacity-0 group-hover:opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @endif
+                            </a>
+                        </th>
                         <th scope="col" class="px-6 py-4 font-bold text-right">Actions</th>
                     </tr>
                 </thead>

@@ -30,176 +30,278 @@
         <form action="{{ route('admin.pos.store') }}" method="POST" id="posForm">
             @csrf
             
-            <!-- 1. Customer Selection -->
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">1. Customer Details</h3>
-                
-                <div class="flex gap-4 mb-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="customer_type" value="existing" checked class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
-                        <span class="text-sm font-medium text-slate-700">Existing Customer</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="customer_type" value="new" class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
-                        <span class="text-sm font-medium text-slate-700">New Customer</span>
-                    </label>
-                </div>
-                
-                <!-- Existing Customer Select -->
-                <div id="existing_customer_section">
-                    <label for="customer_id" class="block mb-2 text-sm font-medium text-slate-900">Select Customer</label>
-                    <select id="customer_id" name="customer_id" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                        <option value="">-- Choose Customer --</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone ?? $customer->email }})</option>
-                        @endforeach
-                    </select>
-                </div>
-                
-                <!-- New Customer Inputs -->
-                <div id="new_customer_section" class="hidden space-y-4">
-                    <div>
-                        <label for="new_customer_name" class="block mb-2 text-sm font-medium text-slate-900">Full Name</label>
-                        <input type="text" id="new_customer_name" name="new_customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="John Doe">
+            <!-- Stepper Navigation -->
+            <div class="mb-8 px-2">
+                <div class="flex items-center justify-between w-full relative">
+                    <!-- Progress Bar Background -->
+                    <div class="absolute top-[20px] left-0 w-full h-1 bg-gray-200 rounded -z-10"></div>
+                    <!-- Active Progress Bar -->
+                    <div id="stepper-progress" class="absolute top-[20px] left-0 h-1 bg-primary-600 rounded -z-10 transition-all duration-500 ease-in-out" style="width: 0%"></div>
+                    
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center cursor-pointer group" onclick="goToStep(1)">
+                        <div id="step-indicator-1" class="w-10 h-10 flex items-center justify-center rounded-full bg-primary-600 text-white font-bold border-4 border-white shadow-sm transition-all duration-300 ring-2 ring-primary-600">
+                            1
+                        </div>
+                        <span id="step-label-1" class="mt-2 text-xs font-bold text-primary-600 uppercase tracking-wider">Customer</span>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="new_customer_phone" class="block mb-2 text-sm font-medium text-slate-900">Phone Number</label>
-                            <input type="tel" id="new_customer_phone" name="new_customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="+1 234 567 890">
+                    
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center cursor-pointer group" onclick="if(currentStep >= 2) goToStep(2)">
+                        <div id="step-indicator-2" class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-400 font-bold border-4 border-white shadow-sm transition-all duration-300 ring-2 ring-gray-200">
+                            2
                         </div>
-                         <div>
-                            <label for="new_customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address (Optional)</label>
-                            <input type="email" id="new_customer_email" name="new_customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="john@example.com">
+                        <span id="step-label-2" class="mt-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Services</span>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center cursor-pointer group" onclick="if(currentStep >= 3) goToStep(3)">
+                        <div id="step-indicator-3" class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-400 font-bold border-4 border-white shadow-sm transition-all duration-300 ring-2 ring-gray-200">
+                            3
                         </div>
+                        <span id="step-label-3" class="mt-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Timing</span>
                     </div>
                 </div>
             </div>
             
-            <!-- 2. Services Selection -->
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">2. Select Services</h3>
-                
-                <!-- Search Bar -->
-                <div class="mb-4">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                            </svg>
-                        </div>
-                        <input type="text" id="serviceSearch" value="{{ $search ?? '' }}" placeholder="Search services..." class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5" onkeyup="filterServices()">
-                    </div>
-                </div>
-                
-                <div class="space-y-3" id="servicesList">
-                    @forelse($services as $service)
-                        <label class="service-item flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors select-none" data-name="{{ strtolower($service->name) }}" data-desc="{{ strtolower($service->description ?? '') }}">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" value="{{ $service->id }}" 
-                                    data-price="{{ $service->price }}" 
-                                    data-name="{{ $service->name }}" 
-                                    data-duration="{{ $service->duration_minutes }}"
-                                    class="service-checkbox w-5 h-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
-                                <div>
-                                    <div class="font-medium text-slate-900">{{ $service->name }}</div>
-                                    <div class="text-xs text-slate-500">{{ $service->duration_minutes }} mins</div>
-                                </div>
-                            </div>
-                            <div class="font-bold text-slate-700">
-                                {{ auth()->user()->shop->currency ?? '$' }} {{ number_format($service->price, 2) }}
-                            </div>
+            <!-- 1. Customer Selection (Step 1) -->
+            <div id="step-1" class="step-section">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">1. Customer Details</h3>
+                    
+                    <div class="flex gap-4 mb-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="customer_type" value="existing" checked class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                            <span class="text-sm font-medium text-slate-700">Existing Customer</span>
                         </label>
-                    @empty
-                        <p class="text-slate-400 text-sm text-center py-4">No services found</p>
-                    @endforelse
-                </div>
-                
-                <!-- Pagination -->
-                @if($services->hasPages())
-                    <div class="mt-4 flex justify-center">
-                        {{ $services->links() }}
-                    </div>
-                @endif
-                <div id="hidden-services-container"></div>
-            </div>
-                        <!-- 3. Date, Time & Stylist -->
-             <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">3. Assignment & Timing</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        @php
-                            $tz = auth()->user()->shop->timezone ?? config('app.timezone');
-                            $today = \Carbon\Carbon::now($tz)->toDateString();
-                        @endphp
-                        <label for="date" class="block mb-2 text-sm font-medium text-slate-900">Date</label>
-                        <input type="date" id="date" name="date" value="{{ $today }}" min="{{ $today }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                    </div>
-                    <div>
-                        <label for="stylist_id" class="block mb-2 text-sm font-medium text-slate-900">Stylist (Optional)</label>
-                        <select id="stylist_id" name="stylist_id" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                            <option value="">-- No Preference --</option>
-                            @foreach($stylists as $stylist)
-                                <option value="{{ $stylist->id }}">{{ $stylist->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="text-sm font-medium text-slate-900">Select Time Slot</label>
-                        <div id="slot-loader" class="hidden">
-                            <svg class="animate-spin h-4 w-4 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        </div>
-                    </div>
-
-                    <!-- Quick Filters -->
-                    <div class="flex gap-2 mb-4 overflow-x-auto pb-1 no-scrollbar">
-                        <button type="button" onclick="filterTimeGroups('all')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-primary-500 text-white shadow-sm border border-primary-500" data-group="all">All Day</button>
-                        <button type="button" onclick="filterTimeGroups('morning')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="morning">Morning</button>
-                        <button type="button" onclick="filterTimeGroups('afternoon')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="afternoon">Afternoon</button>
-                        <button type="button" onclick="filterTimeGroups('evening')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="evening">Evening</button>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="customer_type" value="new" class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                            <span class="text-sm font-medium text-slate-700">New Customer</span>
+                        </label>
                     </div>
                     
-                    <div id="pos-slots-container" class="space-y-6 max-h-96 overflow-y-auto p-4 border border-gray-100 rounded-xl bg-slate-50/50 custom-scrollbar">
-                        <!-- Morning Section -->
-                        <div id="group-morning" class="hidden">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 17a5 5 0 100-10 5 5 0 000 10z"/></svg>
-                                Morning
-                            </h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
-                        </div>
+                <!-- Existing Customer Select (Custom Searchable) -->
+                <div id="existing_customer_section" class="relative">
+                    <label class="block mb-2 text-sm font-medium text-slate-900">Select Customer</label>
+                    
+                    <!-- Hidden Input for Form Submission -->
+                    <input type="hidden" name="customer_id" id="customer_id">
 
-                        <!-- Afternoon Section -->
-                        <div id="group-afternoon" class="hidden">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 17a5 5 0 100-10 5 5 0 000 10z"/></svg>
-                                Afternoon
-                            </h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
-                        </div>
+                    <!-- Custom Select Trigger -->
+                    <div class="relative">
+                        <button type="button" id="customer_select_btn" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 text-left flex justify-between items-center transition-colors hover:bg-white" onclick="toggleCustomerDropdown()">
+                            <span id="customer_selected_text" class="text-slate-500">-- Choose Customer --</span>
+                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                            </svg>
+                        </button>
 
-                        <!-- Evening Section -->
-                        <div id="group-evening" class="hidden">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                                Evening
-                            </h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
-                        </div>
-
-                        <div id="no-slots-msg" class="text-center py-8 text-slate-400 text-sm italic">
-                            Select a client, at least one service, and a valid date to see available times.
+                        <!-- Dropdown Menu -->
+                        <div id="customer_dropdown_list" class="hidden absolute z-20 w-full bg-white rounded-lg shadow-xl border border-gray-200 mt-1 max-h-64 overflow-hidden flex flex-col">
+                            <!-- Search Input -->
+                            <div class="p-2 border-b border-gray-100 bg-gray-50">
+                                <input type="text" id="customer_search_input" class="bg-white border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" placeholder="Search customer..." onkeyup="filterCustomers(this.value)" autocomplete="off">
+                            </div>
+                            
+                            <!-- Options List -->
+                            <div class="overflow-y-auto max-h-48 custom-scrollbar" id="customer_options_container">
+                                @foreach($customers as $customer)
+                                    <div class="customer-option p-2.5 hover:bg-primary-50 cursor-pointer text-sm text-slate-700 transition-colors border-b border-gray-50 last:border-0" 
+                                         onclick="selectCustomer('{{ $customer->id }}', '{{ addslashes($customer->name) }}', '{{ $customer->phone ?? $customer->email }}')"
+                                         data-search="{{ strtolower($customer->name . ' ' . ($customer->phone ?? '') . ' ' . ($customer->email ?? '')) }}">
+                                        <div class="font-medium text-slate-900">{{ $customer->name }}</div>
+                                        <div class="text-xs text-slate-500">{{ $customer->phone ?? $customer->email }}</div>
+                                    </div>
+                                @endforeach
+                                 <div id="no_customer_found" class="hidden p-4 text-sm text-slate-400 text-center italic">No customers found</div>
+                            </div>
                         </div>
                     </div>
-                    <input type="hidden" name="time" id="time" required>
-                    @error('time')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                </div>
+                    
+                    <!-- New Customer Inputs -->
+                    <div id="new_customer_section" class="hidden space-y-4">
+                        <div>
+                            <label for="new_customer_name" class="block mb-2 text-sm font-medium text-slate-900">Full Name</label>
+                            <input type="text" id="new_customer_name" name="new_customer_name" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="John Doe">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="new_customer_phone" class="block mb-2 text-sm font-medium text-slate-900">Phone Number</label>
+                                <input type="tel" id="new_customer_phone" name="new_customer_phone" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="+1 234 567 890">
+                            </div>
+                             <div>
+                                <label for="new_customer_email" class="block mb-2 text-sm font-medium text-slate-900">Email Address (Optional)</label>
+                                <input type="email" id="new_customer_email" name="new_customer_email" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="john@example.com">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="validateAndGoNext(1)" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2">
+                        Next: Select Services
+                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 2. Services Selection (Step 2) -->
+            <div id="step-2" class="step-section hidden">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">2. Select Services</h3>
+                    
+                    <!-- Search Bar -->
+                    <div class="mb-4">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                                </svg>
+                            </div>
+                            <input type="text" id="serviceSearch" value="{{ $search ?? '' }}" placeholder="Search services..." class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5" onkeyup="filterServices()">
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3" id="servicesList">
+                        @forelse($services as $service)
+                            <label class="service-item flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors select-none" data-name="{{ strtolower($service->name) }}" data-desc="{{ strtolower($service->description ?? '') }}">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" value="{{ $service->id }}" 
+                                        data-price="{{ $service->price }}" 
+                                        data-name="{{ $service->name }}" 
+                                        data-duration="{{ $service->duration_minutes }}"
+                                        class="service-checkbox w-5 h-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                                    <div>
+                                        <div class="font-medium text-slate-900">{{ $service->name }}</div>
+                                        <div class="text-xs text-slate-500">{{ $service->duration_minutes }} mins</div>
+                                    </div>
+                                </div>
+                                <div class="font-bold text-slate-700">
+                                    {{ auth()->user()->shop->currency ?? '$' }} {{ number_format($service->price, 2) }}
+                                </div>
+                            </label>
+                        @empty
+                            <p class="text-slate-400 text-sm text-center py-4">No services found</p>
+                        @endforelse
+                    </div>
+                    
+                    <!-- Pagination -->
+                    @if($services->hasPages())
+                        <div class="mt-4 flex justify-center">
+                            {{ $services->links() }}
+                        </div>
+                    @endif
+                    <div id="hidden-services-container"></div>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button type="button" onclick="goToStep(1)" class="text-slate-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                        Back
+                    </button>
+                    <button type="button" onclick="validateAndGoNext(2)" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2">
+                        Next: Assignment
+                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+                        <!-- 3. Date, Time & Stylist (Step 3) -->
+             <div id="step-3" class="step-section hidden">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">3. Assignment & Timing</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            @php
+                                $tz = auth()->user()->shop->timezone ?? config('app.timezone');
+                                $today = \Carbon\Carbon::now($tz)->toDateString();
+                            @endphp
+                            <label for="date" class="block mb-2 text-sm font-medium text-slate-900">Date</label>
+                            <input type="date" id="date" name="date" value="{{ $today }}" min="{{ $today }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
+                        </div>
+                        <div>
+                            <label for="stylist_id" class="block mb-2 text-sm font-medium text-slate-900">Stylist (Optional)</label>
+                            <select id="stylist_id" name="stylist_id" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
+                                <option value="">-- No Preference --</option>
+                                @foreach($stylists as $stylist)
+                                    <option value="{{ $stylist->id }}">{{ $stylist->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-sm font-medium text-slate-900">Select Time Slot</label>
+                            <div id="slot-loader" class="hidden">
+                                <svg class="animate-spin h-4 w-4 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Quick Filters -->
+                        <div class="flex gap-2 mb-4 overflow-x-auto pb-1 no-scrollbar">
+                            <button type="button" onclick="filterTimeGroups('all')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-primary-500 text-white shadow-sm border border-primary-500" data-group="all">All Day</button>
+                            <button type="button" onclick="filterTimeGroups('morning')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="morning">Morning</button>
+                            <button type="button" onclick="filterTimeGroups('afternoon')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="afternoon">Afternoon</button>
+                            <button type="button" onclick="filterTimeGroups('evening')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-primary-400" data-group="evening">Evening</button>
+                        </div>
+                        
+                        <div id="pos-slots-container" class="space-y-6 max-h-96 overflow-y-auto p-4 border border-gray-100 rounded-xl bg-slate-50/50 custom-scrollbar">
+                            <!-- Morning Section -->
+                            <div id="group-morning" class="hidden">
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 17a5 5 0 100-10 5 5 0 000 10z"/></svg>
+                                    Morning
+                                </h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
+                            </div>
+
+                            <!-- Afternoon Section -->
+                            <div id="group-afternoon" class="hidden">
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 17a5 5 0 100-10 5 5 0 000 10z"/></svg>
+                                    Afternoon
+                                </h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
+                            </div>
+
+                            <!-- Evening Section -->
+                            <div id="group-evening" class="hidden">
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                                    Evening
+                                </h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
+                            </div>
+
+                            <div id="no-slots-msg" class="text-center py-8 text-slate-400 text-sm italic">
+                                Select a client, at least one service, and a valid date to see available times.
+                            </div>
+                        </div>
+                        <input type="hidden" name="time" id="time" required>
+                        @error('time')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button type="button" onclick="goToStep(2)" class="text-slate-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                        Back
+                    </button>
+                    <!-- Confirmation happens in the specific Summary Card, so no Next button here needed -->
                 </div>
             </div>
             
@@ -230,7 +332,7 @@
                 </div>
             </div>
             
-            <button type="submit" form="posForm" class="w-full text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:ring-slate-300 font-bold rounded-lg text-sm px-5 py-3.5 text-center transition-transform hover:-translate-y-0.5 shadow-md">
+            <button type="submit" id="btn-confirm-booking" form="posForm" disabled class="w-full text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:ring-slate-300 font-bold rounded-lg text-sm px-5 py-3.5 text-center transition-transform hover:-translate-y-0.5 shadow-md opacity-50 cursor-not-allowed">
                 Confirm Booking
             </button>
         </div>
@@ -240,6 +342,93 @@
 <script>
     const POS_STORAGE_KEY = 'pos_booking_services';
     let selectedServices = new Map(); // id -> {name, price}
+    let currentStep = 1;
+
+    function goToStep(step) {
+        // Toggle step visibility
+        document.querySelectorAll('.step-section').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`step-${step}`).classList.remove('hidden');
+        
+        currentStep = step;
+        updateStepperUI();
+        
+        // Handle Confirm Button
+        const confirmBtn = document.getElementById('btn-confirm-booking');
+        if (confirmBtn) {
+            if (step === 3) {
+                 confirmBtn.removeAttribute('disabled');
+                 confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                 confirmBtn.setAttribute('disabled', 'disabled');
+                 confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    function validateAndGoNext(current) {
+        if (current === 1) {
+            // Check customer
+            const type = document.querySelector('input[name="customer_type"]:checked').value;
+            if (type === 'existing') {
+                const id = document.getElementById('customer_id').value;
+                if (!id) {
+                    alert('Please select a customer.');
+                    return;
+                }
+            } else {
+                const name = document.getElementById('new_customer_name').value.trim();
+                const phone = document.getElementById('new_customer_phone').value.trim();
+                if (!name || !phone) {
+                    alert('Please enter customer name and phone number.');
+                    return;
+                }
+            }
+            goToStep(2);
+        } else if (current === 2) {
+            // Check services
+            if (selectedServices.size === 0) {
+                alert('Please select at least one service.');
+                return;
+            }
+            // Trigger fetch slots when entering step 3
+            goToStep(3);
+            fetchPosSlots();
+        }
+    }
+    
+    function updateStepperUI() {
+        // Update indicators
+        for (let i = 1; i <= 3; i++) {
+            const indicator = document.getElementById(`step-indicator-${i}`);
+            const label = document.getElementById(`step-label-${i}`);
+            
+            if (i < currentStep) {
+                // Completed
+                indicator.className = 'w-10 h-10 flex items-center justify-center rounded-full bg-green-500 text-white font-bold border-4 border-white shadow-sm transition-all duration-300 ring-2 ring-green-500';
+                indicator.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
+                label.className = 'mt-2 text-xs font-bold text-green-500 uppercase tracking-wider';
+            } else if (i === currentStep) {
+                // Current
+                indicator.className = 'w-10 h-10 flex items-center justify-center rounded-full bg-primary-600 text-white font-bold border-4 border-white shadow-sm transition-all duration-300 ring-2 ring-primary-600';
+                indicator.innerHTML = i;
+                label.className = 'mt-2 text-xs font-bold text-primary-600 uppercase tracking-wider';
+            } else {
+                // Future
+                indicator.className = 'w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-400 font-bold border-4 border-white shadow-sm transition-all duration-300 ring-2 ring-gray-200';
+                indicator.innerHTML = i;
+                label.className = 'mt-2 text-xs font-bold text-gray-400 uppercase tracking-wider';
+            }
+        }
+        
+        // Update Progress Bar
+        const progress = document.getElementById('stepper-progress');
+        if (currentStep === 1) progress.style.width = '0%';
+        else if (currentStep === 2) progress.style.width = '50%';
+        else if (currentStep === 3) progress.style.width = '100%';
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         // Toggle Customer Type
@@ -307,6 +496,64 @@
         sessionStorage.setItem(POS_STORAGE_KEY, JSON.stringify(Array.from(selectedServices.values())));
         updateSummary();
     }
+    
+    // Custom Searchable Dropdown Logic
+    function toggleCustomerDropdown() {
+        const dropdown = document.getElementById('customer_dropdown_list');
+        const input = document.getElementById('customer_search_input');
+        dropdown.classList.toggle('hidden');
+        if (!dropdown.classList.contains('hidden')) {
+            input.focus();
+        }
+    }
+    
+    function filterCustomers(val) {
+        const term = val.toLowerCase();
+        const options = document.querySelectorAll('.customer-option');
+        let hasVisible = false;
+        
+        options.forEach(opt => {
+            const searchData = opt.dataset.search;
+            if (searchData.includes(term)) {
+                opt.classList.remove('hidden');
+                hasVisible = true;
+            } else {
+                opt.classList.add('hidden');
+            }
+        });
+        
+        document.getElementById('no_customer_found').classList.toggle('hidden', hasVisible);
+    }
+    
+    function selectCustomer(id, name, contact) {
+        // Update Hidden Input
+        const input = document.getElementById('customer_id');
+        input.value = id;
+        
+        // Update Trigger Text
+        const textSpan = document.getElementById('customer_selected_text');
+        textSpan.textContent = `${name} (${contact})`;
+        textSpan.classList.remove('text-slate-500');
+        textSpan.classList.add('text-slate-900', 'font-medium');
+        
+        // Hide Dropdown
+        document.getElementById('customer_dropdown_list').classList.add('hidden');
+        document.getElementById('customer_search_input').value = '';
+        filterCustomers(''); // Reset filter
+        
+        // Trigger Change Event for other listeners (slots fetching)
+        const event = new Event('change');
+        input.dispatchEvent(event);
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('customer_dropdown_list');
+        const btn = document.getElementById('customer_select_btn');
+        if (!dropdown.classList.contains('hidden') && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
 
     function toggleCustomerType(type) {
         const existingSection = document.getElementById('existing_customer_section');
