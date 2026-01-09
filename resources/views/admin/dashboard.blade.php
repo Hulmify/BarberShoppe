@@ -108,6 +108,7 @@
                                         @foreach($booking->items as $item)
                                             <span class="text-[10px] font-bold bg-white/60 text-primary-800 px-2 py-0.5 rounded border border-primary-300 uppercase tracking-tighter">{{ $item->service->name }}</span>
                                         @endforeach
+                                    </div>
                                     <div class="mt-3 flex items-center gap-2">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Stylist:</span>
                                         <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="m-0">
