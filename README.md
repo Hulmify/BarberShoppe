@@ -25,8 +25,8 @@ To get started with Barber Shoppe, follow these steps:
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
-   cd app.barber_shoppe
+   git clone https://github.com/Hulmify/BarberShoppe.git
+   cd BarberShoppe
    ```
 
 2. **Run the setup script**:
