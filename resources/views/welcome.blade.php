@@ -289,6 +289,56 @@
             </div>
         </div>
     </section>
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-24 bg-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-20 reveal">
+                <h2 class="text-4xl lg:text-5xl font-black text-[#1e445d] mb-6 font-display">Simple setup. <span class="text-primary-500">Powerful results.</span></h2>
+                <p class="text-lg text-slate-600">Get your shop online and ready for business in less than 10 minutes. No technical skills required.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Step 1 -->
+                <div class="relative group reveal" style="transition-delay: 100ms">
+                    <div class="absolute -top-6 -left-6 text-9xl font-black text-slate-50 opacity-[0.03] select-none group-hover:text-primary-500/10 transition-colors">01</div>
+                    <div class="relative">
+                        <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-slate-900/20 group-hover:-translate-y-1 transition-transform">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-900">Configure Your Shop</h3>
+                        <p class="text-slate-600 leading-relaxed">Add your services, pricing, and staff members. Set individual schedules and break times with ease.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative group reveal" style="transition-delay: 200ms">
+                    <div class="absolute -top-6 -left-6 text-9xl font-black text-slate-50 opacity-[0.03] select-none group-hover:text-primary-500/10 transition-colors">02</div>
+                    <div class="relative">
+                        <div class="w-16 h-16 bg-primary-500 text-white rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-primary-500/20 group-hover:-translate-y-1 transition-transform">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-900">Launch Your Brand</h3>
+                        <p class="text-slate-600 leading-relaxed">Connect a custom domain or use your free BarberShoppe booking URL. Customize colors to match your shop's vibe.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative group reveal" style="transition-delay: 300ms">
+                    <div class="absolute -top-6 -left-6 text-9xl font-black text-slate-50 opacity-[0.03] select-none group-hover:text-primary-500/10 transition-colors">03</div>
+                    <div class="relative">
+                        <div class="w-16 h-16 bg-secondary-500 text-white rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-secondary-500/20 group-hover:-translate-y-1 transition-transform">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-900">Take Bookings</h3>
+                        <p class="text-slate-600 leading-relaxed">Everything is live! Clients can now book appointments 24/7. Manage everything from your unified shop dashboard.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connection Line (Desktop) -->
+            <div class="hidden md:block absolute top-[28rem] left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent -z-10"></div>
+        </div>
+    </section>
 
     <!-- Demo Section -->
     <section id="demo" class="py-24 bg-slate-50 relative overflow-hidden">
