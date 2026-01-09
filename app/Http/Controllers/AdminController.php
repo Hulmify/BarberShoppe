@@ -24,10 +24,8 @@ class AdminController extends Controller
         }
 
         $tz = $shop->timezone ?? config('app.timezone');
-        config(['app.timezone' => $tz]);
-        date_default_timezone_set($tz);
         
-        $now = Carbon::now();
+        $now = Carbon::now($tz);
 
         // Fetch bookings for the local 'Today' by calculating UTC boundaries
         $startOfDay = $now->copy()->startOfDay()->setTimezone('UTC');
@@ -40,11 +38,7 @@ class AdminController extends Controller
         
         $stylists = $shop->stylists()->where('is_active', true)->get();
 
-        // Shift all bookings to the shop's timezone for accurate display and diffs
-        $allTodaysBookings->each(function($b) use ($tz) {
-            $b->start_time->setTimezone($tz);
-            $b->end_time->setTimezone($tz);
-        });
+
 
         $ongoingBookings = $allTodaysBookings->filter(function($b) {
             return $b->status === 'in_progress';

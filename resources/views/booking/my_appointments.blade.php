@@ -61,11 +61,12 @@
                             <div>
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-lg font-bold text-slate-900">
-                                        {{ $booking->start_time->format('M d, Y') }}
+                                        {{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('M d, Y') }}
                                     </span>
                                     <span class="w-1 h-1 rounded-full bg-slate-300"></span>
                                     <span class="text-lg font-bold text-primary-600">
-                                        {{ $booking->start_time->format('h:i A') }}
+                                        {{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}
+                                        <span class="text-xs font-normal text-slate-400 ml-1">({{ $shop->timezone ?? config('app.timezone') }})</span>
                                     </span>
                                 </div>
                                 <div class="text-sm text-slate-500 flex flex-wrap gap-x-4 gap-y-1">

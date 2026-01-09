@@ -70,7 +70,7 @@ class PointOfSaleController extends Controller
         $totalDuration = $services->sum('duration_minutes');
         
         $tz = $shop->timezone ?? config('app.timezone');
-        $startDateTime = Carbon::parse($request->date . ' ' . $request->time, $tz);
+        $startDateTime = Carbon::parse($request->date . ' ' . $request->time, $tz)->setTimezone('UTC');
         $endDateTime = $startDateTime->copy()->addMinutes($totalDuration);
 
         $selectedStylistId = $request->stylist_id;

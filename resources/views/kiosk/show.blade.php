@@ -411,7 +411,7 @@
                                             <div class="queue-time">{{ $booking->customer->name }}</div>
                                             <div class="queue-service">with {{ $booking->stylist->name }}</div>
                                         </div>
-                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->format('H:i') }}</div>
+                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
                                     </div>
                                 @empty
                                     <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
@@ -429,7 +429,7 @@
                                             <div class="queue-time">{{ $booking->customer->name }}</div>
                                             <div class="queue-service">with {{ $booking->stylist->name }}</div>
                                         </div>
-                                        <div class="queue-time">{{ $booking->start_time->format('H:i') }}</div>
+                                        <div class="queue-time">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
                                     </div>
                                 @empty
                                     <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
@@ -450,7 +450,7 @@
                                             <div class="queue-time">{{ $booking->customer->name }}</div>
                                             <div class="queue-service">with {{ $booking->stylist->name }}</div>
                                         </div>
-                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->format('H:i') }}</div>
+                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
                                     </div>
                                 @endforeach
                             </div>
@@ -464,7 +464,7 @@
                                             <div class="queue-time">{{ $booking->customer->name }}</div>
                                             <div class="queue-service">with {{ $booking->stylist->name }}</div>
                                         </div>
-                                        <div class="queue-time">{{ $booking->start_time->format('H:i') }}</div>
+                                        <div class="queue-time">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
                                     </div>
                                 @endforeach
                             </div>
@@ -509,7 +509,7 @@
         function updateClock() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-US', { 
-                hour12: false, 
+                hour12: true, 
                 hour: '2-digit', 
                 minute: '2-digit', 
                 second: '2-digit',

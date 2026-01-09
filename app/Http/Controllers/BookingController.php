@@ -70,7 +70,11 @@ class BookingController extends Controller
         // Validate the requested date
         $request->validate(['date' => 'required|date']);
         $tz = $shop->timezone ?? config('app.timezone');
-        $date = Carbon::parse($request->date, $tz)->startOfDay();
+        
+        // Strictly parse the date part only, ensuring we use the shop's timezone
+        // This fixes issues where ISO strings from frontend might trigger UTC interpretation
+        $dateString = substr($request->date, 0, 10);
+        $date = Carbon::parse($dateString, $tz)->startOfDay();
         $today = Carbon::now($tz)->startOfDay();
 
         // Don't allow bookings in the past
@@ -79,7 +83,7 @@ class BookingController extends Controller
         }
 
         // Check if shop is explicitly closed for the requested date (manual override)
-        if ($shop->off_date && Carbon::parse($shop->off_date)->startOfDay()->equalTo($date)) {
+        if ($shop->off_date && Carbon::parse($shop->off_date, $tz)->startOfDay()->equalTo($date)) {
             return response()->json(['slots' => [], 'message' => 'Shop is closed today.']);
         }
         
@@ -123,10 +127,18 @@ class BookingController extends Controller
         $start = Carbon::parse($date->format('Y-m-d') . ' ' . $earliestStartTime, $tz);
         $end = Carbon::parse($date->format('Y-m-d') . ' ' . $latestEndTime, $tz);
         
+        // Convert Shop "Day" start/end to UTC for querying DB (which stores UTC)
+        $searchStartUtc = $date->copy()->setTimezone('UTC');
+        $searchEndUtc = $date->copy()->endOfDay()->setTimezone('UTC');
+
         // Retrieve all existing bookings for this day to check for overlaps
+        // We use whereBetween or overlapping logic on the UTC range
         $allBookings = $shop->bookings()
-            ->whereDate('start_time', $date)
             ->where('status', '!=', 'cancelled')
+            ->where(function($q) use ($searchStartUtc, $searchEndUtc) {
+                 $q->where('start_time', '<', $searchEndUtc)
+                   ->where('end_time', '>', $searchStartUtc);
+            })
             ->get();
 
         $slots = [];
@@ -155,7 +167,9 @@ class BookingController extends Controller
                 if ($stylistId && $s->id != $stylistId) return false;
 
                 // Check if stylist is busy
-                if ($overlappingBookings->contains('stylist_id', $s->id)) return false;
+                if ($overlappingBookings->contains(function($b) use ($s) {
+                    return (string)$b->stylist_id === (string)$s->id;
+                })) return false;
 
                 // Check if stylist is on shift
                 $sAvail = $s->availabilities->first();
@@ -222,7 +236,7 @@ class BookingController extends Controller
         $totalDuration = $services->sum('duration_minutes');
         
         $tz = $shop->timezone ?? config('app.timezone');
-        $startTime = Carbon::parse($validated['date'] . ' ' . $validated['time'], $tz);
+        $startTime = Carbon::parse($validated['date'] . ' ' . $validated['time'], $tz)->setTimezone('UTC');
         
         if ($startTime->isPast()) {
             return response()->json(['success' => false, 'message' => 'Cannot book appointments in the past'], 422);
@@ -239,12 +253,8 @@ class BookingController extends Controller
         $overlappingBookings = $shop->bookings()
             ->where('status', '!=', 'cancelled')
             ->where(function ($q) use ($startTime, $endTime) {
-                $q->whereBetween('start_time', [$startTime, $endTime])
-                  ->orWhereBetween('end_time', [$startTime, $endTime])
-                  ->orWhere(function ($q2) use ($startTime, $endTime) {
-                      $q2->where('start_time', '<=', $startTime)
-                         ->where('end_time', '>=', $endTime);
-                  });
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
             })->get();
 
         $selectedStylistId = $validated['stylist_id'] ?? null;
@@ -258,7 +268,9 @@ class BookingController extends Controller
             ->get();
 
         $availableStylists = $activeStylists->filter(function($s) use ($startTime, $endTime, $overlappingBookings, $tz) {
-            if ($overlappingBookings->contains('stylist_id', $s->id)) return false;
+            if ($overlappingBookings->contains(function($b) use ($s) {
+                return (string)$b->stylist_id === (string)$s->id;
+            })) return false;
 
             $sAvail = $s->availabilities->first();
             if (!$sAvail) return false;
@@ -331,6 +343,8 @@ class BookingController extends Controller
                     ->with(['items.service', 'stylist'])
                     ->orderBy('start_time', 'desc')
                     ->get();
+                
+
             }
         }
 

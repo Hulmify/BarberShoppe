@@ -116,8 +116,8 @@
                     @foreach($bookings as $booking)
                     <tr class="bg-white hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="font-bold text-slate-800 text-base">{{ $booking->start_time->format('M d, Y') }}</div>
-                            <div class="text-xs text-slate-500">{{ $booking->start_time->format('h:i A') }}</div>
+                            <div class="font-bold text-slate-800 text-base">{{ $booking->start_time->setTimezone($tz)->format('M d, Y') }}</div>
+                            <div class="text-xs text-slate-500">{{ $booking->start_time->setTimezone($tz)->format('h:i A') }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="font-semibold text-slate-800">{{ $booking->customer->name }}</div>

@@ -23,10 +23,8 @@ class KioskController extends Controller
         $services = $shop->services()->take(8)->get();
 
         $tz = $shop->timezone ?? config('app.timezone');
-        config(['app.timezone' => $tz]);
-        date_default_timezone_set($tz);
 
-        $now = Carbon::now();
+        $now = Carbon::now($tz);
         
         // Use boundaries for the shop's current day to be timezone-safe
         $startOfDay = $now->copy()->startOfDay()->setTimezone('UTC');
@@ -39,10 +37,7 @@ class KioskController extends Controller
             ->orderBy('start_time', 'asc')
             ->get();
 
-        $bookings->each(function($b) use ($tz) {
-            $b->start_time->setTimezone($tz);
-            if ($b->end_time) $b->end_time->setTimezone($tz);
-        });
+
 
         // Now Serving: Explicitly in_progress ONLY
         $nowServing = $bookings->filter(function($b) {

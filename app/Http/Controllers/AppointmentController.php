@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
@@ -22,9 +23,13 @@ class AppointmentController extends Controller
         
         // Filter by specific date or pre-defined filters
         if ($request->filled('date')) {
-            $query->whereDate('start_time', $request->date);
+            $startUtc = Carbon::parse($request->date, $tz)->startOfDay()->setTimezone('UTC');
+            $endUtc = Carbon::parse($request->date, $tz)->endOfDay()->setTimezone('UTC');
+            $query->whereBetween('start_time', [$startUtc, $endUtc]);
         } elseif ($request->get('filter') === 'today') {
-            $query->whereDate('start_time', now()->timezone($tz));
+            $startUtc = now($tz)->startOfDay()->setTimezone('UTC');
+            $endUtc = now($tz)->endOfDay()->setTimezone('UTC');
+            $query->whereBetween('start_time', [$startUtc, $endUtc]);
         }
         
         // Filter by Status (supports multiple via array or comma-separated string)
@@ -43,15 +48,9 @@ class AppointmentController extends Controller
 
         $bookings = $query->paginate(15)->withQueryString();
         
-        // Ensure all times are shifted to the shop's local timezone for display
-        $bookings->getCollection()->each(function($b) use ($tz) {
-            $b->start_time->setTimezone($tz);
-            if ($b->end_time) $b->end_time->setTimezone($tz);
-        });
-
         $stylists = $shop->stylists()->where('is_active', true)->get();
         
-        return view('admin.appointments.index', compact('bookings', 'stylists'));
+        return view('admin.appointments.index', compact('bookings', 'stylists', 'tz'));
     }
 
     /**
@@ -128,8 +127,14 @@ class AppointmentController extends Controller
         
         $query = $shop->bookings()->with(['customer', 'stylist', 'items.service']);
         
-        if ($start) $query->where('start_time', '>=', $start);
-        if ($end) $query->where('start_time', '<=', $end);
+        if ($start) {
+            $startUtc = Carbon::parse($start)->setTimezone('UTC');
+            $query->where('start_time', '>=', $startUtc);
+        }
+        if ($end) {
+            $endUtc = Carbon::parse($end)->setTimezone('UTC');
+            $query->where('start_time', '<=', $endUtc);
+        }
         
         $bookings = $query->get();
         
@@ -146,11 +151,15 @@ class AppointmentController extends Controller
                 default => '#94a3b8'
             };
 
+            // Convert to shop timezone for display
+            $startTime = $b->start_time->copy()->setTimezone($tz);
+            $endTime = $b->end_time ? $b->end_time->copy()->setTimezone($tz) : $startTime->copy()->addMinutes(30);
+
             return [
                 'id' => $b->id,
                 'title' => $b->customer->name . " (" . $services . ")",
-                'start' => $b->start_time->toIso8601String(),
-                'end' => $b->end_time ? $b->end_time->toIso8601String() : $b->start_time->addMinutes(30)->toIso8601String(),
+                'start' => $startTime->toIso8601String(),
+                'end' => $endTime->toIso8601String(),
                 'backgroundColor' => $color,
                 'borderColor' => $color,
                 'extendedProps' => [

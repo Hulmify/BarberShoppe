@@ -99,7 +99,7 @@
                             <div class="flex items-center gap-5 w-full md:w-auto">
                                 <div class="bg-primary-400 text-white font-black px-4 py-2 rounded-xl text-center shadow-inner">
                                     <div class="text-xs uppercase tracking-tighter opacity-80">Started</div>
-                                    <div class="text-lg">{{ $booking->start_time->format('h:i A') }}</div>
+                                    <div class="text-lg">{{ $booking->start_time->setTimezone($tz)->format('h:i A') }}</div>
                                 </div>
                                 <div class="flex-1">
                                     <div class="text-xs font-bold text-primary-700 uppercase mb-0.5">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
@@ -180,7 +180,7 @@
                             @foreach($upcomingBookings as $booking)
                             <tr class="hover:bg-primary-50/30 transition-colors">
                                 <td class="px-6 py-4">
-                                    <div class="text-base font-black text-slate-900">{{ $booking->start_time->format('h:i A') }}</div>
+                                    <div class="text-base font-black text-slate-900">{{ $booking->start_time->setTimezone($tz)->format('h:i A') }}</div>
                                     <div class="text-[10px] font-bold text-primary-500 uppercase">{{ $booking->start_time->copy()->setTimezone('UTC')->diffForHumans($now->copy()->setTimezone('UTC')) }}</div>
                                 </td>
                                 <td class="px-6 py-4">
@@ -283,7 +283,7 @@
                         <tbody class="divide-y divide-gray-200">
                             @foreach($pastBookings as $booking)
                             <tr>
-                                <td class="px-6 py-3 w-32 font-bold text-gray-500">{{ $booking->start_time->format('h:i A') }}</td>
+                                <td class="px-6 py-3 w-32 font-bold text-gray-500">{{ $booking->start_time->setTimezone($tz)->format('h:i A') }}</td>
                                 <td class="px-6 py-3 font-semibold text-gray-600">{{ $booking->customer->name }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <div class="flex items-center justify-end gap-3">
