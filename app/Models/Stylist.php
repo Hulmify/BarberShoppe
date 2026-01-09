@@ -9,7 +9,7 @@ class Stylist extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = ['shop_id', 'name', 'bio', 'image_base64', 'is_active', 'display_order'];
 
     protected $casts = [
         'is_active' => 'boolean',

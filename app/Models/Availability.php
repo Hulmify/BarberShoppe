@@ -9,7 +9,7 @@ class Availability extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = ['shop_id', 'stylist_id', 'day_of_week', 'start_time', 'end_time', 'is_active'];
 
     public function shop()
     {

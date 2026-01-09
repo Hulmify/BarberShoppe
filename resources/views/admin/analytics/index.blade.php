@@ -203,11 +203,11 @@
             series: [{
                 name: 'Revenue',
                 type: 'area',
-                data: {!! json_encode($chartData['revenue']) !!}
+                data: @json($chartData['revenue'])
             }, {
                 name: 'Bookings',
                 type: 'line',
-                data: {!! json_encode($chartData['bookings']) !!}
+                data: @json($chartData['bookings'])
             }],
             chart: {
                 height: 350,
@@ -226,7 +226,7 @@
                     stops: [0, 90, 100]
                 }
             },
-            labels: {!! json_encode($chartData['labels']) !!},
+            labels: @json($chartData['labels']),
             xaxis: {
                 axisBorder: { show: false },
                 axisTicks: { show: false },
@@ -255,7 +255,7 @@
         var hoursOptions = {
             series: [{
                 name: 'Bookings',
-                data: {!! json_encode($busyHours['counts']) !!}
+                data: @json($busyHours['counts'])
             }],
             chart: {
                 type: 'bar',
@@ -273,7 +273,7 @@
             dataLabels: { enabled: false },
             legend: { show: false },
             xaxis: {
-                categories: {!! json_encode($busyHours['labels']) !!},
+                categories: @json($busyHours['labels']),
                 labels: { style: { colors: '#94a3b8', fontSize: '10px', fontWeight: 600 }, rotate: -45 }
             },
             yaxis: {
@@ -288,12 +288,12 @@
 
         // Stylist Revenue Chart
         var stylistOptions = {
-            series: {!! json_encode($stylistPerformance->pluck('total_revenue')) !!},
+            series: @json($stylistPerformance->pluck('total_revenue')),
             chart: {
                 type: 'donut',
                 height: 350,
             },
-            labels: {!! json_encode($stylistPerformance->pluck('name')) !!},
+            labels: @json($stylistPerformance->pluck('name')),
             colors: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6'],
             legend: {
                 position: 'bottom',

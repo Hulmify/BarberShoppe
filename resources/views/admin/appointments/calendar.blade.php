@@ -327,13 +327,23 @@
                 const borderColor = statusColors[status] || '#6366f1';
                 const bgColor = statusColors[status] + '15'; // 15 = ~8% opacity hex
                 
+                // Helper to prevent XSS
+                const escapeHtml = (unsafe) => {
+                    return unsafe
+                         .replace(/&/g, "&amp;")
+                         .replace(/</g, "&lt;")
+                         .replace(/>/g, "&gt;")
+                         .replace(/"/g, "&quot;")
+                         .replace(/'/g, "&#039;");
+                };
+
                 return {
                     html: `
                         <div class="fc-event-custom-content" style="border-left-color: ${borderColor}; background-color: ${bgColor}">
                             <div class="flex items-center justify-between gap-1 w-full relative">
-                                <div class="font-bold text-xs text-slate-800 truncate leading-tight">${customerName}</div>
+                                <div class="font-bold text-xs text-slate-800 truncate leading-tight">${escapeHtml(customerName)}</div>
                             </div>
-                            <div class="text-[10px] text-slate-500 font-medium truncate mt-0.5">${serviceName}</div>
+                            <div class="text-[10px] text-slate-500 font-medium truncate mt-0.5">${escapeHtml(serviceName)}</div>
                             <div class="mt-auto flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wide">
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 ${timeText}

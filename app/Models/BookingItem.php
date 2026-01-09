@@ -9,7 +9,7 @@ class BookingItem extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = ['booking_id', 'service_id', 'price'];
 
     public function booking()
     {

@@ -9,7 +9,7 @@ class Booking extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = ['shop_id', 'customer_id', 'stylist_id', 'start_time', 'end_time', 'total_price', 'status', 'notes'];
 
     protected $casts = [
         'start_time' => 'datetime',
