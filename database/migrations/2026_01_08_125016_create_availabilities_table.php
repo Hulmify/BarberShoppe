@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('availabilities', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; 
             $table->id();
             $table->foreignId('shop_id')->constrained()->onDelete('cascade');
             $table->integer('day_of_week'); // 0 = Sunday, 1 = Monday, etc.
