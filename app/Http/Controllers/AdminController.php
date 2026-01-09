@@ -46,9 +46,8 @@ class AdminController extends Controller
             $b->end_time->setTimezone($tz);
         });
 
-        $ongoingBookings = $allTodaysBookings->filter(function($b) use ($now) {
-            return $b->status === 'in_progress' || 
-                   ($b->status !== 'completed' && $b->status !== 'cancelled' && $now->between($b->start_time, $b->end_time));
+        $ongoingBookings = $allTodaysBookings->filter(function($b) {
+            return $b->status === 'in_progress';
         })->sortBy('start_time');
 
         $ongoingIds = $ongoingBookings->pluck('id')->toArray();
@@ -56,8 +55,8 @@ class AdminController extends Controller
         $upcomingBookings = $allTodaysBookings->filter(function($b) use ($now, $ongoingIds) {
             return $b->status !== 'completed' && 
                    $b->status !== 'cancelled' && 
-                   $b->start_time->gt($now) && 
-                   !in_array($b->id, $ongoingIds);
+                   $b->status !== 'in_progress' &&
+                   $b->end_time->gt($now);
         })->sortBy('start_time');
 
         $pastBookings = $allTodaysBookings->filter(function($b) use ($now) {

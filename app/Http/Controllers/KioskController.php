@@ -44,18 +44,15 @@ class KioskController extends Controller
             if ($b->end_time) $b->end_time->setTimezone($tz);
         });
 
-        // Determine who is "Now Serving" and who is "Next Up"
-        // Now Serving: Explicitly in_progress OR starting within 5 mins
-        $nowServing = $bookings->filter(function($b) use ($now) {
-            return $b->status === 'in_progress' || 
-                   ($b->start_time->lte($now->copy()->addMinutes(5)) && 
-                    $b->end_time->gt($now->copy()->subMinutes(10)));
+        // Now Serving: Explicitly in_progress ONLY
+        $nowServing = $bookings->filter(function($b) {
+            return $b->status === 'in_progress';
         });
 
-        // Next Up: Strictly future appointments that are NOT in Now Serving
+        // Next Up: All active appointments that are NOT in Now Serving and have not ended yet
         $nowServingIds = $nowServing->pluck('id')->toArray();
         $nextUp = $bookings->filter(function($b) use ($now, $nowServingIds) {
-            return $b->start_time->gt($now) && !in_array($b->id, $nowServingIds);
+            return !in_array($b->id, $nowServingIds) && $b->end_time->gt($now);
         })->take(5);
 
         return view('kiosk.show', compact('shop', 'stylists', 'services', 'nowServing', 'nextUp'));

@@ -85,16 +85,18 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
+            min-height: 0; /* Important for grid 1fr scrolling */
             overflow: hidden;
         }
 
         .section-card {
             background: var(--bg-card);
             border-radius: 32px;
-            padding: 2rem;
+            padding: 2.5rem;
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            min-height: 0; /* Allow inner content to control scrolling */
             overflow: hidden;
         }
 
@@ -161,6 +163,25 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            overflow-y: hidden;
+            flex: 1;
+            position: relative;
+        }
+
+        .queue-scroll-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: scroll-vertical 40s linear infinite;
+        }
+
+        .queue-scroll-container:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll-vertical {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
         }
 
         .queue-item {
@@ -378,39 +399,77 @@
                 <div class="section-title">
                     Now Serving & Next Up
                 </div>
-                <div class="queue-list">
-                    @forelse($nowServing as $booking)
-                        <div class="queue-item" style="background: {{ $booking->status === 'in_progress' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(197, 160, 89, 0.1)' }}; border-color: {{ $booking->status === 'in_progress' ? 'var(--accent)' : 'var(--primary)' }};">
-                            <div>
-                                <span class="now-serving-badge" style="background: {{ $booking->status === 'in_progress' ? 'var(--accent)' : 'var(--primary)' }};">
-                                    {{ $booking->status === 'in_progress' ? 'IN PROGRESS' : 'NOW SERVING' }}
-                                </span>
-                                <div class="queue-time">{{ $booking->customer->name }}</div>
-                                <div class="queue-service">with {{ $booking->stylist->name }}</div>
+                <div class="queue-list" id="queue-list">
+                    <div class="queue-scroll-container" id="queue-scroll-container">
+                        <div class="queue-content">
+                            <!-- Now Serving Section -->
+                            <div style="margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Now Serving</div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
+                                @forelse($nowServing as $booking)
+                                    <div class="queue-item" style="background: rgba(56, 189, 248, 0.15); border-color: var(--accent);">
+                                        <div>
+                                            <div class="queue-time">{{ $booking->customer->name }}</div>
+                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
+                                        </div>
+                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->format('H:i') }}</div>
+                                    </div>
+                                @empty
+                                    <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
+                                        No active sessions
+                                    </div>
+                                @endforelse
                             </div>
-                            <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->format('H:i') }}</div>
-                        </div>
-                    @empty
-                        <div style="text-align: center; color: var(--text-muted); padding: 1rem;">
-                            No active sessions
-                        </div>
-                    @endforelse
 
-                    <div style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em;">Next Up</div>
-                    
-                    @forelse($nextUp as $booking)
-                        <div class="queue-item">
-                            <div>
-                                <div class="queue-time">{{ $booking->customer->name }}</div>
-                                <div class="queue-service">with {{ $booking->stylist->name }}</div>
+                            <!-- Next Up Section -->
+                            <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Next Up</div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                @forelse($nextUp as $booking)
+                                    <div class="queue-item">
+                                        <div>
+                                            <div class="queue-time">{{ $booking->customer->name }}</div>
+                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
+                                        </div>
+                                        <div class="queue-time">{{ $booking->start_time->format('H:i') }}</div>
+                                    </div>
+                                @empty
+                                    <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
+                                        No upcoming bookings
+                                    </div>
+                                @endforelse
                             </div>
-                            <div class="queue-time">{{ $booking->start_time->format('H:i') }}</div>
                         </div>
-                    @empty
-                        <div style="text-align: center; color: var(--text-muted); padding: 1rem;">
-                            No upcoming bookings
+
+                        {{-- Duplicate content for seamless loop --}}
+                        <div class="queue-content-clone">
+                            <!-- Now Serving Clone -->
+                            <div style="margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Now Serving</div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
+                                @foreach($nowServing as $booking)
+                                    <div class="queue-item" style="background: rgba(56, 189, 248, 0.15); border-color: var(--accent);">
+                                        <div>
+                                            <div class="queue-time">{{ $booking->customer->name }}</div>
+                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
+                                        </div>
+                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->format('H:i') }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <!-- Next Up Clone -->
+                            <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Next Up</div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                @foreach($nextUp as $booking)
+                                    <div class="queue-item">
+                                        <div>
+                                            <div class="queue-time">{{ $booking->customer->name }}</div>
+                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
+                                        </div>
+                                        <div class="queue-time">{{ $booking->start_time->format('H:i') }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    @endforelse
+                    </div>
                 </div>
             </div>
         </main>
@@ -541,6 +600,19 @@
                 overlay.remove();
             };
             document.body.appendChild(overlay);
+        }
+        // Auto-scroll logic: only animate if content overflows
+        const scrollContainer = document.getElementById('queue-scroll-container');
+        const queueList = document.getElementById('queue-list');
+        const queueContent = document.querySelector('.queue-content');
+        
+        if (queueContent.offsetHeight <= queueList.offsetHeight) {
+            scrollContainer.style.animation = 'none';
+            document.querySelector('.queue-content-clone').style.display = 'none';
+        } else {
+            // Adjust animation speed based on content height
+            const duration = Math.max(20, queueContent.offsetHeight / 20);
+            scrollContainer.style.animationDuration = `${duration}s`;
         }
     </script>
 </body>
