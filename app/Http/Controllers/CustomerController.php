@@ -12,15 +12,26 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         // Identify the user's shop
         $shopId = auth()->user()->shop->id;
+        $search = $request->input('search');
         
         // Find customers that have at least one booking in this shop
-        $customers = Customer::whereHas('bookings', function($q) use ($shopId) {
+        $query = Customer::whereHas('bookings', function($q) use ($shopId) {
             $q->where('shop_id', $shopId);
-        })->withCount(['bookings' => function($q) use ($shopId) {
+        });
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $customers = $query->withCount(['bookings' => function($q) use ($shopId) {
             $q->where('shop_id', $shopId);
         }])->paginate(20);
         
