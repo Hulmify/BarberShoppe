@@ -30,7 +30,8 @@ zip -r zips/app.zip . \
     -x ".env.example" \
     -x ".editorconfig" \
     -x "prepare.sh" \
-    -x "vendor/*"
+    -x "vendor/*" \
+    -x "zips/*"
 
 # Zip vendor
 zip -r zips/vendor.zip vendor
