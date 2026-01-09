@@ -11,9 +11,87 @@
         <p class="text-sm text-gray-500 dark:text-gray-400">Update your shop's basic details and configuration.</p>
     </div>
 
-    <form action="{{ route('admin.shop.update') }}" method="POST">
+    <form action="{{ route('admin.shop.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        
+        <div class="mb-8 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">Brand Logo</h3>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="relative group">
+                    <div class="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 bg-white overflow-hidden flex items-center justify-center">
+                        @if($shop->logo)
+                            <img src="{{ $shop->logo }}" id="logo-preview" class="w-full h-full object-contain">
+                        @else
+                            <div id="logo-placeholder" class="text-center p-4">
+                                <svg class="w-8 h-8 text-gray-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">No Logo</span>
+                            </div>
+                            <img src="" id="logo-preview" class="hidden w-full h-full object-contain">
+                        @endif
+                    </div>
+                </div>
+                <div class="flex-1 space-y-3">
+                    <p class="text-xs text-slate-500 max-w-sm">Upload your brand logo. This will be visible on your booking page and kiosk view. Recommended size: 512x512px (PNG, JPG).</p>
+                    <div class="flex flex-wrap gap-2">
+                        <label for="logo" class="cursor-pointer bg-white border border-gray-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors">
+                            Change Logo
+                        </label>
+                        <input type="file" id="logo" name="logo" class="hidden" accept="image/*" onchange="previewLogo(this)">
+                        
+                        @if($shop->logo)
+                            <button type="button" onclick="removeLogo()" class="bg-red-50 text-red-600 border border-red-100 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors">
+                                Remove
+                            </button>
+                        @endif
+                        <input type="hidden" name="remove_logo" id="remove_logo" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function previewLogo(input) {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('logo-preview');
+                        const placeholder = document.getElementById('logo-placeholder');
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                        if (placeholder) placeholder.classList.add('hidden');
+                        document.getElementById('remove_logo').value = "0";
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            function removeLogo() {
+                const preview = document.getElementById('logo-preview');
+                const placeholder = document.getElementById('logo-placeholder');
+                const input = document.getElementById('logo');
+                
+                input.value = '';
+                preview.src = '';
+                preview.classList.add('hidden');
+                
+                if (!placeholder) {
+                    const container = preview.parentElement;
+                    const newPlaceholder = document.createElement('div');
+                    newPlaceholder.id = 'logo-placeholder';
+                    newPlaceholder.className = 'text-center p-4';
+                    newPlaceholder.innerHTML = `
+                        <svg class="w-8 h-8 text-gray-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase">No Logo</span>
+                    `;
+                    container.appendChild(newPlaceholder);
+                } else {
+                    placeholder.classList.remove('hidden');
+                }
+                
+                document.getElementById('remove_logo').value = "1";
+            }
+        </script>
         
         <div class="grid gap-6 mb-6 md:grid-cols-2">
             <div>

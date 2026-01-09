@@ -28,7 +28,7 @@
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Revenue <span class="text-[8px] opacity-60">(in selection)</span></div>
         <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-black text-slate-900">{{ $shop->currency ?? '$' }}{{ number_format($totalRevenue, 2) }}</span>
+            <span class="text-3xl font-black text-slate-900">{{ $shop->currency ?? '$' }} {{ number_format($totalRevenue, 2) }}</span>
         </div>
     </div>
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -40,7 +40,7 @@
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Avg. Value <span class="text-[8px] opacity-60">(in selection)</span></div>
         <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-black text-slate-900">{{ $shop->currency ?? '$' }}{{ number_format($avgBookingValue, 2) }}</span>
+            <span class="text-3xl font-black text-slate-900">{{ $shop->currency ?? '$' }} {{ number_format($avgBookingValue, 2) }}</span>
         </div>
     </div>
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -92,7 +92,7 @@
                     </div>
                     <div class="ml-4 text-right">
                         <div class="text-xs font-black text-slate-900">{{ $service->usage_count }} booked</div>
-                        <div class="text-[10px] font-bold text-slate-400">{{ $shop->currency ?? '$' }}{{ number_format($service->service_revenue, 2) }}</div>
+                        <div class="text-[10px] font-bold text-slate-400">{{ $shop->currency ?? '$' }} {{ number_format($service->service_revenue, 2) }}</div>
                     </div>
                 </div>
             @empty
@@ -160,6 +160,41 @@
     </div>
 </div>
 
+<!-- Stylist Performance Section -->
+<div class="mt-8 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h3 class="text-xl font-black text-slate-900">Stylist Performance</h3>
+            <p class="text-sm text-slate-500">Revenue and booking share by team member.</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div id="stylistChart" class="min-h-[350px]"></div>
+        <div class="overflow-hidden">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50/50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-gray-100">
+                    <tr>
+                        <th class="px-6 py-4">Stylist Name</th>
+                        <th class="px-6 py-4 text-center">Bookings</th>
+                        <th class="px-6 py-4 text-right">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    @foreach($stylistPerformance as $perf)
+                    <tr>
+                        <td class="px-6 py-4 font-bold text-slate-800">{{ $perf->name }}</td>
+                        <td class="px-6 py-4 text-center font-bold text-slate-600">{{ $perf->booking_count }}</td>
+                        <td class="px-6 py-4 text-right">
+                           <span class="text-base font-black text-slate-900">{{ $shop->currency ?? '$' }} {{ number_format($perf->total_revenue, 2) }}</span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -209,7 +244,8 @@
                 }
             ],
             legend: { show: false },
-            grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+            grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
+            tooltip: { theme: 'light' }
         };
 
         var growthChart = new ApexCharts(document.querySelector("#growthChart"), growthOptions);
@@ -243,11 +279,55 @@
             yaxis: {
                 labels: { style: { colors: '#94a3b8', fontWeight: 600 } }
             },
-            grid: { borderColor: '#f1f5f9' }
+            grid: { borderColor: '#f1f5f9' },
+            tooltip: { theme: 'light' }
         };
 
         var hoursChart = new ApexCharts(document.querySelector("#hoursChart"), hoursOptions);
         hoursChart.render();
+
+        // Stylist Revenue Chart
+        var stylistOptions = {
+            series: {!! json_encode($stylistPerformance->pluck('total_revenue')) !!},
+            chart: {
+                type: 'donut',
+                height: 350,
+            },
+            labels: {!! json_encode($stylistPerformance->pluck('name')) !!},
+            colors: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6'],
+            legend: {
+                position: 'bottom',
+                fontFamily: 'Outfit',
+                fontWeight: 600
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function (val) {
+                    return Math.round(val) + "%"
+                }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '70%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: 'Total Revenue',
+                                formatter: function (w) {
+                                    return '{{ $shop->currency ?? '$' }} ' + {{ $totalRevenue }}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            tooltip: { theme: 'light' }
+        };
+
+        var stylistChart = new ApexCharts(document.querySelector("#stylistChart"), stylistOptions);
+        stylistChart.render();
     });
 </script>
 

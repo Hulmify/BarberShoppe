@@ -30,29 +30,31 @@
           </button>
         </div>
         <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-          <ul class="flex flex-col p-4 md:p-0 js-nav-menu mt-4 font-medium border border-gray-700 rounded-lg bg-slate-800 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-slate-900">
+          <ul class="flex flex-col p-4 md:p-0 js-nav-menu mt-4 font-medium border border-gray-700 rounded-lg bg-slate-800 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-slate-900 items-center">
             <li>
               <a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.dashboard') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Dashboard</a>
             </li>
-            <li>
-              <a href="{{ route('admin.analytics.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.analytics*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Analytics</a>
-            </li>
+            <li class="hidden md:block w-px h-4 bg-slate-700 mx-1"></li>
             <li>
               <a href="{{ route('admin.appointments.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.appointments*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Appointments</a>
             </li>
             <li>
-                <a href="{{ route('admin.pos.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.pos*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Quick Reserve</a>
+                <a href="{{ route('admin.pos.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.pos*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">POS</a>
             </li>
-             <li>
+            <li>
               <a href="{{ route('admin.customers.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.customers*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Customers</a>
+            </li>
+            <li class="hidden md:block w-px h-4 bg-slate-700 mx-1"></li>
+            <li>
+              <a href="{{ route('admin.analytics.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.analytics*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Analytics</a>
             </li>
             <li>
                <a href="{{ route('admin.services.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.services*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Services</a>
             </li>
-
             <li>
                <a href="{{ route('admin.stylists.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.stylists*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Stylists</a>
             </li>
+            <li class="hidden md:block w-px h-4 bg-slate-700 mx-1"></li>
              <li>
                <a href="{{ route('admin.shop.edit') }}" class="block py-2 px-3 rounded {{ request()->routeIs('admin.shop*') ? 'text-amber-500 md:p-0' : 'text-white hover:text-amber-500 md:p-0 transition-colors' }}">Settings</a>
             </li>

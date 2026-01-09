@@ -40,15 +40,21 @@ class AdminController extends Controller
         });
 
         $ongoingBookings = $allTodaysBookings->filter(function($b) use ($now) {
-            return $now->between($b->start_time, $b->end_time);
+            return $b->status === 'in_progress' || 
+                   ($b->status !== 'completed' && $b->status !== 'cancelled' && $now->between($b->start_time, $b->end_time));
         })->sortBy('start_time');
 
-        $upcomingBookings = $allTodaysBookings->filter(function($b) use ($now) {
-            return $b->start_time->gt($now);
+        $ongoingIds = $ongoingBookings->pluck('id')->toArray();
+
+        $upcomingBookings = $allTodaysBookings->filter(function($b) use ($now, $ongoingIds) {
+            return $b->status !== 'completed' && 
+                   $b->status !== 'cancelled' && 
+                   $b->start_time->gt($now) && 
+                   !in_array($b->id, $ongoingIds);
         })->sortBy('start_time');
 
         $pastBookings = $allTodaysBookings->filter(function($b) use ($now) {
-            return $b->end_time->lt($now);
+            return $b->status === 'completed' || ($b->status !== 'cancelled' && $b->end_time->lt($now));
         })->sortByDesc('start_time');
 
         $todaysBookings = $ongoingBookings->concat($upcomingBookings)->concat($pastBookings);
@@ -64,7 +70,7 @@ class AdminController extends Controller
         
         $potentialRevenue = $shop->bookings()
             ->whereBetween('start_time', [$startOfWeek, $endOfWeek])
-            ->whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('status', ['confirmed', 'completed', 'in_progress'])
             ->sum('total_price');
             
         $totalCustomers = \App\Models\Customer::whereHas('bookings', function($q) use ($shop) {
@@ -101,8 +107,20 @@ class AdminController extends Controller
             'primary_color' => 'nullable|string',
             'currency' => 'nullable|string|size:3',
             'timezone' => 'required|string',
+            'logo' => 'nullable|image|max:2048',
+            'remove_logo' => 'nullable|boolean',
         ]);
 
+        if ($request->hasFile('logo')) {
+            $image = $request->file('logo');
+            $imageContent = file_get_contents($image->getRealPath());
+            $base64 = 'data:' . $image->getMimeType() . ';base64,' . base64_encode($imageContent);
+            $data['logo'] = $base64;
+        } elseif ($request->boolean('remove_logo')) {
+            $data['logo'] = null;
+        }
+
+        unset($data['remove_logo']);
         auth()->user()->shop->update($data);
         return back()->with('success', 'Shop updated.');
     }
@@ -117,7 +135,15 @@ class AdminController extends Controller
             'primary_color' => 'nullable|string',
             'currency' => 'nullable|string|size:3',
             'timezone' => 'required|string',
+            'logo' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('logo')) {
+            $image = $request->file('logo');
+            $imageContent = file_get_contents($image->getRealPath());
+            $base64 = 'data:' . $image->getMimeType() . ';base64,' . base64_encode($imageContent);
+            $data['logo'] = $base64;
+        }
 
         auth()->user()->shop()->create($data);
         return redirect()->route('admin.dashboard');

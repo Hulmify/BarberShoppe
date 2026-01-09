@@ -114,7 +114,7 @@
                             <div class="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
                                 <div class="text-right mr-4 hidden md:block">
                                     <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Pricing</div>
-                                    <div class="text-xl font-black text-slate-900">{{ $shop->currency ?? '$' }}{{ number_format($booking->total_price, 2) }}</div>
+                                    <div class="text-xl font-black text-slate-900">{{ $shop->currency ?? '$' }} {{ number_format($booking->total_price, 2) }}</div>
                                 </div>
                                 <div class="flex items-center gap-2 flex-1 md:flex-initial">
                                     <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" class="flex-1 md:flex-initial">
@@ -186,13 +186,23 @@
                                         $sStyle = match($booking->status) {
                                             'pending' => 'bg-amber-100 text-amber-700',
                                             'confirmed' => 'bg-green-100 text-green-700',
+                                            'in_progress' => 'bg-blue-600 text-white',
                                             default => 'bg-gray-100 text-gray-700'
                                         };
                                     @endphp
-                                    <span class="px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest {{ $sStyle }}">{{ $booking->status }}</span>
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold {{ $sStyle }}">{{ ucwords(str_replace('_', ' ', $booking->status)) }}</span>
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
+                                        @if($booking->status == 'pending' || $booking->status == 'confirmed')
+                                            <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST">
+                                                @csrf @method('PUT')
+                                                <input type="hidden" name="status" value="in_progress">
+                                                <button title="Start Visit" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                </button>
+                                            </form>
+                                        @endif
                                         @if($booking->status == 'pending')
                                             <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST">
                                                 @csrf @method('PUT')
@@ -241,7 +251,7 @@
                                 <td class="px-6 py-3 font-semibold text-gray-600">{{ $booking->customer->name }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <div class="flex items-center justify-end gap-3">
-                                        <span class="px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest {{ $booking->status == 'completed' ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600' }}">{{ $booking->status }}</span>
+                                        <span class="px-2 py-1 rounded text-[10px] font-bold {{ $booking->status == 'completed' ? 'bg-blue-100 text-blue-700' : ($booking->status == 'in_progress' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600') }}">{{ ucwords(str_replace('_', ' ', $booking->status)) }}</span>
                                         <form action="{{ route('admin.appointments.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Permanently delete this appointment? This action cannot be undone.');">
                                             @csrf @method('DELETE')
                                             <button title="Delete Permanently" class="text-red-400 hover:text-red-600 transition-colors">
@@ -263,7 +273,7 @@
 
 <!-- Quick Access Actions -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    <a href="{{ route('booking.kiosk', $shop->slug) }}?fullscreen=1" target="_blank" class="group relative overflow-hidden bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800 transition-all hover:scale-[1.02] hover:shadow-2xl">
+    <a href="{{ route('booking.kiosk', $shop->slug) }}" target="_blank" class="group relative overflow-hidden bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800 transition-all hover:scale-[1.02] hover:shadow-2xl">
         <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform">
              <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
         </div>

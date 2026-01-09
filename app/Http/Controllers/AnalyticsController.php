@@ -85,7 +85,22 @@ class AnalyticsController extends Controller
             $busyHours['counts'][] = isset($busyHoursRaw[$h]) ? $busyHoursRaw[$h]->count() : 0;
         }
 
-        // 4. Overall Stats (within range)
+        // 4. Stylist Performance (Revenue & Bookings per stylist)
+        $stylistPerformance = DB::table('bookings')
+            ->join('stylists', 'bookings.stylist_id', '=', 'stylists.id')
+            ->where('bookings.shop_id', $shop->id)
+            ->where('bookings.status', 'completed')
+            ->whereBetween('bookings.start_time', [$startDate->copy()->setTimezone('UTC'), $endDate->copy()->setTimezone('UTC')])
+            ->select(
+                'stylists.name', 
+                DB::raw('COUNT(*) as booking_count'), 
+                DB::raw('SUM(total_price) as total_revenue')
+            )
+            ->groupBy('stylists.id', 'stylists.name')
+            ->orderByDesc('total_revenue')
+            ->get();
+
+        // 5. Overall Stats (within range)
         $totalRevenue = (float)$bookings->where('status', 'completed')->sum('total_price');
         $totalBookings = $bookings->count();
         $avgBookingValue = $totalBookings > 0 ? $totalRevenue / $totalBookings : 0;
@@ -95,6 +110,7 @@ class AnalyticsController extends Controller
             'chartData',
             'topServices',
             'busyHours',
+            'stylistPerformance',
             'totalRevenue',
             'totalBookings',
             'avgBookingValue',

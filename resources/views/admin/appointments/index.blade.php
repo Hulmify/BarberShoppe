@@ -6,31 +6,76 @@
 
 @section('content')
 
+<!-- Quick Filters -->
+<div class="flex flex-wrap gap-2 mb-4">
+    <a href="{{ route('admin.appointments.index') }}" 
+       class="px-4 py-2 rounded-full text-sm font-medium {{ !request()->has('filter') && !request()->has('status') && !request()->has('statuses') && !request()->has('date') ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       All Appointments
+    </a>
+    <a href="{{ route('admin.appointments.index', ['filter' => 'today']) }}" 
+       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'today' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       Today
+    </a>
+    <a href="{{ route('admin.appointments.index', ['filter' => 'pending']) }}" 
+       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'pending' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       Pending Approvals
+    </a>
+    <a href="{{ route('admin.appointments.index', ['filter' => 'active']) }}" 
+       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'active' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       Active Visits
+    </a>
+    <a href="{{ route('admin.appointments.index', ['filter' => 'completed']) }}" 
+       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'completed' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       Completed
+    </a>
+</div>
+
 <!-- Filter Section -->
 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-8">
-    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">Filter Options</h3>
-    <form method="GET" class="flex flex-col md:flex-row gap-4 items-end">
-        <div class="w-full md:w-auto">
-            <label for="date" class="block mb-2 text-sm font-medium text-slate-700">Filter Date</label>
-            <input type="date" id="date" name="date" value="{{ request('date') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">Detailed Filters</h3>
+    <form method="GET" class="space-y-4">
+        <div class="flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-64">
+                <label for="date" class="block mb-2 text-sm font-medium text-slate-700">Filter Date</label>
+                <input type="date" id="date" name="date" value="{{ request('date') }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
+            </div>
+            <div class="flex-1">
+                <label class="block mb-2 text-sm font-medium text-slate-700">Filter by Statuses</label>
+                <div class="flex flex-wrap gap-x-6 gap-y-2 mt-3">
+                    @foreach(['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $status)
+                        @php
+                            $checked = (is_array(request('statuses')) && in_array($status, request('statuses'))) || 
+                                       request('status') == $status ||
+                                       (request('filter') === 'pending' && $status === 'pending') ||
+                                       (request('filter') === 'active' && in_array($status, ['confirmed', 'in_progress'])) ||
+                                       (request('filter') === 'completed' && $status === 'completed');
+                        @endphp
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" name="statuses[]" value="{{ $status }}" 
+                                {{ $checked ? 'checked' : '' }}
+                                class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 transition-colors">
+                            <span class="ml-2 text-sm text-slate-600 group-hover:text-slate-900 capitalize">{{ str_replace('_', ' ', $status) }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
         </div>
-        <div class="w-full md:w-48">
-             <label for="status" class="block mb-2 text-sm font-medium text-slate-700">Status</label>
-             <select id="status" name="status" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
-                <option value="">All Statuses</option>
-                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-            </select>
-        </div>
-        <div class="flex gap-2">
-            <button type="submit" class="text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none transition-colors">
-                Apply Filters
-            </button>
-            <a href="{{ route('admin.appointments.index') }}" class="text-slate-700 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors">
-                Reset
-            </a>
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+            <div class="text-xs text-slate-500">
+                @if(request()->anyFilled(['date', 'statuses', 'status', 'filter']))
+                    Showing filtered results
+                @else
+                    Showing all appointments
+                @endif
+            </div>
+            <div class="flex gap-2">
+                <a href="{{ route('admin.appointments.index') }}" class="text-slate-700 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors">
+                    Reset
+                </a>
+                <button type="submit" class="text-white bg-slate-900 hover:bg-slate-800 focus:ring-4 focus:ring-slate-300 font-medium rounded-lg text-sm px-8 py-2.5 focus:outline-none transition-colors">
+                    Apply Filters
+                </button>
+            </div>
         </div>
     </form>
 </div>
@@ -90,13 +135,14 @@
                                 $statusStyles = match($booking->status) {
                                     'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200 ring-yellow-600/20',
                                     'confirmed' => 'bg-green-50 text-green-700 border-green-200 ring-green-600/20',
+                                    'in_progress' => 'bg-blue-600 text-white border-blue-700 ring-blue-500/20',
                                     'completed' => 'bg-blue-50 text-blue-700 border-blue-200 ring-blue-600/20',
                                     'cancelled' => 'bg-red-50 text-red-700 border-red-200 ring-red-600/20',
                                     default => 'bg-gray-50 text-gray-600 border-gray-200 ring-gray-500/10'
                                 };
                             @endphp
-                            <span class="inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $statusStyles }} capitalize">
-                                {{ $booking->status }}
+                            <span class="inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $statusStyles }}">
+                                {{ ucwords(str_replace('_', ' ', $booking->status)) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right whitespace-nowrap">
@@ -119,12 +165,12 @@
                                         </button>
                                     </form>
                                 @elseif($booking->status === 'confirmed')
-                                    <!-- Mark Completed -->
+                                    <!-- Start Visit -->
                                     <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST">
                                         @csrf @method('PUT')
-                                        <input type="hidden" name="status" value="completed">
-                                        <button type="submit" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-lg transition-colors border border-green-200" title="Mark Completed">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <input type="hidden" name="status" value="in_progress">
+                                        <button type="submit" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200" title="Start Visit">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         </button>
                                     </form>
                                     <!-- Cancel -->
@@ -135,12 +181,21 @@
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                         </button>
                                     </form>
-                                @elseif($booking->status === 'completed')
-                                    <!-- Revert to Confirmed -->
-                                    <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" onsubmit="return confirm('Revert status to Confirmed?');">
+                                @elseif($booking->status === 'in_progress')
+                                    <!-- Mark Completed -->
+                                    <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST">
                                         @csrf @method('PUT')
-                                        <input type="hidden" name="status" value="confirmed">
-                                        <button type="submit" class="p-2 bg-gray-50 text-slate-600 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200 group" title="Undo / Revert to Confirmed">
+                                        <input type="hidden" name="status" value="completed">
+                                        <button type="submit" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-lg transition-colors border border-green-200" title="Mark Completed">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </button>
+                                    </form>
+                                @elseif($booking->status === 'completed')
+                                    <!-- Revert to In Progress -->
+                                    <form action="{{ route('admin.appointments.update', $booking->id) }}" method="POST" onsubmit="return confirm('Revert status to In Progress?');">
+                                        @csrf @method('PUT')
+                                        <input type="hidden" name="status" value="in_progress">
+                                        <button type="submit" class="p-2 bg-gray-50 text-slate-600 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200 group" title="Undo / Revert to In Progress">
                                              <div class="flex items-center gap-1 text-xs font-semibold px-1">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
                                                 Undo

@@ -79,6 +79,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefi
     // POS / Quick Reservation
     Route::get('/pos', [App\Http\Controllers\PointOfSaleController::class, 'index'])->name('pos.index');
     Route::post('/pos', [App\Http\Controllers\PointOfSaleController::class, 'store'])->name('pos.store');
+    Route::get('/pos/slots', [App\Http\Controllers\PointOfSaleController::class, 'slots'])->name('pos.slots');
 
     // Stylists
     Route::get('/stylists/{stylist}/availability', [App\Http\Controllers\Admin\StylistController::class, 'availability'])->name('stylists.availability');

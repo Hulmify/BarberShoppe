@@ -6,6 +6,23 @@
 
 @section('content')
 
+<style>
+    #pos-slots-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    #pos-slots-container::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+    #pos-slots-container::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+    }
+    #pos-slots-container::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
+    }
+</style>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     
     <!-- Left Column: Form -->
@@ -81,6 +98,7 @@
                                 <input type="checkbox" value="{{ $service->id }}" 
                                     data-price="{{ $service->price }}" 
                                     data-name="{{ $service->name }}" 
+                                    data-duration="{{ $service->duration_minutes }}"
                                     class="service-checkbox w-5 h-5 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
                                 <div>
                                     <div class="font-medium text-slate-900">{{ $service->name }}</div>
@@ -107,7 +125,7 @@
                         <!-- 3. Date, Time & Stylist -->
              <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
                 <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">3. Assignment & Timing</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
                         @php
                             $tz = auth()->user()->shop->timezone ?? config('app.timezone');
@@ -115,20 +133,6 @@
                         @endphp
                         <label for="date" class="block mb-2 text-sm font-medium text-slate-900">Date</label>
                         <input type="date" id="date" name="date" value="{{ $today }}" min="{{ $today }}" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5">
-                    </div>
-                     <div>
-                        <label for="time" class="block mb-2 text-sm font-medium text-slate-900">Time Slot</label>
-                        <select id="time" name="time" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5" required>
-                            <option value="">-- Select Time --</option>
-                            @php
-                                $start = \Carbon\Carbon::createFromTime(0, 0);
-                                $end = \Carbon\Carbon::createFromTime(23, 45);
-                            @endphp
-                            @while($start->lte($end))
-                                <option value="{{ $start->format('H:i') }}">{{ $start->format('h:i A') }}</option>
-                                @php $start->addMinutes(15); @endphp
-                            @endwhile
-                        </select>
                     </div>
                     <div>
                         <label for="stylist_id" class="block mb-2 text-sm font-medium text-slate-900">Stylist (Optional)</label>
@@ -139,6 +143,63 @@
                             @endforeach
                         </select>
                     </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm font-medium text-slate-900">Select Time Slot</label>
+                        <div id="slot-loader" class="hidden">
+                            <svg class="animate-spin h-4 w-4 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Quick Filters -->
+                    <div class="flex gap-2 mb-4 overflow-x-auto pb-1 no-scrollbar">
+                        <button type="button" onclick="filterTimeGroups('all')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-amber-500 text-white shadow-sm border border-amber-500" data-group="all">All Day</button>
+                        <button type="button" onclick="filterTimeGroups('morning')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="morning">Morning</button>
+                        <button type="button" onclick="filterTimeGroups('afternoon')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="afternoon">Afternoon</button>
+                        <button type="button" onclick="filterTimeGroups('evening')" class="time-filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all bg-white text-slate-500 border border-slate-200 hover:border-amber-400" data-group="evening">Evening</button>
+                    </div>
+                    
+                    <div id="pos-slots-container" class="space-y-6 max-h-96 overflow-y-auto p-4 border border-gray-100 rounded-xl bg-slate-50/50 custom-scrollbar">
+                        <!-- Morning Section -->
+                        <div id="group-morning" class="hidden">
+                            <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 17a5 5 0 100-10 5 5 0 000 10z"/></svg>
+                                Morning
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
+                        </div>
+
+                        <!-- Afternoon Section -->
+                        <div id="group-afternoon" class="hidden">
+                            <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 17a5 5 0 100-10 5 5 0 000 10z"/></svg>
+                                Afternoon
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
+                        </div>
+
+                        <!-- Evening Section -->
+                        <div id="group-evening" class="hidden">
+                            <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                                Evening
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 slot-grid"></div>
+                        </div>
+
+                        <div id="no-slots-msg" class="text-center py-8 text-slate-400 text-sm italic">
+                            Select a client, at least one service, and a valid date to see available times.
+                        </div>
+                    </div>
+                    <input type="hidden" name="time" id="time" required>
+                    @error('time')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
             
@@ -176,8 +237,15 @@
         radioBtns.forEach(btn => {
             btn.addEventListener('change', function() {
                 toggleCustomerType(this.value);
+                fetchPosSlots();
             });
         });
+
+        // Date/Stylist changes
+        document.getElementById('date').addEventListener('change', fetchPosSlots);
+        document.getElementById('stylist_id').addEventListener('change', fetchPosSlots);
+        document.getElementById('customer_id').addEventListener('change', fetchPosSlots);
+        document.getElementById('new_customer_name').addEventListener('input', fetchPosSlots);
 
         // Load Persistent State
         const stored = sessionStorage.getItem(POS_STORAGE_KEY);
@@ -190,24 +258,34 @@
         const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
         serviceCheckboxes.forEach(cb => {
             const id = parseInt(cb.value);
-            if (selectedServices.has(id)) {
-                cb.checked = true;
+            const isChecked = selectedServices.has(id);
+            cb.checked = isChecked;
+            
+            // Highlight row if checked
+            if (isChecked) {
+                cb.closest('.service-item').classList.add('bg-amber-50', 'border-amber-300');
             }
+
             cb.addEventListener('change', function() {
+                const row = this.closest('.service-item');
                 if (this.checked) {
                     selectedServices.set(id, {
                         id: id,
                         name: this.dataset.name,
-                        price: parseFloat(this.dataset.price)
+                        price: parseFloat(this.dataset.price),
+                        duration: parseInt(this.dataset.duration || 30)
                     });
+                    row.classList.add('bg-amber-50', 'border-amber-300');
                 } else {
                     selectedServices.delete(id);
+                    row.classList.remove('bg-amber-50', 'border-amber-300');
                 }
                 saveAndRefresh();
             });
         });
 
         updateSummary();
+        fetchPosSlots(); // Initial fetch if everything set
 
         // Clear storage on form submit
         document.getElementById('posForm').addEventListener('submit', () => {
@@ -233,6 +311,37 @@
         }
     }
     
+    let activeTimeFilter = 'all';
+
+    function filterTimeGroups(group) {
+        activeTimeFilter = group;
+        const sections = ['morning', 'afternoon', 'evening'];
+        const buttons = document.querySelectorAll('.time-filter-btn');
+        
+        // Update button styles
+        buttons.forEach(btn => {
+            if (btn.dataset.group === group) {
+                btn.classList.remove('bg-white', 'text-slate-500', 'border-slate-200');
+                btn.classList.add('bg-amber-500', 'text-white', 'shadow-sm', 'border-amber-500');
+            } else {
+                btn.classList.add('bg-white', 'text-slate-500', 'border-slate-200');
+                btn.classList.remove('bg-amber-500', 'text-white', 'shadow-sm', 'border-amber-500');
+            }
+        });
+
+        // Toggle visibility based on active filter and presence of slots
+        sections.forEach(s => {
+            const el = document.getElementById(`group-${s}`);
+            const hasData = el.querySelector('.slot-grid').children.length > 0;
+            
+            if (hasData && (group === 'all' || group === s)) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        });
+    }
+
     function filterServices() {
         const searchTerm = document.getElementById('serviceSearch').value.toLowerCase();
         const serviceItems = document.querySelectorAll('.service-item');
@@ -242,11 +351,167 @@
             const desc = item.dataset.desc || '';
             
             if (name.includes(searchTerm) || desc.includes(searchTerm)) {
-                item.style.display = '';
+                item.style.display = 'flex';
             } else {
                 item.style.display = 'none';
             }
         });
+    }
+
+    async function fetchPosSlots() {
+        const date = document.getElementById('date').value;
+        const stylistId = document.getElementById('stylist_id').value;
+        const loader = document.getElementById('slot-loader');
+        const container = document.getElementById('pos-slots-container');
+        const noSlotsMsg = document.getElementById('no-slots-msg');
+        const timeInput = document.getElementById('time');
+        
+        // Reset state
+        timeInput.value = '';
+        
+        const customerType = document.querySelector('input[name="customer_type"]:checked').value;
+        const customerSelected = customerType === 'existing' 
+            ? document.getElementById('customer_id').value 
+            : document.getElementById('new_customer_name').value.trim();
+        
+        if (!date || selectedServices.size === 0 || !customerSelected) {
+            document.getElementById('group-morning').classList.add('hidden');
+            document.getElementById('group-afternoon').classList.add('hidden');
+            document.getElementById('group-evening').classList.add('hidden');
+            noSlotsMsg.classList.remove('hidden');
+            noSlotsMsg.textContent = 'Select a client, at least one service, and a valid date to see available times.';
+            return;
+        }
+
+        loader.classList.remove('hidden');
+        noSlotsMsg.classList.remove('hidden'); 
+        noSlotsMsg.textContent = 'Fetching available times...'; 
+        
+        // Hide existing grid while loading
+        document.getElementById('group-morning').classList.add('hidden');
+        document.getElementById('group-afternoon').classList.add('hidden');
+        document.getElementById('group-evening').classList.add('hidden');
+        
+        let totalDuration = 0;
+        selectedServices.forEach(s => {
+            const d = parseInt(s.duration);
+            totalDuration += isNaN(d) ? 30 : d;
+        });
+
+        // Use the dedicated admin POS slots route
+        const url = `{{ route('admin.pos.slots') }}?date=${date}&duration=${totalDuration}&stylist_id=${stylistId}`;
+
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Failed to fetch slots');
+            
+            const data = await res.json();
+            
+            // Clear existing slots in grids
+            document.querySelectorAll('.slot-grid').forEach(g => g.innerHTML = '');
+            
+            if (!data.slots || data.slots.length === 0) {
+                document.getElementById('group-morning').classList.add('hidden');
+                document.getElementById('group-afternoon').classList.add('hidden');
+                document.getElementById('group-evening').classList.add('hidden');
+                noSlotsMsg.classList.remove('hidden');
+                noSlotsMsg.textContent = data.message || 'No available slots for this selection.';
+            } else {
+                noSlotsMsg.classList.add('hidden');
+                
+                let hasMorning = false;
+                let hasAfternoon = false;
+                let hasEvening = false;
+
+                data.slots.forEach(timeStr => {
+                    const hour = parseInt(timeStr.split(':')[0]);
+                    let group = 'evening';
+                    if (hour < 12) {
+                        group = 'morning';
+                        hasMorning = true;
+                    } else if (hour < 17) {
+                        group = 'afternoon';
+                        hasAfternoon = true;
+                    } else {
+                        hasEvening = true;
+                    }
+
+                    const grid = document.querySelector(`#group-${group} .slot-grid`);
+                    const slotBtn = createSlotButton(timeStr);
+                    grid.appendChild(slotBtn);
+                });
+
+                // Apply both "Has Data" and "Filter" logic
+                document.getElementById('group-morning').classList.toggle('hidden', !hasMorning || (activeTimeFilter !== 'all' && activeTimeFilter !== 'morning'));
+                document.getElementById('group-afternoon').classList.toggle('hidden', !hasAfternoon || (activeTimeFilter !== 'all' && activeTimeFilter !== 'afternoon'));
+                document.getElementById('group-evening').classList.toggle('hidden', !hasEvening || (activeTimeFilter !== 'all' && activeTimeFilter !== 'evening'));
+                
+                if (!hasMorning && !hasAfternoon && !hasEvening) {
+                    noSlotsMsg.classList.remove('hidden');
+                    noSlotsMsg.textContent = 'No available slots for this selection.';
+                }
+            }
+        } catch (err) {
+            console.error('POS Slot Fetch Error:', err);
+            noSlotsMsg.classList.remove('hidden');
+            noSlotsMsg.textContent = 'Failed to load available slots. Please check your connection or try again.';
+        } finally {
+            loader.classList.add('hidden');
+        }
+    }
+
+    function formatTime12h(timeStr) {
+        let [hours, minutes] = timeStr.split(':');
+        hours = parseInt(hours);
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        return `${displayHours}:${minutes} ${ampm}`;
+    }
+
+    function createSlotButton(timeStr) {
+        const div = document.createElement('div');
+        div.className = 'time-slot-btn py-3 px-2 text-center bg-white border border-gray-200 hover:border-amber-400 hover:bg-amber-50 rounded-xl cursor-pointer transition-all shadow-sm flex flex-col items-center justify-center gap-0.5';
+        
+        const [hours, minutes] = timeStr.split(':');
+        const h = parseInt(hours);
+        const displayH = h % 12 || 12;
+        const ampm = h >= 12 ? 'PM' : 'AM';
+
+        div.innerHTML = `
+            <span class="text-sm font-bold text-slate-900">${displayH}:${minutes}</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${ampm}</span>
+        `;
+
+        div.onclick = function() { selectPosTime(this, timeStr); };
+        return div;
+    }
+    
+    function selectPosTime(el, time) {
+        // Remove previous selection styles
+        const allSlots = document.querySelectorAll('.time-slot-btn');
+        allSlots.forEach(d => {
+            d.classList.remove('border-amber-500', 'bg-amber-600', 'text-white', 'ring-2', 'ring-amber-500/20');
+            d.classList.add('bg-white', 'border-gray-200');
+            
+            // Fix nested spans color
+            const spans = d.querySelectorAll('span');
+            spans[0].classList.remove('text-white');
+            spans[0].classList.add('text-slate-900');
+            spans[1].classList.remove('text-amber-100');
+            spans[1].classList.add('text-slate-400');
+        });
+
+        // Add new selection styles
+        el.classList.remove('bg-white', 'border-gray-200', 'hover:bg-amber-50');
+        el.classList.add('border-amber-500', 'bg-amber-600', 'text-white', 'ring-2', 'ring-amber-500/20');
+        
+        const selectedSpans = el.querySelectorAll('span');
+        selectedSpans[0].classList.remove('text-slate-900');
+        selectedSpans[0].classList.add('text-white');
+        selectedSpans[1].classList.remove('text-slate-400');
+        selectedSpans[1].classList.add('text-amber-100');
+        
+        document.getElementById('time').value = time;
     }
     
     function updateSummary() {
@@ -281,6 +546,9 @@
             input.value = s.id;
             container.appendChild(input);
         });
+
+        // Trigger slot fetch when total duration changes
+        fetchPosSlots();
     }
 </script>
 

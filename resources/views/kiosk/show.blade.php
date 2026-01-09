@@ -8,12 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --primary: #c5a059;
+            --primary: {{ $shop->primary_color ?? '#c5a059' }};
             --bg-dark: #0f172a;
             --bg-card: rgba(30, 41, 59, 0.7);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --accent: #38bdf8;
+            --accent: {{ $shop->primary_color ?? '#38bdf8' }};
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
         }
@@ -265,18 +265,77 @@
             margin-bottom: 8px;
             display: inline-block;
         }
+
+        /* Fullscreen Toggle */
+        .fullscreen-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--text-main);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .fullscreen-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 15px 30px -10px rgba(197, 160, 89, 0.5);
+        }
+
+        .fullscreen-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .fullscreen-toggle svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Tooltip */
+        .fullscreen-toggle::after {
+            content: 'Toggle Fullscreen';
+            position: absolute;
+            right: 120%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .fullscreen-toggle:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body>
     <div class="kiosk-container">
         <header>
-            <div class="shop-info" style="display: flex; align-items: center; gap: 2rem;">
+            <div class="shop-info" style="display: flex; align-items: center; gap: 1.5rem;">
+                @if($shop->logo)
+                    <img src="{{ $shop->logo }}" alt="{{ $shop->name }}" style="height: 60px; width: auto; object-contain; border-radius: 8px;">
+                @endif
                 <h1>{{ $shop->name }}</h1>
-                <button id="fullscreen-btn" title="Toggle Fullscreen" class="bg-transparent border-none p-0 text-white hover:text-gray-300 focus:outline-none focus:ring-0 active:outline-none" onclick="toggleFullscreen()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3"/>
-                    </svg>
-                </button>
             </div>
             <div class="clock-container">
                 <div id="clock">00:00:00</div>
@@ -318,9 +377,11 @@
                 </div>
                 <div class="queue-list">
                     @forelse($nowServing as $booking)
-                        <div class="queue-item" style="background: rgba(197, 160, 89, 0.1); border-color: var(--accent);">
+                        <div class="queue-item" style="background: {{ $booking->status === 'in_progress' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(197, 160, 89, 0.1)' }}; border-color: {{ $booking->status === 'in_progress' ? 'var(--accent)' : 'var(--primary)' }};">
                             <div>
-                                <span class="now-serving-badge">NOW SERVING</span>
+                                <span class="now-serving-badge" style="background: {{ $booking->status === 'in_progress' ? 'var(--accent)' : 'var(--primary)' }};">
+                                    {{ $booking->status === 'in_progress' ? 'IN PROGRESS' : 'NOW SERVING' }}
+                                </span>
                                 <div class="queue-time">{{ $booking->customer->name }}</div>
                                 <div class="queue-service">with {{ $booking->stylist->name }}</div>
                             </div>
@@ -377,6 +438,11 @@
         </footer>
     </div>
 
+    <button id="fullscreen-btn" class="fullscreen-toggle" aria-label="Toggle Fullscreen">
+        <svg id="fs-icon-maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <svg id="fs-icon-minimize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+    </button>
+
     <script>
         function updateClock() {
             const now = new Date();
@@ -412,13 +478,28 @@
             correctLevel : QRCode.CorrectLevel.H
         });
 
-        // Auto refresh page every 60 seconds to update queue
+        // Auto refresh page every 20 seconds to update queue
         setTimeout(() => {
             window.location.reload();
-        }, 60000);
+        }, 20000);
 
         // Fullscreen Logic
         const fsBtn = document.getElementById('fullscreen-btn');
+        const maxIcon = document.getElementById('fs-icon-maximize');
+        const minIcon = document.getElementById('fs-icon-minimize');
+
+        function updateFsIcons() {
+            if (document.fullscreenElement) {
+                maxIcon.style.display = 'none';
+                minIcon.style.display = 'block';
+                fsBtn.setAttribute('title', 'Exit Fullscreen');
+            } else {
+                maxIcon.style.display = 'block';
+                minIcon.style.display = 'none';
+                fsBtn.setAttribute('title', 'Enter Fullscreen');
+            }
+        }
+
         fsBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => {
@@ -430,6 +511,8 @@
                 }
             }
         });
+
+        document.addEventListener('fullscreenchange', updateFsIcons);
 
         // Check for auto-fullscreen request
         const urlParams = new URLSearchParams(window.location.search);

@@ -3,18 +3,20 @@
 <head>
     <title>Setup Shop</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; }
-        form { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 400px; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; padding: 20px; }
+        form { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 450px; }
         h1 { margin-top: 0; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1.1em; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1.1em; }
         .error { color: red; font-size: 0.9em; margin-bottom: 10px; }
+        .logo-preview-container { text-align: center; margin-bottom: 20px; }
+        #logo-preview { max-width: 100px; max-height: 100px; display: none; margin: 10px auto; border-radius: 8px; }
     </style>
 </head>
 <body>
-    <form method="POST" action="{{ route('admin.shop.store') }}">
+    <form method="POST" action="{{ route('admin.shop.store') }}" enctype="multipart/form-data">
         <h1>Setup Your Shop</h1>
         <p>Create your shop profile to get started.</p>
         @csrf
@@ -22,6 +24,12 @@
             <div class="error">{{ $errors->first() }}</div>
         @endif
         
+        <div class="form-group">
+            <label>Brand Logo</label>
+            <input type="file" name="logo" accept="image/*" onchange="document.getElementById('logo-preview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('logo-preview').style.display='block';">
+            <img id="logo-preview" src="#" alt="Logo Preview">
+        </div>
+
         <div class="form-group">
             <label>Shop Name</label>
             <input type="text" name="name" required placeholder="e.g. Ace Barbers" value="{{ old('name') }}">
