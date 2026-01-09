@@ -104,5 +104,66 @@ class AppointmentController extends Controller
         
         return back()->with('success', 'Appointment permanently deleted.');
     }
+
+    /**
+     * Display appointments in a calendar view.
+     */
+    public function calendar()
+    {
+        $shop = auth()->user()->shop;
+        $stylists = $shop->stylists()->where('is_active', true)->get();
+        return view('admin.appointments.calendar', compact('stylists'));
+    }
+
+    /**
+     * Get appointments as JSON events for FullCalendar.
+     */
+    public function events(Request $request)
+    {
+        $shop = auth()->user()->shop;
+        $tz = $shop->timezone ?? config('app.timezone');
+        
+        $start = $request->input('start');
+        $end = $request->input('end');
+        
+        $query = $shop->bookings()->with(['customer', 'stylist', 'items.service']);
+        
+        if ($start) $query->where('start_time', '>=', $start);
+        if ($end) $query->where('start_time', '<=', $end);
+        
+        $bookings = $query->get();
+        
+        $events = $bookings->map(function($b) use ($tz) {
+            $services = $b->items->map(fn($i) => $i->service->name)->implode(', ');
+            $stylistName = $b->stylist ? $b->stylist->name : 'Unassigned';
+            
+            $color = match($b->status) {
+                'pending' => '#eab308', // yellow-500
+                'confirmed' => '#22c55e', // green-500
+                'in_progress' => '#4896bf', // primary
+                'completed' => '#64748b', // slate-500
+                'cancelled' => '#ef4444', // red-500
+                default => '#94a3b8'
+            };
+
+            return [
+                'id' => $b->id,
+                'title' => $b->customer->name . " (" . $services . ")",
+                'start' => $b->start_time->toIso8601String(),
+                'end' => $b->end_time ? $b->end_time->toIso8601String() : $b->start_time->addMinutes(30)->toIso8601String(),
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'extendedProps' => [
+                    'status' => $b->status,
+                    'customer' => $b->customer->name,
+                    'phone' => $b->customer->phone,
+                    'stylist' => $stylistName,
+                    'price' => number_format($b->total_price, 2)
+                ]
+            ];
+        });
+        
+        return response()->json($events);
+    }
 }
 

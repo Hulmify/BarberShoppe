@@ -72,6 +72,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefi
 
     // Appointments
     Route::get('/appointments/today', [App\Http\Controllers\AppointmentController::class, 'today'])->name('appointments.today');
+    Route::get('/appointments/calendar', [App\Http\Controllers\AppointmentController::class, 'calendar'])->name('appointments.calendar');
+    Route::get('/appointments/events', [App\Http\Controllers\AppointmentController::class, 'events'])->name('appointments.events');
     Route::resource('appointments', App\Http\Controllers\AppointmentController::class)->only(['index', 'update', 'destroy']);
 
     // POS / Quick Reservation

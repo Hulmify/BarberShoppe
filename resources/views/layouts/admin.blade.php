@@ -10,6 +10,7 @@
     <style>
         body { font-family: 'Outfit', sans-serif; }
     </style>
+    @stack('styles')
 </head>
 <body class="bg-gray-50 text-slate-800">
 
@@ -145,5 +146,6 @@
         </footer>
     </div>
 
+    @stack('scripts')
 </body>
 </html>
