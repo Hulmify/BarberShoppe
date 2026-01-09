@@ -407,15 +407,12 @@
                     <h4 class="font-bold mb-6 text-white uppercase tracking-widest text-sm">Product</h4>
                     <ul class="space-y-4 text-slate-400">
                         <li><a href="#features" class="hover:text-primary-400 transition-colors">Features</a></li>
+                        <li><a href="#how-it-works" class="hover:text-primary-400 transition-colors">How It Works</a></li>
                     </ul>
                 </div>
             </div>
             <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
                 <p class="text-slate-500 text-sm">© {{ date('Y') }} BarberShoppe by Hulmify. All rights reserved.</p>
-                <div class="flex gap-8 text-sm text-slate-500 font-medium">
-                    <a href="#" class="hover:text-white transition-colors">Terms</a>
-                    <a href="#" class="hover:text-white transition-colors">Cookies</a>
-                </div>
             </div>
         </div>
     </footer>
