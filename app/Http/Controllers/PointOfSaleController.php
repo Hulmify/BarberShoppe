@@ -8,9 +8,18 @@ use App\Models\Booking;
 use App\Models\BookingItem; // Assuming this model exists based on context
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\PhoneNumberService;
+use App\Rules\Phone;
 
 class PointOfSaleController extends Controller
 {
+    protected $phoneService;
+
+    public function __construct(PhoneNumberService $phoneService)
+    {
+        $this->phoneService = $phoneService;
+    }
+
     public function index(Request $request)
     {
         $shop = auth()->user()->shop;
@@ -41,6 +50,7 @@ class PointOfSaleController extends Controller
     public function store(Request $request)
     {
         $shop = auth()->user()->shop;
+        $tz = $shop->timezone ?? config('app.timezone');
         
         $request->validate([
             'date' => 'required|date',
@@ -50,14 +60,16 @@ class PointOfSaleController extends Controller
             'customer_id' => 'required_if:customer_type,existing|nullable|exists:customers,id',
             'new_customer_name' => 'required_if:customer_type,new|nullable|string|max:255',
             'new_customer_email' => 'nullable|email|max:255', 
-            'new_customer_phone' => 'required_if:customer_type,new|nullable|string|max:20',
+            'new_customer_phone' => ['required_if:customer_type,new', 'nullable', 'string', 'max:20', new Phone($tz)],
             'stylist_id' => 'nullable|exists:stylists,id',
         ]);
 
         // 1. Resolve Customer
         if ($request->customer_type === 'new') {
+            $normalizedPhone = $this->phoneService->formatE164($request->new_customer_phone, $tz);
+
             $customer = Customer::updateOrCreate(
-                ['phone' => $request->new_customer_phone],
+                ['phone' => $normalizedPhone],
                 ['name' => $request->new_customer_name, 'email' => $request->new_customer_email] 
             );
         } else {

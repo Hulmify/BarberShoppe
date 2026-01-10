@@ -8,9 +8,17 @@ use App\Models\Booking;
 use App\Models\BookingItem;
 use App\Models\Customer;
 use Carbon\Carbon;
+use App\Services\PhoneNumberService;
+use App\Rules\Phone;
 
 class BookingController extends Controller
 {
+    protected $phoneService;
+
+    public function __construct(PhoneNumberService $phoneService)
+    {
+        $this->phoneService = $phoneService;
+    }
     /**
      * Resolve the shop instance from request or slug.
      *
@@ -203,6 +211,8 @@ class BookingController extends Controller
     {
         $shop = $this->getShop($request, $slug);
         
+        $tz = $shop->timezone ?? config('app.timezone');
+
         $validated = $request->validate([
             'service_ids' => 'required|array',
             'service_ids.*' => 'exists:services,id',
@@ -210,9 +220,12 @@ class BookingController extends Controller
             'time' => 'required|date_format:H:i',
             'customer_name' => 'required|string',
             'customer_email' => 'nullable|email',
-            'customer_phone' => 'required|string',
+            'customer_phone' => ['required', 'string', new Phone($tz)],
             'stylist_id' => 'nullable|exists:stylists,id',
         ]);
+
+        $normalizedPhone = $this->phoneService->formatE164($validated['customer_phone'], $tz);
+        $validated['customer_phone'] = $normalizedPhone;
 
         // Rate limiting/Business logic: prevent multiple active bookings from the same customer
         $existingCustomer = Customer::where('phone', $validated['customer_phone'])->first();
@@ -336,7 +349,10 @@ class BookingController extends Controller
         $bookings = collect();
 
         if ($phone) {
-            $customer = Customer::where('phone', $phone)->first();
+            $tz = $shop->timezone ?? config('app.timezone');
+            $normalizedPhone = $this->phoneService->formatE164($phone, $tz) ?? $phone;
+            
+            $customer = Customer::where('phone', $normalizedPhone)->first();
             if ($customer) {
                 $bookings = Booking::where('shop_id', $shop->id)
                     ->where('customer_id', $customer->id)
@@ -345,7 +361,7 @@ class BookingController extends Controller
                     ->limit(10)
                     ->get();
                 
-
+                $phone = $normalizedPhone;
             }
         }
 
@@ -361,14 +377,19 @@ class BookingController extends Controller
      */
     public function searchAppointments(Request $request, $slug = null)
     {
-        $request->validate(['phone' => 'required|string']);
+        $shop = $this->getShop($request, $slug);
+        $tz = $shop->timezone ?? config('app.timezone');
+
+        $request->validate(['phone' => ['required', 'string', new Phone($tz)]]);
         
+        $normalizedPhone = $this->phoneService->formatE164($request->phone, $tz);
+
         // Handle both domain-based and slug-based routing
         if ($request->attributes->has('shop')) {
-            return redirect()->route('shop.my_appointments', ['phone' => $request->phone]);
+            return redirect()->route('shop.my_appointments', ['phone' => $normalizedPhone]);
         }
         
-        return redirect()->route('booking.my_appointments', ['slug' => $slug, 'phone' => $request->phone]);
+        return redirect()->route('booking.my_appointments', ['slug' => $slug, 'phone' => $normalizedPhone]);
     }
 }
 
