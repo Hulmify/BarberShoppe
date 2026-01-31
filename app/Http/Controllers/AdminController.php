@@ -53,11 +53,18 @@ class AdminController extends Controller
                    $b->end_time->gt($now);
         })->sortBy('start_time');
 
-        $pastBookings = $allTodaysBookings->filter(function($b) use ($now) {
-            return $b->status === 'completed' || ($b->status !== 'cancelled' && $b->end_time->lt($now));
+        $completedBookings = $allTodaysBookings->filter(function($b) {
+            return $b->status === 'completed';
         })->sortByDesc('start_time');
 
-        $todaysBookings = $ongoingBookings->concat($upcomingBookings)->concat($pastBookings);
+        $pastDueBookings = $allTodaysBookings->filter(function($b) use ($now, $ongoingIds) {
+            return !in_array($b->id, $ongoingIds) && 
+                   $b->status !== 'completed' && 
+                   $b->status !== 'cancelled' && 
+                   $b->end_time->lt($now);
+        })->sortByDesc('start_time');
+
+        $todaysBookings = $ongoingBookings->concat($upcomingBookings)->concat($completedBookings)->concat($pastDueBookings);
             
         // Stats
         $startOfWeek = $now->copy()->startOfWeek()->setTimezone('UTC');
@@ -82,7 +89,8 @@ class AdminController extends Controller
             'todaysBookings', 
             'ongoingBookings', 
             'upcomingBookings', 
-            'pastBookings', 
+            'completedBookings',
+            'pastDueBookings', 
             'weekRevenue', 
             'potentialRevenue', 
             'totalCustomers', 

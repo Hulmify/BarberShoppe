@@ -9,334 +9,67 @@
     @else
         <link rel="icon" type="image/png" href="/app_favicon.png">
     @endif
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    @include('partials.pwa')
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --primary: {{ $shop->primary_color ?? '#c5a059' }};
-            --bg-dark: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: {{ $shop->primary_color ?? '#38bdf8' }};
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
+            --primary: {{ $shop->primary_color ?? '#4896bf' }};
+            --primary-rgb: {{ implode(',', sscanf($shop->primary_color ?? '#4896bf', "#%02x%02x%02x")) }};
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            background-color: #020617;
+            color: #f8fafc;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
-            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            font-family: 'Outfit', sans-serif;
         }
 
-        .kiosk-container {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            height: 100vh;
-            padding: 1.5rem;
-            gap: 1.5rem;
+        /* Cinematic Background */
+        .cinematic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 10% 20%, rgba(var(--primary-rgb), 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(var(--primary-rgb), 0.1) 0%, transparent 40%),
+                        #020617;
         }
 
-        @media (max-width: 768px) {
-            .kiosk-container {
-                display: flex;
-                flex-direction: column;
-                height: auto;
-                min-height: 100vh;
-                padding: 1rem;
-                gap: 1.5rem;
-                overflow-y: auto;
-            }
-            body {
-                overflow: auto;
-                height: auto;
-            }
-        }
-
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            padding: 1.5rem 2.5rem;
-            border-radius: 24px;
-            border: 1px solid var(--border);
-        }
-
-        .shop-info h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .clock-container {
-            text-align: right;
-        }
-
-        #clock {
-            font-size: 3rem;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-        }
-
-        #date {
-            color: var(--text-muted);
-            font-size: 1.2rem;
-        }
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                padding: 1rem;
-                text-align: center;
-                gap: 1rem;
-            }
-            .shop-info {
-                flex-direction: column;
-                gap: 0.5rem !important;
-            }
-            .shop-info h1 { font-size: 1.5rem; }
-            #clock { font-size: 2rem; }
-            #date { font-size: 1rem; }
-        }
-
-        /* Main Content */
-        main {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            min-height: 0; /* Important for grid 1fr scrolling */
-            overflow: hidden;
-        }
-
-        @media (max-width: 768px) {
-            main {
-                grid-template-columns: 1fr;
-                overflow: visible;
-                height: auto;
-            }
-        }
-
-        .section-card {
-            background: var(--bg-card);
-            border-radius: 32px;
-            padding: 2.5rem;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            min-height: 0; /* Allow inner content to control scrolling */
-            overflow: hidden;
-        }
-
-        @media (max-width: 768px) {
-            .section-card {
-                padding: 1.5rem;
-                border-radius: 24px;
-                overflow: visible;
-                height: auto;
-            }
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Stylists Grid */
-        .stylist-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-        }
-
-        .stylist-card {
-            background: var(--glass);
-            border-radius: 20px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-            border: 1px solid var(--border);
-        }
-
-        .stylist-image {
-            width: 100px;
-            height: 100px;
+        .ambient-light {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%);
             border-radius: 50%;
-            margin: 0 auto 1rem;
-            object-fit: cover;
-            border: 3px solid var(--primary);
-            padding: 3px;
+            animation: drift 30s infinite alternate-reverse ease-in-out;
+            pointer-events: none;
         }
 
-        .stylist-name {
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
+        @keyframes drift {
+            0% { transform: translate(-20%, -20%) scale(1); }
+            100% { transform: translate(40%, 40%) scale(1.2); }
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-available { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-        .status-busy { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-
-        /* Queue Section */
-        .queue-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            overflow-y: hidden;
-            flex: 1;
-            position: relative;
-            min-height: 200px;
-        }
-
-        @media (max-width: 768px) {
-            .queue-list {
-                overflow: visible;
-                height: auto;
-                flex: none;
-            }
-            .queue-scroll-container {
-                animation: none !important;
-                transform: none !important;
-            }
-            .queue-content-clone {
-                display: none !important;
-            }
-        }
-
-        .queue-scroll-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            animation: scroll-vertical 40s linear infinite;
-        }
-
-        .queue-scroll-container:hover {
-            animation-play-state: paused;
-        }
-
-        @keyframes scroll-vertical {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50%); }
-        }
-
-        .queue-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--glass);
-            padding: 1.25rem 1.5rem;
-            border-radius: 16px;
-            border-left: 4px solid var(--primary);
-        }
-
-        .queue-time {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .queue-service {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* Footer / Booking QR */
-        footer {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 2rem;
-            align-items: center;
-            background: var(--glass);
-            padding: 1.5rem;
-            border-radius: 24px;
-            border: 1px solid var(--border);
-        }
-
-        @media (max-width: 768px) {
-            footer {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 1.5rem;
-            }
-            .qr-section {
-                flex-direction: column;
-                gap: 1rem !important;
-            }
-        }
-
-        .qr-section {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        #qrcode {
-            background: white;
-            padding: 10px;
-            border-radius: 12px;
-        }
-
-        .qr-text h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .qr-text p {
-            color: var(--text-muted);
-        }
-
-        .services-ticker-container {
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-        }
-
-        .services-ticker {
-            display: inline-block;
-            animation: ticker 30s linear infinite;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .ticker-item {
             display: inline-flex;
             align-items: center;
-            margin-right: 3rem;
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-
-        .ticker-price {
-            color: var(--primary);
-            margin-left: 0.5rem;
+            margin-right: 4rem;
+            font-size: 1.5rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         @keyframes ticker {
@@ -344,246 +77,213 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        .now-serving-badge {
-            background: var(--primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+        .animate-ticker {
             display: inline-block;
+            animation: ticker 40s linear infinite;
         }
 
-        /* Fullscreen Toggle */
-        .fullscreen-toggle {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: var(--text-main);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        @keyframes scroll-queue {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
         }
 
-        .fullscreen-toggle:hover {
-            transform: scale(1.1) rotate(5deg);
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            box-shadow: 0 15px 30px -10px rgba(197, 160, 89, 0.5);
+        .animate-queue {
+            animation: scroll-queue 30s linear infinite;
         }
 
-        .fullscreen-toggle:active {
-            transform: scale(0.95);
+        .now-serving-item {
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2), rgba(var(--primary-rgb), 0.05));
+            border-left: 6px solid var(--primary);
         }
 
-        .fullscreen-toggle svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        /* Tooltip */
-        .fullscreen-toggle::after {
-            content: 'Toggle Fullscreen';
-            position: absolute;
-            right: 120%;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            white-space: nowrap;
-            opacity: 0;
-            transform: translateX(10px);
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
-        .fullscreen-toggle:hover::after {
-            opacity: 1;
-            transform: translateX(0);
+        @media (max-width: 768px) {
+            body { overflow: auto; height: auto; }
+            .animate-queue { animation: none; transform: none; }
         }
     </style>
 </head>
-<body>
-    <div class="kiosk-container">
-        <header>
-            <div class="shop-info" style="display: flex; align-items: center; gap: 1.5rem;">
-                @if($shop->logo)
-                    <img src="{{ $shop->logo }}" alt="{{ $shop->name }}" style="height: 60px; width: auto; object-contain; border-radius: 8px;">
-                @endif
-                <h1>{{ $shop->name }}</h1>
-            </div>
-            <div class="clock-container">
-                <div id="clock">00:00:00</div>
-                <div id="date">Thursday, January 8</div>
-            </div>
-        </header>
-
-        <main>
-            <div class="section-card">
-                <div class="section-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    Our Stylists
-                </div>
-                <div class="stylist-grid">
-                    @foreach($stylists as $stylist)
-                    <div class="stylist-card">
-                        @if($stylist->image_base64)
-                            <img src="{{ $stylist->image_base64 }}" alt="{{ $stylist->name }}" class="stylist-image">
-                        @else
-                            <div class="stylist-image" style="background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--primary);">
-                                {{ substr($stylist->name, 0, 1) }}
-                            </div>
-                        @endif
-                        <div class="stylist-name">{{ $stylist->name }}</div>
-                        @php
-                            $isBusy = $nowServing->contains('stylist_id', $stylist->id);
-                        @endphp
-                        <span class="status-badge {{ $isBusy ? 'status-busy' : 'status-available' }}">
-                            {{ $isBusy ? 'Busy' : 'Available' }}
-                        </span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="section-card">
-                <div class="section-title">
-                    Now Serving & Next Up
-                </div>
-                <div class="queue-list" id="queue-list">
-                    <div class="queue-scroll-container" id="queue-scroll-container">
-                        <div class="queue-content">
-                            <!-- Now Serving Section -->
-                            <div style="margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Now Serving</div>
-                            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
-                                @forelse($nowServing as $booking)
-                                    <div class="queue-item" style="background: rgba(56, 189, 248, 0.15); border-color: var(--accent);">
-                                        <div>
-                                            <div class="queue-time">{{ $booking->customer->name }}</div>
-                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
-                                        </div>
-                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
-                                    </div>
-                                @empty
-                                    <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
-                                        No active sessions
-                                    </div>
-                                @endforelse
-                            </div>
-
-                            <!-- Next Up Section -->
-                            <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Next Up</div>
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                @forelse($nextUp as $booking)
-                                    <div class="queue-item">
-                                        <div>
-                                            <div class="queue-time">{{ $booking->customer->name }}</div>
-                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
-                                        </div>
-                                        <div class="queue-time">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
-                                    </div>
-                                @empty
-                                    <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
-                                        No upcoming bookings
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-
-                        {{-- Duplicate content for seamless loop --}}
-                        <div class="queue-content-clone">
-                            <!-- Now Serving Clone -->
-                            <div style="margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Now Serving</div>
-                            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
-                                @forelse($nowServing as $booking)
-                                    <div class="queue-item" style="background: rgba(56, 189, 248, 0.15); border-color: var(--accent);">
-                                        <div>
-                                            <div class="queue-time">{{ $booking->customer->name }}</div>
-                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
-                                        </div>
-                                        <div class="queue-time" style="color: var(--accent);">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
-                                    </div>
-                                @empty
-                                    <div style="text-align: center; color: var(--text-muted); padding: 1.5rem; background: var(--glass); border-radius: 16px; border: 1px dashed var(--border);">
-                                        No upcoming bookings
-                                    </div>
-                                @endforelse
-                            </div>
-
-                            <!-- Next Up Clone -->
-                            <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Next Up</div>
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                @foreach($nextUp as $booking)
-                                    <div class="queue-item">
-                                        <div>
-                                            <div class="queue-time">{{ $booking->customer->name }}</div>
-                                            <div class="queue-service">with {{ $booking->stylist->name }}</div>
-                                        </div>
-                                        <div class="queue-time">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer>
-            <div class="qr-section">
-                <div id="qrcode"></div>
-                <div class="qr-text">
-                    <h2>Book Your Spot</h2>
-                    <p>Scan to see available slots and book online</p>
-                </div>
-            </div>
-            <div class="services-ticker-container">
-                <div class="services-ticker" id="ticker">
-                    @foreach($services as $service)
-                        <div class="ticker-item">
-                            {{ $service->name }} <span class="ticker-price">{{ $shop->currency ?? '$' }} {{ number_format($service->price, 2) }}</span>
-                        </div>
-                    @endforeach
-                    {{-- Duplicate for seamless loop --}}
-                    @foreach($services as $service)
-                        <div class="ticker-item">
-                            {{ $service->name }} <span class="ticker-price">{{ $shop->currency ?? '$' }} {{ number_format($service->price, 2) }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </footer>
+<body class="flex flex-col h-screen p-6 gap-6 relative">
+    <div class="cinematic-bg">
+        <div class="ambient-light" style="top: -10%; left: -10%;"></div>
+        <div class="ambient-light" style="bottom: -10%; right: -10%; animation-delay: -15s;"></div>
     </div>
 
-    <button id="fullscreen-btn" class="fullscreen-toggle" aria-label="Toggle Fullscreen">
-        <svg id="fs-icon-maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-        <svg id="fs-icon-minimize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+    <!-- Header -->
+    <header class="glass-card rounded-[32px] p-8 flex justify-between items-center animate-fade-in-down">
+        <div class="flex items-center gap-6">
+            @if($shop->logo)
+                <img src="{{ $shop->logo }}" alt="{{ $shop->name }}" class="h-20 w-auto object-contain rounded-2xl bg-white/10 p-2 border border-white/10">
+            @else
+                <div class="h-20 w-20 rounded-2xl flex items-center justify-center text-4xl font-black shadow-2xl" style="background: var(--primary)">
+                    {{ substr($shop->name, 0, 1) }}
+                </div>
+            @endif
+            <div>
+                <h1 class="text-5xl font-black uppercase tracking-tighter" style="color: var(--primary)">{{ $shop->name }}</h1>
+                <p class="text-slate-400 font-medium tracking-widest uppercase text-sm mt-1">Queue Board</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <div id="clock" class="text-7xl font-black tracking-tighter tabular-nums leading-none">00:00</div>
+            <div id="date" class="text-xl font-bold text-slate-500 uppercase tracking-widest mt-2">JANUARY 24</div>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-0">
+        <!-- Stylists Section -->
+        <section class="glass-card rounded-[40px] p-10 flex flex-col min-h-0">
+            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-500 mb-8 flex items-center gap-3">
+                <span class="w-8 h-px bg-slate-800"></span>
+                Our Professionals
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 overflow-y-auto pr-2 custom-scrollbar">
+                @foreach($stylists as $stylist)
+                    @php $isBusy = $nowServing->contains('stylist_id', $stylist->id); @endphp
+                    <div class="glass-card rounded-3xl p-6 text-center transition-all duration-500 hover:scale-105 {{ $isBusy ? 'opacity-40 grayscale-[0.5]' : '' }}">
+                        <div class="relative inline-block mb-4">
+                            @if($stylist->image_base64)
+                                <img src="{{ $stylist->image_base64 }}" class="w-24 h-24 rounded-full object-cover border-4" style="border-color: {{ $isBusy ? '#334155' : 'var(--primary)' }}">
+                            @else
+                                <div class="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-3xl font-bold border-4 border-slate-700 text-slate-500">
+                                    {{ substr($stylist->name, 0, 1) }}
+                                </div>
+                            @endif
+                            <!-- Pulse indicator -->
+                            <span class="absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-[#101827] {{ $isBusy ? 'bg-rose-500' : 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' }}"></span>
+                        </div>
+                        <div class="text-lg font-black tracking-tight leading-tight">{{ $stylist->name }}</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest mt-1 {{ $isBusy ? 'text-slate-500' : 'text-green-500' }}">
+                            {{ $isBusy ? 'Currently Busy' : 'Available Now' }}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <!-- Queue Section -->
+        <section class="glass-card rounded-[40px] p-10 flex flex-col min-h-0 overflow-hidden">
+            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-500 mb-8 flex items-center gap-3">
+                <span class="w-8 h-px bg-slate-800"></span>
+                Now Serving & Next Up
+            </h2>
+            <div class="flex-1 overflow-hidden relative mt-4" id="queue-container">
+                <div id="queue-wrapper" class="flex flex-col gap-8 pr-4">
+                    <div class="flex flex-col gap-8" id="queue-scroll">
+                    <!-- Serving -->
+                    <div class="flex flex-col gap-4">
+                        @forelse($nowServing as $booking)
+                            <div class="now-serving-item glass-card rounded-3xl p-6 flex justify-between items-center">
+                                <div>
+                                    <div class="text-xs font-black uppercase tracking-[0.2em] text-white/40 mb-1">Serving</div>
+                                    <div class="text-3xl font-black tracking-tighter">{{ $booking->customer->name }}</div>
+                                    <div class="text-sm font-bold text-white/50">with {{ $booking->stylist->name }}</div>
+                                </div>
+                                <div class="text-4xl font-black tabular-nums" style="color: var(--primary)">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
+                            </div>
+                        @empty
+                            <div class="p-8 text-center glass-card rounded-3xl border-dashed border-slate-700/50">
+                                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm text-balance">Welcoming New Walk-ins</p>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <!-- Next -->
+                    @if($nextUp->count() > 0)
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-500 mb-2 flex items-center gap-3">
+                            <span class="w-8 h-px bg-slate-800"></span>
+                            Next Appointments
+                        </h2>
+                        @foreach($nextUp as $booking)
+                            <div class="glass-card rounded-3xl p-6 flex justify-between items-center">
+                                <div>
+                                    <div class="text-2xl font-black text-slate-300 tracking-tighter">{{ $booking->customer->name }}</div>
+                                    <div class="text-xs font-bold text-slate-500">with {{ $booking->stylist->name }}</div>
+                                </div>
+                                <div class="text-3xl font-black text-slate-400 tabular-nums">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    <!-- Past Due -->
+                    @if($pastDue->count() > 0)
+                        <div class="flex flex-col gap-4">
+                            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-orange-500 mb-2 flex items-center gap-3">
+                                <span class="animate-pulse w-2 h-2 rounded-full bg-orange-500"></span>
+                                Past Due
+                            </h2>
+                            @foreach($pastDue as $booking)
+                                <div class="glass-card rounded-3xl p-5 flex justify-between items-center bg-orange-950/20 border-orange-500/30">
+                                    <div>
+                                        <div class="text-2xl font-black text-orange-200 tracking-tighter">{{ $booking->customer->name }}</div>
+                                        <div class="text-[10px] font-bold text-orange-500/60 uppercase tracking-widest">Awaiting Completion</div>
+                                    </div>
+                                    <div class="text-2xl font-black text-orange-500 tabular-nums">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <!-- Completed -->
+                    @if($completedToday->count() > 0)
+                        <div class="flex flex-col gap-4 opacity-50">
+                            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-green-600 mb-2 flex items-center gap-3">
+                                <span class="w-8 h-px bg-green-900/30"></span>
+                                Completed Today
+                            </h2>
+                            @foreach($completedToday as $booking)
+                                <div class="glass-card rounded-3xl p-4 flex justify-between items-center bg-green-900/10 border-green-900/20">
+                                    <div>
+                                        <div class="text-xl font-bold text-green-500/80 line-through tracking-tighter">{{ $booking->customer->name }}</div>
+                                        <div class="text-[10px] font-bold text-green-600 uppercase tracking-widest">Finished</div>
+                                    </div>
+                                    <div class="text-xl font-bold text-green-700 tabular-nums">{{ $booking->start_time->setTimezone($shop->timezone ?? config('app.timezone'))->format('h:i A') }}</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-card rounded-[32px] p-6 flex items-center gap-10 overflow-hidden">
+        <div class="flex items-center gap-6 shrink-0 border-r border-white/10 pr-10">
+            <div id="qrcode" class="bg-white p-2 rounded-2xl shadow-2xl"></div>
+            <div>
+                <h3 class="text-2xl font-black tracking-tighter">Book Online</h3>
+                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mt-1">Scan for Slots</p>
+            </div>
+        </div>
+        
+        <div class="flex-1 overflow-hidden">
+            <div class="animate-ticker whitespace-nowrap">
+                @foreach($services as $service)
+                    <div class="ticker-item">
+                        <span class="text-slate-500 uppercase text-xs tracking-widest font-black mr-3">Service</span>
+                        <span class="text-white">{{ $service->name }}</span>
+                        <span class="ml-4 tabular-nums" style="color: var(--primary)">{{ $shop->currency ?? '$' }}{{ number_format($service->price, 2) }}</span>
+                    </div>
+                @endforeach
+                {{-- Duplicate --}}
+                @foreach($services as $service)
+                    <div class="ticker-item">
+                        <span class="text-slate-500 uppercase text-xs tracking-widest font-black mr-3">Service</span>
+                        <span class="text-white">{{ $service->name }}</span>
+                        <span class="ml-4 tabular-nums" style="color: var(--primary)">{{ $shop->currency ?? '$' }}{{ number_format($service->price, 2) }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </footer>
+
+    <!-- Fullscreen Action -->
+    <button id="fullscreen-btn" class="fixed bottom-10 right-10 w-16 h-16 glass-card rounded-full flex items-center justify-center text-slate-400 hover:bg-white/10 transition-all opacity-20 hover:opacity-100 z-[100]">
+        <svg id="fs-maximize" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        <svg id="fs-minimize" class="w-8 h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3"/></svg>
     </button>
 
     <script>
@@ -592,109 +292,82 @@
             const timeStr = now.toLocaleTimeString('en-US', { 
                 hour12: true, 
                 hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
+                minute: '2-digit',
                 timeZone: "{{ $shop->timezone ?? config('app.timezone') }}"
             });
             const dateStr = now.toLocaleDateString('en-US', { 
-                weekday: 'long', 
                 month: 'long', 
                 day: 'numeric',
                 timeZone: "{{ $shop->timezone ?? config('app.timezone') }}"
             });
             
             document.getElementById('clock').textContent = timeStr;
-            document.getElementById('date').textContent = dateStr;
+            document.getElementById('date').textContent = dateStr.toUpperCase();
         }
 
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Generate QR Code
-        const bookingUrl = "{{ $shop->booking_url }}";
-        new QRCode(document.getElementById("qrcode"), {
-            text: bookingUrl,
-            width: 120,
-            height: 120,
+        // QR Code
+        const qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: "{{ $shop->booking_url }}",
+            width: 80,
+            height: 80,
             colorDark : "#000000",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
         });
 
-        // Auto refresh page every 20 seconds to update queue
-        setTimeout(() => {
-            window.location.reload();
-        }, 20000);
+        // Auto Refresh
+        setTimeout(() => window.location.reload(), 30000);
 
-        // Fullscreen Logic
-        const fsBtn = document.getElementById('fullscreen-btn');
-        const maxIcon = document.getElementById('fs-icon-maximize');
-        const minIcon = document.getElementById('fs-icon-minimize');
+        // Auto Dynamic Animation Speed
+        window.addEventListener('load', () => {
+            const queueScroll = document.getElementById('queue-scroll');
+            const queueWrapper = document.getElementById('queue-wrapper');
+            const queueContainer = document.getElementById('queue-container');
+            
+            if (queueScroll && queueWrapper && queueContainer) {
+                const scrollHeight = queueScroll.offsetHeight;
+                const containerHeight = queueContainer.offsetHeight;
 
-        function updateFsIcons() {
-            if (document.fullscreenElement) {
-                maxIcon.style.display = 'none';
-                minIcon.style.display = 'block';
-                fsBtn.setAttribute('title', 'Exit Fullscreen');
-            } else {
-                maxIcon.style.display = 'block';
-                minIcon.style.display = 'none';
-                fsBtn.setAttribute('title', 'Enter Fullscreen');
-            }
-        }
+                // Only scroll if content is taller than container plus a buffer
+                if (scrollHeight > containerHeight + 20) {
+                    const clones = queueScroll.cloneNode(true);
+                    clones.id = 'queue-scroll-clone';
+                    queueWrapper.appendChild(clones);
 
-        fsBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-                });
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
+                    // Add animation class to the WRAPPER instead of items
+                    queueWrapper.classList.add('animate-queue');
+
+                    const duration = Math.max(30, scrollHeight / 25);
+                    queueWrapper.style.animationDuration = `${duration}s`;
                 }
             }
         });
 
-        document.addEventListener('fullscreenchange', updateFsIcons);
+        // Fullscreen Toggle
+        const fsBtn = document.getElementById('fullscreen-btn');
+        const maxIcon = document.getElementById('fs-maximize');
+        const minIcon = document.getElementById('fs-minimize');
 
-        // Check for auto-fullscreen request
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('fullscreen') === '1') {
-            // Create a temporary overlay to request fullscreen on first click
-            const overlay = document.createElement('div');
-            overlay.style.position = 'fixed';
-            overlay.style.top = '0';
-            overlay.style.left = '0';
-            overlay.style.width = '100vw';
-            overlay.style.height = '100vh';
-            overlay.style.background = 'rgba(0,0,0,0.8)';
-            overlay.style.color = 'white';
-            overlay.style.display = 'flex';
-            overlay.style.alignItems = 'center';
-            overlay.style.justifyContent = 'center';
-            overlay.style.zIndex = '9999';
-            overlay.style.cursor = 'pointer';
-            overlay.innerHTML = '<div style="text-align:center"><h2 style="font-size:2rem;margin-bottom:1rem">Kiosk Mode</h2><p>Click anywhere to enter full screen</p></div>';
-            
-            overlay.onclick = () => {
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
-                overlay.remove();
-            };
-            document.body.appendChild(overlay);
-        }
-        // Auto-scroll logic: only animate if content overflows
-        const scrollContainer = document.getElementById('queue-scroll-container');
-        const queueList = document.getElementById('queue-list');
-        const queueContent = document.querySelector('.queue-content');
-        
-        if (queueContent.offsetHeight <= queueList.offsetHeight) {
-            scrollContainer.style.animation = 'none';
-            document.querySelector('.queue-content-clone').style.display = 'none';
-        } else {
-            // Adjust animation speed based on content height
-            const duration = Math.max(20, queueContent.offsetHeight / 20);
-            scrollContainer.style.animationDuration = `${duration}s`;
-        }
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                maxIcon.classList.add('hidden');
+                minIcon.classList.remove('hidden');
+            } else {
+                maxIcon.classList.remove('hidden');
+                minIcon.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>

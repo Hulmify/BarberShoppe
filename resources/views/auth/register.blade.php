@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - BarberShoppe</title>
+    @include('partials.pwa')
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; font-family: 'Outfit', sans-serif; background: #f1f5f9; display: flex; height: 100vh; align-items: center; justify-content: center; }

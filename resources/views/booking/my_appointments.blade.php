@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $shop->name }} | My Appointments</title>
+    @include('partials.pwa')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <style>
         body { font-family: 'Outfit', sans-serif; }
     </style>
@@ -29,13 +31,13 @@
         </header>
         
         @if(request()->query('booked'))
-            <div class="mb-8 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-6 flex items-center gap-4 animate-fade-in">
-                <div class="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            <div class="mb-8 bg-sky-50 border border-sky-200 text-sky-800 rounded-2xl p-6 flex items-center gap-4 animate-fade-in">
+                <div class="flex-shrink-0 w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center text-sky-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-lg">Booking Confirmed!</h3>
-                    <p class="text-emerald-700/80">Your appointment has been successfully scheduled. We've listed it below.</p>
+                    <h3 class="font-bold text-lg">Booking Received!</h3>
+                    <p class="text-sky-700/80">We've received your appointment request! Our team will review and confirm it shortly.</p>
                 </div>
             </div>
         @endif
@@ -96,16 +98,42 @@
                                 <div class="text-right mr-2">
                                     <div class="text-xl font-bold text-slate-900">{{ $shop->currency ?? '$' }} {{ number_format($booking->total_price, 2) }}</div>
                                     @php
-                                        $statusClasses = [
-                                            'pending' => 'bg-primary-100 text-primary-700',
-                                            'confirmed' => 'bg-emerald-100 text-emerald-700',
-                                            'cancelled' => 'bg-rose-100 text-rose-700',
-                                            'completed' => 'bg-primary-100 text-primary-700',
+                                        $statusMap = [
+                                            'pending' => [
+                                                'bg' => 'bg-sky-50',
+                                                'text' => 'text-sky-700',
+                                                'dot' => 'bg-sky-500',
+                                                'label' => 'Awaiting Confirmation'
+                                            ],
+                                            'confirmed' => [
+                                                'bg' => 'bg-emerald-50',
+                                                'text' => 'text-emerald-700',
+                                                'dot' => 'bg-emerald-500',
+                                                'label' => 'Confirmed'
+                                            ],
+                                            'cancelled' => [
+                                                'bg' => 'bg-rose-50',
+                                                'text' => 'text-rose-700',
+                                                'dot' => 'bg-rose-500',
+                                                'label' => 'Cancelled'
+                                            ],
+                                            'completed' => [
+                                                'bg' => 'bg-slate-50',
+                                                'text' => 'text-slate-700',
+                                                'dot' => 'bg-slate-400',
+                                                'label' => 'Completed'
+                                            ],
                                         ];
-                                        $statusClass = $statusClasses[$booking->status] ?? 'bg-gray-100 text-gray-700';
+                                        $currentStatus = $statusMap[$booking->status] ?? [
+                                            'bg' => 'bg-gray-50',
+                                            'text' => 'text-gray-700',
+                                            'dot' => 'bg-gray-400',
+                                            'label' => $booking->status
+                                        ];
                                     @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }} capitalize">
-                                        {{ $booking->status }}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $currentStatus['bg'] }} {{ $currentStatus['text'] }} border border-current/5 shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $currentStatus['dot'] }} animate-pulse"></span>
+                                        {{ $currentStatus['label'] }}
                                     </span>
                                 </div>
                             </div>
@@ -139,5 +167,31 @@
         @endif
     </div>
 
+    <!-- Spacer to prevent content from being hidden behind nav -->
+    <div class="h-24 sm:hidden"></div>
+
+    <!-- Mobile App Bottom Nav -->
+    <div class="sm:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-sm h-16 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-around px-4 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+        <a href="{{ request()->attributes->has('shop') ? route('shop.index') : $shop->booking_url }}" class="flex flex-col items-center gap-1 group transition-all">
+            <div class="p-2 rounded-xl {{ request()->routeIs('shop.index') || request()->routeIs('booking.index') ? 'text-primary-400' : 'text-slate-400' }} group-active:scale-90 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-widest {{ request()->routeIs('shop.index') || request()->routeIs('booking.index') ? 'text-primary-400' : 'text-slate-500' }}">Home</span>
+        </a>
+        <a href="{{ request()->attributes->has('shop') ? route('shop.my_appointments') : route('booking.my_appointments', ['slug' => $shop->slug]) }}" class="flex flex-col items-center gap-1 group transition-all">
+            <div class="p-2 rounded-xl {{ request()->routeIs('shop.my_appointments') || request()->routeIs('booking.my_appointments') ? 'text-primary-400' : 'text-slate-400' }} group-active:scale-90 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-widest {{ request()->routeIs('shop.my_appointments') || request()->routeIs('booking.my_appointments') ? 'text-primary-400' : 'text-slate-500' }}">My Bookings</span>
+        </a>
+        <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center gap-1 group transition-all">
+            <div class="p-2 rounded-xl text-slate-400 group-active:scale-90 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Top</span>
+        </button>
+    </div>
+
 </body>
+
 </html>

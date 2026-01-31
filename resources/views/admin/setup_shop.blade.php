@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Setup Shop</title>
+    @include('partials.pwa')
+
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; padding: 20px; }
         form { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 450px; }
