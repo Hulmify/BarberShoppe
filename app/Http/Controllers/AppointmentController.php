@@ -87,6 +87,8 @@ class AppointmentController extends Controller
             'stylist_id' => 'nullable|exists:stylists,id'
         ]);
         
+        $originalStatus = $booking->status;
+
         if ($request->filled('status')) {
             $booking->update(['status' => $request->status]);
         }
@@ -99,6 +101,19 @@ class AppointmentController extends Controller
                 $booking->update(['stylist_id' => $stylist->id]);
             } else {
                 $booking->update(['stylist_id' => null]);
+            }
+        }
+
+        // Notification Logic
+        if ($request->filled('status') && $booking->status !== $originalStatus) {
+            try {
+                if ($booking->status === 'confirmed') {
+                    $booking->customer->notify(new \App\Notifications\BookingConfirmed($booking));
+                } elseif ($booking->status === 'cancelled') {
+                    $booking->customer->notify(new \App\Notifications\BookingCancelled($booking));
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Customer Notification Failed: ' . $e->getMessage());
             }
         }
         

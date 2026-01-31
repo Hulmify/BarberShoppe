@@ -10,6 +10,8 @@ use App\Models\Customer;
 use Carbon\Carbon;
 use App\Services\PhoneNumberService;
 use App\Rules\Phone;
+use App\Notifications\BookingConfirmed;
+use App\Notifications\NewBookingReceived;
 
 class BookingController extends Controller
 {
@@ -330,6 +332,21 @@ class BookingController extends Controller
                 'service_id' => $svc->id,
                 'price' => $svc->price
             ]);
+        }
+        
+        // Send Push Notification
+        try {
+            $customer->notify(new BookingConfirmed($booking));
+            
+            if ($shop->user) {
+                \Illuminate\Support\Facades\Log::info('Sending admin notification to: ' . $shop->user->email);
+                $shop->user->notify(new NewBookingReceived($booking));
+            } else {
+                \Illuminate\Support\Facades\Log::warning('No user found for shop: ' . $shop->id);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Notification Error: ' . $e->getMessage());
+            // Silence silent failures for push if user isn't subscribed yet
         }
         
         return response()->json(['success' => true, 'booking_id' => $booking->id]);

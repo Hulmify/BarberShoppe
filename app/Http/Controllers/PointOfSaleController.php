@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Services\PhoneNumberService;
 use App\Rules\Phone;
+use App\Notifications\BookingConfirmed;
 
 class PointOfSaleController extends Controller
 {
@@ -111,7 +112,14 @@ class PointOfSaleController extends Controller
                 'price' => $service->price
             ]);
         }
-
+        
+        // Send Push Notification
+        try {
+            $customer->notify(new BookingConfirmed($booking));
+        } catch (\Exception $e) {
+            // Silence silent failures for push if user isn't subscribed yet
+        }
+        
         return redirect()->route('admin.appointments.index')->with('success', 'Reservation created successfully.');
     }
     public function slots(Request $request)

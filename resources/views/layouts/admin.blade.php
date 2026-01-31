@@ -59,6 +59,46 @@
              <li>
                <a href="{{ route('admin.shop.edit') }}" class="block py-2 px-3 rounded-lg {{ request()->routeIs('admin.shop*') ? 'text-primary-500 md:p-0 bg-primary-500/10 md:bg-transparent' : 'text-white hover:text-primary-500 md:p-0 transition-all duration-200 hover:bg-slate-700/50 md:hover:bg-transparent' }}">Settings</a>
             </li>
+            <li>
+              <div class="relative ml-3">
+                  <button id="notification-bell" class="relative block py-2 px-3 text-white hover:text-primary-500 transition-all duration-200">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                      </svg>
+                      @if(auth()->user()->unreadNotifications->count() > 0)
+                          <span class="absolute top-1 right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/4 -translate-y-1/4">
+                              {{ auth()->user()->unreadNotifications->count() }}
+                          </span>
+                      @endif
+                  </button>
+                  <div id="notification-dropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl overflow-hidden z-50 hidden border border-gray-100 origin-top-right transition-all duration-200">
+                      <div class="py-2 bg-slate-50 border-b border-gray-100 flex justify-between items-center px-4">
+                          <span class="text-sm font-semibold text-slate-700">Notifications</span>
+                          @if(auth()->user()->unreadNotifications->count() > 0)
+                              <a href="{{ route('admin.notifications.readAll') }}" class="text-xs text-primary-600 hover:text-primary-700 font-medium">Mark all read</a>
+                          @endif
+                      </div>
+                      <div class="max-h-96 overflow-y-auto">
+                          @forelse(auth()->user()->notifications->take(10) as $notification)
+                              <div class="px-4 py-3 hover:bg-slate-50 border-b border-gray-50 transition-colors duration-150 {{ $notification->read_at ? 'opacity-75' : 'bg-blue-50/30' }}">
+                                  <p class="text-sm font-medium text-slate-800">{{ $notification->data['title'] ?? 'Notification' }}</p>
+                                  <p class="text-xs text-slate-600 mt-1 line-clamp-2">{{ $notification->data['body'] ?? '' }}</p>
+                                  <div class="mt-2 flex justify-between items-center">
+                                     <span class="text-[10px] text-slate-400 font-medium">{{ $notification->created_at->diffForHumans() }}</span>
+                                     @if(isset($notification->data['data']['url']))
+                                        <a href="{{ $notification->data['data']['url'] }}" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded shadow-sm text-primary-600 hover:bg-primary-50 transition-colors">View</a>
+                                     @endif
+                                  </div>
+                              </div>
+                          @empty
+                              <div class="px-4 py-8 text-center text-gray-400 text-sm">
+                                  No notifications yet.
+                              </div>
+                          @endforelse
+                      </div>
+                  </div>
+              </div>
+            </li>
           </ul>
         </div>
       </div>
@@ -109,6 +149,49 @@
             }
             setInterval(updateClock, 1000);
             updateClock();
+
+            // Notification Dropdown Logic
+            const bell = document.getElementById('notification-bell');
+            const dropdown = document.getElementById('notification-dropdown');
+
+            if(bell && dropdown) {
+                bell.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', (e) => {
+                   if (!dropdown.contains(e.target) && !dropdown.classList.contains('hidden')) {
+                       dropdown.classList.add('hidden');
+                   }
+                });
+
+                dropdown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+
+                // Polling for Notifications (Every 30s)
+                setInterval(() => {
+                    fetch("{{ route('admin.notifications.count') }}")
+                        .then(res => res.json())
+                        .then(data => {
+                            const badge = bell.querySelector('span');
+                            if (data.count > 0) {
+                                if (badge) {
+                                    badge.textContent = data.count;
+                                } else {
+                                    const newBadge = document.createElement('span');
+                                    newBadge.className = 'absolute top-1 right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/4 -translate-y-1/4';
+                                    newBadge.textContent = data.count;
+                                    bell.appendChild(newBadge);
+                                }
+                            } else {
+                                if (badge) badge.remove();
+                            }
+                        })
+                        .catch(err => console.error('Notification Poll Error:', err));
+                }, 30000);
+            }
         </script>
 
         @if(session('success'))

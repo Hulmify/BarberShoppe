@@ -11,22 +11,21 @@ export default defineConfig({
         }),
         tailwindcss(),
         VitePWA({
+            strategies: 'injectManifest',
+            srcDir: 'resources/js',
+            filename: 'sw.js',
             registerType: 'autoUpdate',
             injectRegister: null,
-            workbox: {
-                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-                navigateFallback: '/',
-                cleanupOutdatedCaches: true,
-            },
-
             manifest: {
 
+                scope: '/',
+                start_url: '/',
                 name: 'BarberShoppe',
                 short_name: 'BarberShoppe',
                 description: 'The Ultimate Shop Management Platform',
                 theme_color: '#4896bf',
                 background_color: '#ffffff',
-                display: 'fullscreen',
+                display: 'standalone',
                 orientation: 'portrait',
 
                 categories: ['business', 'productivity', 'lifestyle'],

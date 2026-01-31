@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Middleware\IdentifyShop;
 
 /*
@@ -29,6 +30,10 @@ Route::domain('{domain}')
             Route::get('/kiosk', [App\Http\Controllers\KioskController::class, 'show'])->name('shop.kiosk');
             Route::get('/my-appointments', [BookingController::class, 'myAppointments'])->name('shop.my_appointments');
             Route::post('/my-appointments', [BookingController::class, 'searchAppointments'])->name('shop.search_appointments');
+            
+            // Push Notifications
+            Route::post('/push-subscriptions', [PushSubscriptionController::class, 'update'])->name('push.update');
+            Route::post('/push-subscriptions/delete', [PushSubscriptionController::class, 'destroy'])->name('push.destroy');
         });
     });
 
@@ -54,6 +59,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware(['auth', \App\Http\Middleware\CheckTrialExpiry::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/notifications/read-all', function() {
+        auth()->user()->unreadNotifications->markAsRead();
+        return back()->with('success', 'All notifications marked as read.');
+    })->name('notifications.readAll');
+
+    Route::get('/notifications/count', function() {
+        return response()->json(['count' => auth()->user()->unreadNotifications->count()]);
+    })->name('notifications.count');
+
     Route::get('/trial-expired', function() {
         return view('admin.trial_expired');
     })->name('trial_expired');
@@ -107,3 +121,12 @@ Route::post('/book/{slug}', [BookingController::class, 'store']);
 Route::get('/book/{slug}/kiosk', [App\Http\Controllers\KioskController::class, 'show'])->name('booking.kiosk');
 Route::get('/book/{slug}/my-appointments', [BookingController::class, 'myAppointments'])->name('booking.my_appointments');
 Route::post('/book/{slug}/my-appointments', [BookingController::class, 'searchAppointments'])->name('booking.search_appointments');
+
+// Push Notifications (slug-based)
+Route::post('/book/{slug}/push-subscriptions', [PushSubscriptionController::class, 'update']);
+Route::post('/book/{slug}/push-subscriptions/delete', [PushSubscriptionController::class, 'destroy']);
+
+// Push Notifications (Global/Admin)
+Route::post('/push-subscriptions', [PushSubscriptionController::class, 'update'])->name('push.global.update');
+Route::post('/push-subscriptions/delete', [PushSubscriptionController::class, 'destroy'])->name('push.global.destroy');
+

@@ -150,7 +150,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @foreach($bookings as $booking)
-                    <tr class="bg-white hover:bg-gray-50 transition-colors">
+                    <tr id="booking-{{ $booking->id }}" class="bg-white hover:bg-gray-50 transition-colors {{ request('highlight') == $booking->id ? 'bg-yellow-50/50' : '' }}">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="font-bold text-slate-800 text-base">{{ $booking->start_time->setTimezone($tz)->format('M d, Y') }}</div>
                             <div class="text-xs text-slate-500">{{ $booking->start_time->setTimezone($tz)->format('h:i A') }}</div>
@@ -296,12 +296,36 @@
             </table>
         </div>
         
-        @if($bookings->hasPages())
+@if($bookings->hasPages())
             <div class="p-4 border-t border-gray-200">
                 {{ $bookings->links() }}
             </div>
         @endif
     @endif
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const highlightId = urlParams.get('highlight');
+        
+        if (highlightId) {
+            const row = document.getElementById('booking-' + highlightId);
+            if (row) {
+                // Scroll into view
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Add temporary highlight effect
+                row.classList.add('bg-yellow-100');
+                row.classList.remove('bg-white');
+                
+                setTimeout(() => {
+                    row.classList.remove('bg-yellow-100');
+                    row.classList.add('transition-colors', 'duration-1000');
+                }, 2000);
+            }
+        }
+    });
+</script>
 
 @endsection
