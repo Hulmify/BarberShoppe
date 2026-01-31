@@ -7,40 +7,40 @@
 @section('content')
 
 <!-- View Toggle -->
-<div class="flex justify-end mb-4">
-    <a href="{{ route('admin.appointments.calendar') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-gray-50 hover:text-primary-600 transition-colors shadow-sm gap-2">
+<div class="flex justify-end mb-6">
+    <a href="{{ route('admin.appointments.calendar') }}" class="inline-flex items-center px-5 py-2.5 bg-white border border-gray-200/80 rounded-xl text-sm font-medium text-slate-700 hover:bg-gray-50 hover:text-primary-600 hover:border-primary-200 transition-all duration-200 shadow-sm hover:shadow-md active:scale-95 gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
         Calendar View
     </a>
 </div>
 
 <!-- Quick Filters -->
-<div class="flex flex-wrap gap-2 mb-4">
+<div class="flex flex-wrap gap-3 mb-6">
     <a href="{{ route('admin.appointments.index') }}" 
-       class="px-4 py-2 rounded-full text-sm font-medium {{ !request()->has('filter') && !request()->has('status') && !request()->has('statuses') && !request()->has('date') ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ !request()->has('filter') && !request()->has('status') && !request()->has('statuses') && !request()->has('date') ? 'bg-slate-900 text-white shadow-md hover:shadow-lg hover:shadow-slate-900/30 active:scale-95' : 'bg-white border border-gray-200/80 text-slate-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm active:scale-95' }}">
        All Appointments
     </a>
     <a href="{{ route('admin.appointments.index', ['filter' => 'today']) }}" 
-       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'today' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request('filter') === 'today' ? 'bg-slate-900 text-white shadow-md hover:shadow-lg hover:shadow-slate-900/30 active:scale-95' : 'bg-white border border-gray-200/80 text-slate-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm active:scale-95' }}">
        Today
     </a>
     <a href="{{ route('admin.appointments.index', ['filter' => 'pending']) }}" 
-       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'pending' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request('filter') === 'pending' ? 'bg-slate-900 text-white shadow-md hover:shadow-lg hover:shadow-slate-900/30 active:scale-95' : 'bg-white border border-gray-200/80 text-slate-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm active:scale-95' }}">
        Pending Approvals
     </a>
     <a href="{{ route('admin.appointments.index', ['filter' => 'active']) }}" 
-       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'active' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request('filter') === 'active' ? 'bg-slate-900 text-white shadow-md hover:shadow-lg hover:shadow-slate-900/30 active:scale-95' : 'bg-white border border-gray-200/80 text-slate-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm active:scale-95' }}">
        Active Visits
     </a>
     <a href="{{ route('admin.appointments.index', ['filter' => 'completed']) }}" 
-       class="px-4 py-2 rounded-full text-sm font-medium {{ request('filter') === 'completed' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50' }}">
+       class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request('filter') === 'completed' ? 'bg-slate-900 text-white shadow-md hover:shadow-lg hover:shadow-slate-900/30 active:scale-95' : 'bg-white border border-gray-200/80 text-slate-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm active:scale-95' }}">
        Completed
     </a>
 </div>
 
 <!-- Filter Section -->
-<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-8">
-    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">Detailed Filters</h3>
+<div class="bg-white border border-gray-200/80 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-6 mb-8">
+    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-5">Detailed Filters</h3>
     <form method="GET" class="space-y-4">
         <div class="flex flex-col md:flex-row gap-6">
             <div class="w-full md:w-64">
@@ -89,7 +89,7 @@
 </div>
 
 <!-- Table Section -->
-<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+<div class="bg-white border border-gray-200/80 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
     @if($bookings->isEmpty())
         <div class="flex flex-col items-center justify-center p-12 text-center">
             <div class="p-4 bg-gray-50 rounded-full mb-4">

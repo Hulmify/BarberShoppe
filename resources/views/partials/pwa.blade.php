@@ -25,15 +25,7 @@
 @if(!$isKioskView)
 <!-- Mobile App Splash Screen -->
 <div id="app-splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#ffffff;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:32px;">
-        @if($isShopView && isset($shop) && $shop->logo)
-            <img src="{{ $shop->logo }}" alt="Logo" style="width:80px;height:80px;object-contain;filter:drop-shadow(0 10px 15px rgba(0,0,0,0.05));">
-        @else
-            <div style="width:64px;height:64px;background:{{ $pwaThemeColor }};border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 25px -5px {{ $pwaThemeColor }}40">
-                <svg style="width:32px;height:32px;text-color:white" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-            </div>
-        @endif
-        
+    <div style="display:flex;flex-direction:column;align-items:center;gap:32px;">        
         <div style="width:140px;height:3px;background:#f1f5f9;border-radius:10px;overflow:hidden;position:relative;">
             <div style="position:absolute;top:0;left:0;height:100%;width:45%;background:{{ $pwaThemeColor }};border-radius:10px;animation:splashProgress 1.5s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395)"></div>
         </div>
@@ -43,9 +35,6 @@
 <!-- Cinematic Kiosk Splash (TV Optimized) -->
 <div id="app-splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#020617;z-index:99999;display:flex;align-items:center;justify-content:center;transition:opacity 0.8s ease-in-out, visibility 0.8s;">
     <div style="display:flex;flex-direction:column;align-items:center;gap:24px;">
-        @if(isset($shop) && $shop->logo)
-            <img src="{{ $shop->logo }}" alt="Logo" style="width:120px;height:120px;object-contain;margin-bottom:20px;filter:brightness(1.2)">
-        @endif
         <div style="width:300px;height:2px;background:rgba(255,255,255,0.05);border-radius:10px;overflow:hidden;position:relative;">
             <div style="position:absolute;top:0;left:0;height:100%;width:40%;background:{{ $pwaThemeColor }};border-radius:10px;animation:splashProgress 2s infinite ease-in-out;box-shadow:0 0 20px {{ $pwaThemeColor }}"></div>
         </div>
